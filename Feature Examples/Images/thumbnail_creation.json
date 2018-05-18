@@ -1,0 +1,71 @@
+{
+  "definitions": {
+    "profile_name": "thumbnail_creation",
+		"type": "features",
+    "category": "images",
+		"source_filename": "tears_of_steel_1080p.mov",
+
+		"source_path": "s3://hybrik-examples/public/sources",
+		"destination_basepath": "s3://hybrik-examples/public/output",
+		"source": "{{source_path}}/{{source_filename}}",
+		"destination_path": "{{destination_basepath}}/{{type}}/{{category}}/",
+
+    "destination": "{{destination_path}}{{profile_name}}"
+  },
+  "name": "{{profile_name}}: {{source}}",
+  "payload": {
+    "elements": [
+      {
+        "uid": "source_file",
+        "kind": "source",
+        "payload": {
+          "kind": "asset_url",
+          "payload": {
+            "storage_provider": "s3",
+            "url": "{{source}}"
+          }
+        }
+      },
+      {
+        "uid": "transcode_thumbnails",
+        "kind": "transcode",
+        "payload": {
+          "location": {
+            "storage_provider": "s3",
+            "path": "{{destination}}"
+          },
+          "targets": [
+            {
+              "uid": "thumbnails",
+              "file_pattern": "thumb_%05d.jpg",
+              "existing_files": "replace",
+              "ffmpeg_args": "-q:v 4",
+              "video": {
+                "frame_rate": "1/30",
+                "width": 420,
+                "par": 1,
+                "ar_pad_crop_ratio": 1
+              }
+            }
+          ]
+        }
+      }
+    ],
+    "connections": [
+      {
+        "from": [
+          {
+            "element": "source_file"
+          }
+        ],
+        "to": {
+          "success": [
+            {
+              "element": "transcode_thumbnails"
+            }
+          ]
+        }
+      }
+    ]
+  }
+}

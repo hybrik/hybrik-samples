@@ -1,0 +1,361 @@
+{
+	"definitions": {
+		"profile_name": "hls_advanced_alternate_audio_subtitles",
+		"type": "formats",
+		"category": "hls-dash",
+		"source_filename": "tears_of_steel_720p.mov",
+		"audio_it_filename": "tears_of_steel_italian_audio.mp4",
+		"caption_filename": "TOS-en.scc",
+		"destination_mp4s": "{{destination_path}}{{profile_name}}/fmp4s",
+		"destination_hls_media": "{{destination_path}}{{profile_name}}/hls_media",
+		"destination_hls_manifests": "{{destination_path}}{{profile_name}}/hls_manifests",
+
+		"segment_duration_sec": 6,
+
+		"source_path": "s3://hybrik-examples/public/sources",
+		"destination_basepath": "s3://hybrik-examples/public/output",
+		"source": "{{source_path}}/{{source_filename}}",
+		"destination_path": "{{destination_basepath}}/{{type}}/{{category}}/"
+	},
+	"name": "{{profile_name}}:  {{source_filename}}",
+	"payload": {
+		"elements": [
+			{
+				"uid": "source_file",
+				"kind": "source",
+				"payload": {
+					"kind": "asset_complex",
+					"payload": {
+						"asset_versions": [
+							{
+								"version_uid": "audio_video",
+								"asset_components": [
+									{
+										"component_uid": "audio_video",
+										"kind": "name",
+										"name": "{{source_filename}}",
+										"location": {
+											"storage_provider": "s3",
+											"path": "{{source_path}}"
+										},
+										"contents": [
+											{
+												"kind": "video"
+											},
+											{
+												"kind": "audio",
+												"map": [
+													{
+														"input": {
+															"track": 0
+														},
+														"output": {
+															"track": 0
+														}
+													}
+												]
+											}
+										]
+									},
+									{
+										"component_uid": "audio_it",
+										"kind": "name",
+										"name": "{{audio_it_filename}}",
+										"location": {
+											"storage_provider": "s3",
+											"path": "{{source_path}}"
+										},
+										"contents": [
+											{
+												"kind": "audio",
+												"map": [
+													{
+														"input": {
+															"track": 0
+														},
+														"output": {
+															"track": 1
+														}
+													}
+												]
+											}
+										]
+									},
+									{
+										"kind": "name",
+										"component_uid": "captions",
+										"name": "{{caption_filename}}",
+										"location": {
+											"storage_provider": "s3",
+											"path": "{{source_path}}"
+										},
+										"contents": [
+											{
+												"kind": "closed_caption",
+												"payload": {
+													"format": "scc"
+												}
+											}
+										]
+									}
+								]
+							}
+						]
+					}
+				}
+			},
+			{
+				"uid": "transcode_all_renditions",
+				"kind": "transcode",
+				"task": {
+					"flags": {
+						"split_task": "smart"
+					}
+				},
+				"payload": {
+					"location": {
+						"storage_provider": "s3",
+						"path": "{{destination_mp4s}}"
+					},
+					"targets": [
+						{
+							"file_pattern": "{source_basename}_800kbps{default_extension}",
+							"existing_files": "replace",
+							"container": {
+								"kind": "fmp4",
+								"segment_duration": "{{segment_duration_sec}}"
+							},
+							"video": {
+								"codec": "h264",
+								"bitrate_mode": "cbr",
+								"use_scene_detection": false,
+								"bitrate_kb": 800,
+								"vbv_buffer_size_kb": 800,
+								"profile": "high",
+								"level": "3.1",
+								"height": 486,
+								"par": "1:1",
+								"layer_affinities": [
+									"audio_high"
+								]
+							}
+						},
+						{
+							"file_pattern": "{source_basename}_400kbps{default_extension}",
+							"existing_files": "replace",
+							"container": {
+								"kind": "fmp4",
+								"segment_duration": "{{segment_duration_sec}}"
+							},
+							"video": {
+								"codec": "h264",
+								"bitrate_mode": "cbr",
+								"use_scene_detection": false,
+								"bitrate_kb": 400,
+								"vbv_buffer_size_kb": 400,
+								"profile": "main",
+								"level": "3.0",
+								"height": 360,
+								"par": "1:1",
+								"layer_affinities": [
+									"audio_low"
+								]
+							}
+						},
+						{
+							"file_pattern": "{source_basename}_200kbps{default_extension}",
+							"existing_files": "replace",
+							"container": {
+								"kind": "fmp4",
+								"segment_duration": "{{segment_duration_sec}}"
+							},
+							"video": {
+								"codec": "h264",
+								"bitrate_mode": "cbr",
+								"use_scene_detection": false,
+								"bitrate_kb": 200,
+								"vbv_buffer_size_kb": 200,
+								"profile": "baseline",
+								"level": "3.0",
+								"height": 252,
+								"par": "1:1",
+								"layer_affinities": [
+									"audio_low"
+								]
+							}
+						},
+						{
+							"file_pattern": "{source_basename}_audio_en_64kbps{default_extension}",
+							"existing_files": "replace",
+							"container": {
+								"kind": "fmp4",
+								"segment_duration": "{{segment_duration_sec}}"
+							},
+							"audio": [
+								{
+									"channels": 2,
+									"codec": "aac_lc",
+									"sample_rate": 48000,
+									"bitrate_kb": 64,
+									"layer_id": "audio_low",
+									"language": "english",
+									"source": [
+										{
+											"track": 0
+										}
+									]
+								}
+							]
+						},
+						{
+							"file_pattern": "{source_basename}_audio_en_128kbps{default_extension}",
+							"existing_files": "replace",
+							"container": {
+								"kind": "fmp4",
+								"segment_duration": "{{segment_duration_sec}}"
+							},
+							"audio": [
+								{
+									"channels": 2,
+									"codec": "aac_lc",
+									"sample_rate": 48000,
+									"bitrate_kb": 128,
+									"layer_id": "audio_high",
+									"language": "english",
+									"source": [
+										{
+											"track": 0
+										}
+									]
+								}
+							]
+						},
+						{
+							"file_pattern": "{source_basename}_audio_it_64kbps{default_extension}",
+							"existing_files": "replace",
+							"container": {
+								"kind": "fmp4",
+								"segment_duration": "{{segment_duration_sec}}"
+							},
+							"audio": [
+								{
+									"channels": 2,
+									"codec": "aac_lc",
+									"sample_rate": 48000,
+									"bitrate_kb": 64,
+									"layer_id": "audio_low",
+									"language": "italian",
+									"source": [
+										{
+											"track": 1
+										}
+									]
+								}
+							]
+						},
+						{
+							"file_pattern": "{source_basename}_audio_it_128kbps{default_extension}",
+							"existing_files": "replace",
+							"container": {
+								"kind": "fmp4",
+								"segment_duration": "{{segment_duration_sec}}"
+							},
+							"audio": [
+								{
+									"channels": 2,
+									"codec": "aac_lc",
+									"sample_rate": 48000,
+									"bitrate_kb": 128,
+									"layer_id": "audio_high",
+									"language": "italian",
+									"source": [
+										{
+											"track": 1
+										}
+									]
+								}
+							]
+						}
+					]
+				}
+			},
+			{
+				"uid": "hls_single_ts",
+				"kind": "package",
+				"payload": {
+					"uid": "main_manifest",
+					"kind": "hls",
+					"location": {
+						"storage_provider": "s3",
+						"path": "{{destination_hls_manifests}}"
+					},
+					"file_pattern": "master_manifest.m3u8",
+					"segmentation_mode": "single_ts",
+					"force_original_media": false,
+					"closed_captions": [
+						{
+							"cc_index": 1,
+							"language": "english",
+							"is_default": true,
+							"is_autoselect": true
+						}
+					],
+					"media_location": {
+						"storage_provider": "s3",
+						"path": "{{destination_hls_media}}",
+						"attributes": [
+							{
+								"name": "ContentType",
+								"value": "video/MP2T"
+							}
+						]
+					},
+					"media_file_pattern": "{source_basename}.ts",
+					"hls": {
+						"version": 7,
+						"media_playlist_location": {
+							"storage_provider": "s3",
+							"path": "{{destination_hls_manifests}}",
+							"attributes": [
+								{
+									"name": "ContentType",
+									"value": "application/x-mpegURL"
+								}
+							]
+						}
+					}
+				}
+			}
+		],
+		"connections": [
+			{
+				"from": [
+					{
+						"element": "source_file"
+					}
+				],
+				"to": {
+					"success": [
+						{
+							"element": "transcode_all_renditions"
+						}
+					]
+				}
+			},
+			{
+				"from": [
+					{
+						"element": "transcode_all_renditions"
+					}
+				],
+				"to": {
+					"success": [
+						{
+							"element": "hls_single_ts"
+						}
+					]
+				}
+			}
+		]
+	}
+}

@@ -1,0 +1,105 @@
+{
+  "definitions": {
+    "profile_name": "BIF_creation",
+		"type": "features",
+    "category": "advanced_outputs",
+		"source_filename": "tears_of_steel_720p.mov",
+
+		"source_path": "s3://hybrik-examples/public/sources",
+		"destination_basepath": "s3://hybrik-examples/public/output",
+		"source": "{{source_path}}/{{source_filename}}",
+		"destination_path": "{{destination_basepath}}/{{type}}/{{category}}/"
+  },
+  "name": "{{profile_name}}:  {{source}}",
+  "payload": {
+    "elements": [
+      {
+        "uid": "source_file",
+        "kind": "source",
+        "payload": {
+          "kind": "asset_url",
+          "payload": {
+            "storage_provider": "s3",
+            "url": "{{source}}"
+          }
+        }
+      },
+      {
+        "uid": "transcode_task",
+        "kind": "transcode",
+        "payload": {
+          "location": {
+            "storage_provider": "s3",
+            "path": "{{destination_path}}"
+          },
+          "targets": [
+            {
+              "file_pattern": "{{profile_name}}{default_extension}",
+              "existing_files": "replace",
+              "container": {
+                "kind": "mp4"
+              },
+              "video": {
+                "codec": "h264",
+                "height": 480,
+                "bitrate_kb": 800
+              },
+              "audio": [
+                {
+                  "codec": "heaac_v2",
+                  "channels": 2,
+                  "sample_rate": 48000,
+                  "bitrate_kb": 128
+                }
+              ]
+            }
+          ]
+        }
+      },
+      {
+        "uid": "bif_creator",
+        "kind": "bif_creator",
+        "payload": {
+          "source_stream_selection": "highest",
+          "location": {
+            "storage_provider": "s3",
+            "path": "{{destination_path}}"
+          },
+          "base_name": "{source_basename}",
+          "include_in_result": true,
+          "existing_files": "replace"
+        }
+      }
+    ],
+    "connections": [
+      {
+        "from": [
+          {
+            "element": "source_file"
+          }
+        ],
+        "to": {
+          "success": [
+            {
+              "element": "transcode_task"
+            }
+          ]
+        }
+      },
+      {
+        "from": [
+          {
+            "element": "transcode_task"
+          }
+        ],
+        "to": {
+          "success": [
+            {
+              "element": "bif_creator"
+            }
+          ]
+        }
+      }
+    ]
+  }
+}

@@ -1,0 +1,55 @@
+{
+  "definitions": {
+    "profile_name": "delete_folder",
+		"type": "features",
+    "category": "data_movement",
+
+		"destination_basepath": "s3://hybrik-examples/public/output",
+		"destination_path": "{{destination_basepath}}/{{type}}/{{category}}/",
+
+    "destination": "{{destination_path}}copy_folder"
+  },
+  "name": "{{profile_name}}:  {{destination}}",
+  "payload": {
+    "elements": [
+      {
+        "uid": "folder_enum",
+        "kind": "folder_enum",
+        "payload": {
+          "source": {
+            "storage_provider": "s3",
+            "path": "{{destination}}"
+          },
+          "settings": {
+            "pattern_matching": "wildcard",
+            "wildcard": "*",
+            "recursive": true
+          }
+        }
+      },
+      {
+        "uid": "delete_task",
+        "kind": "delete_asset",
+        "payload": {
+          "asset_selector": "workflow_document"
+        }
+      }
+    ],
+    "connections": [
+      {
+        "from": [
+          {
+            "element": "folder_enum"
+          }
+        ],
+        "to": {
+          "success": [
+            {
+              "element": "delete_task"
+            }
+          ]
+        }
+      }
+    ]
+  }
+}

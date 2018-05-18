@@ -1,0 +1,113 @@
+{
+  "definitions": {
+    "profile_name": "alternate_audio_tracks",
+		"type": "features",
+    "category": "audio",
+		"source_filename": "tears_of_steel_1080p.mov",
+		"alternate_audio": "tears_of_steel_italian_audio.mp4",
+
+		"source_path": "s3://hybrik-examples/public/sources",
+		"destination_basepath": "s3://hybrik-examples/public/output",
+		"source": "{{source_path}}/{{source_filename}}",
+		"destination_path": "{{destination_basepath}}/{{type}}/{{category}}/"
+  },
+  "name": "{{profile_name}}:  {{source}}",
+  "payload": {
+    "elements": [
+      {
+        "uid": "sources",
+        "kind": "source",
+        "payload": {
+          "kind": "asset_complex",
+          "payload": {
+            "asset_versions": [
+              {
+                "version_uid": "asset",
+                "asset_components": [
+                  {
+                    "component_uid": "source_filename",
+                    "kind": "name",
+                    "name": "{{source_filename}}",
+                    "location": {
+                      "storage_provider": "s3",
+                      "path": "{{source_path}}"
+                    },
+                    "contents": [
+                      {
+                        "kind": "video"
+                      }
+                    ]
+                  },
+                  {
+                    "component_uid": "alternate_audio",
+                    "kind": "name",
+                    "name": "{{alternate_audio}}",
+                    "location": {
+                      "storage_provider": "s3",
+                      "path": "{{source_path}}"
+                    },
+                    "contents": [
+                      {
+                        "kind": "audio"
+                      }
+                    ]
+                  }
+                ]
+              }
+            ]
+          }
+        }
+      },
+      {
+        "uid": "transcode_task",
+        "kind": "transcode",
+        "payload": {
+          "location": {
+            "storage_provider": "s3",
+            "path": "{{destination_path}}"
+          },
+          "targets": [
+            {
+              "file_pattern": "{source_basename}_alt_language{default_extension}",
+              "existing_files": "replace",
+              "container": {
+                "kind": "mov"
+              },
+              "video": {
+                "codec": "prores",
+                "profile": "apcn",
+                "width": 1920,
+                "height": 1080
+              },
+              "audio": [
+                {
+                  "codec": "pcm",
+                  "channels": 2,
+                  "sample_rate": 48000,
+                  "sample_size": 16,
+                  "language": "it"
+                }
+              ]
+            }
+          ]
+        }
+      }
+    ],
+    "connections": [
+      {
+        "from": [
+          {
+            "element": "sources"
+          }
+        ],
+        "to": {
+          "success": [
+            {
+              "element": "transcode_task"
+            }
+          ]
+        }
+      }
+    ]
+  }
+}

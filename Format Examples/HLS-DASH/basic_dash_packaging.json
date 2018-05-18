@@ -1,0 +1,188 @@
+{
+	"definitions": {
+		"profile_name": "basic_dash_packaging",
+		"type": "formats",
+		"category": "hls-dash",
+		"source_filename": "tears_of_steel_720p.mov",
+		"destination_mp4s": "{{destination_path}}{{profile_name}}/mp4s",
+		"destination_dash_manifests": "{{destination_path}}{{profile_name}}/dash_manifests",
+
+		"source_path": "s3://hybrik-examples/public/sources",
+		"destination_basepath": "s3://hybrik-examples/public/output",
+		"source": "{{source_path}}/{{source_filename}}",
+		"destination_path": "{{destination_basepath}}/{{type}}/{{category}}/"
+	},
+	"name": "{{profile_name}}:  {{source}}",
+	"payload": {
+		"elements": [
+			{
+				"uid": "source_file",
+				"kind": "source",
+				"payload": {
+					"kind": "asset_url",
+					"payload": {
+						"storage_provider": "s3",
+						"url": "{{source}}"
+					}
+				}
+			},
+			{
+				"uid": "transcode_all_renditions",
+				"kind": "transcode",
+				"payload": {
+					"location": {
+						"storage_provider": "s3",
+						"path": "{{destination_mp4s}}"
+					},
+					"targets": [
+						{
+							"file_pattern": "{source_basename}_800kbps{default_extension}",
+							"existing_files": "replace",
+							"container": {
+								"kind": "fmp4",
+								"segment_duration": 6
+							},
+							"video": {
+								"codec": "h264",
+								"bitrate_mode": "cbr",
+								"use_scene_detection": false,
+								"bitrate_kb": 800,
+								"vbv_buffer_size_kb": 800,
+								"profile": "high",
+								"level": "3.1",
+								"height": 486,
+								"par": "1:1",
+								"layer_affinities": [
+									"audio_high"
+								]
+							}
+						},
+						{
+							"file_pattern": "{source_basename}_400kbps{default_extension}",
+							"existing_files": "replace",
+							"container": {
+								"kind": "fmp4",
+								"segment_duration": 6
+							},
+							"video": {
+								"codec": "h264",
+								"bitrate_mode": "cbr",
+								"use_scene_detection": false,
+								"bitrate_kb": 400,
+								"vbv_buffer_size_kb": 400,
+								"profile": "main",
+								"level": "3.0",
+								"height": 360,
+								"par": "1:1",
+								"layer_affinities": [
+									"audio_low"
+								]
+							}
+						},
+						{
+							"file_pattern": "{source_basename}_200kbps{default_extension}",
+							"existing_files": "replace",
+							"container": {
+								"kind": "fmp4",
+								"segment_duration": 6
+							},
+							"video": {
+								"codec": "h264",
+								"bitrate_mode": "cbr",
+								"use_scene_detection": false,
+								"bitrate_kb": 200,
+								"vbv_buffer_size_kb": 200,
+								"profile": "baseline",
+								"level": "3.0",
+								"height": 252,
+								"par": "1:1",
+								"layer_affinities": [
+									"audio_low"
+								]
+							}
+						},
+						{
+							"file_pattern": "{source_basename}_audio_64kbps{default_extension}",
+							"existing_files": "replace",
+							"container": {
+								"kind": "fmp4",
+								"segment_duration": 6
+							},
+							"audio": [
+								{
+									"channels": 2,
+									"codec": "aac_lc",
+									"sample_rate": 48000,
+									"bitrate_kb": 64,
+									"layer_id": "audio_low"
+								}
+							]
+						},
+						{
+							"file_pattern": "{source_basename}_audio_128kbps{default_extension}",
+							"existing_files": "replace",
+							"container": {
+								"kind": "fmp4",
+								"segment_duration": 6
+							},
+							"audio": [
+								{
+									"channels": 2,
+									"codec": "aac_lc",
+									"sample_rate": 48000,
+									"bitrate_kb": 128,
+									"layer_id": "audio_high"
+								}
+							]
+						}
+					]
+				}
+			},
+			{
+				"uid": "dash_fmp4",
+				"kind": "package",
+				"payload": {
+					"uid": "main_manifest",
+					"kind": "dash",
+					"location": {
+						"storage_provider": "s3",
+						"path": "{{destination_dash_manifests}}"
+					},
+					"file_pattern": "master_manifest.mpd",
+					"segmentation_mode": "fmp4",
+					"force_original_media": true
+				}
+			}
+		],
+		"connections": [
+			{
+				"from": [
+					{
+						"element": "source_file"
+					}
+				],
+				"to": {
+					"success": [
+						{
+							"element": "transcode_all_renditions"
+						}
+					]
+				}
+			},
+			{
+				"from": [
+					{
+						"element": "transcode_all_renditions"
+					}
+				],
+				"to": {
+					"success": [
+						{
+							"element": "dash_fmp4"
+						}
+					]
+				}
+			}
+		]
+	}
+}

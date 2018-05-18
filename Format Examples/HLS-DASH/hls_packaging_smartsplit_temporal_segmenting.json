@@ -1,0 +1,248 @@
+{
+	"definitions": {
+		"profile_name": "hls_packaging_smartsplit_temporal_segmenting",
+		"type": "formats",
+		"category": "hls-dash",
+		"source_filename": "tears_of_steel_720p.mov",
+		"destination_mp4s": "{{destination_path}}{{profile_name}}/mp4s",
+		"destination_hls_media": "{{destination_path}}{{profile_name}}/hls_media",
+		"destination_hls_manifests": "{{destination_path}}{{profile_name}}/hls_manifests",
+
+		"temporal_segment_duration": 60,
+		
+		"source_path": "s3://hybrik-examples/public/sources",
+		"destination_basepath": "s3://hybrik-examples/public/output",
+		"source": "{{source_path}}/{{source_filename}}",
+		"destination_path": "{{destination_basepath}}/{{type}}/{{category}}/"
+
+	},
+	"name": "{{profile_name}}:  {{source}}",
+	"payload": {
+		"elements": [
+			{
+				"uid": "source_file",
+				"kind": "source",
+				"payload": {
+					"kind": "asset_url",
+					"payload": {
+						"storage_provider": "s3",
+						"url": "{{source}}"
+					}
+				}
+			},
+			{
+				"uid": "transcode_video",
+				"kind": "transcode",
+				"task": {
+					"flags": {
+						"split_task": "smart"
+					}
+				},
+				"payload": {
+					"source_pipeline": {
+						"segmented_rendering": {
+							"duration_sec": 60
+						}
+					},
+					"location": {
+						"storage_provider": "s3",
+						"path": "{{destination_mp4s}}"
+					},
+					"targets": [
+						{
+							"file_pattern": "{source_basename}_800kbps{default_extension}",
+							"existing_files": "replace",
+							"container": {
+								"kind": "mp4",
+								"segment_duration": 6
+							},
+							"video": {
+								"codec": "h264",
+								"bitrate_mode": "cbr",
+								"use_scene_detection": false,
+								"bitrate_kb": 800,
+								"vbv_buffer_size_kb": 800,
+								"profile": "high",
+								"level": "3.1",
+								"height": 486,
+								"par": "1:1",
+								"layer_affinities": [
+									"audio_high"
+								]
+							}
+						},
+						{
+							"file_pattern": "{source_basename}_400kbps{default_extension}",
+							"existing_files": "replace",
+							"container": {
+								"kind": "mp4",
+								"segment_duration": 6
+							},
+							"video": {
+								"codec": "h264",
+								"bitrate_mode": "cbr",
+								"use_scene_detection": false,
+								"bitrate_kb": 400,
+								"vbv_buffer_size_kb": 400,
+								"profile": "main",
+								"level": "3.0",
+								"height": 360,
+								"par": "1:1",
+								"layer_affinities": [
+									"audio_low"
+								]
+							}
+						},
+						{
+							"file_pattern": "{source_basename}_200kbps{default_extension}",
+							"existing_files": "replace",
+							"container": {
+								"kind": "mp4",
+								"segment_duration": 6
+							},
+							"video": {
+								"codec": "h264",
+								"bitrate_mode": "cbr",
+								"use_scene_detection": false,
+								"bitrate_kb": 200,
+								"vbv_buffer_size_kb": 200,
+								"profile": "baseline",
+								"level": "3.0",
+								"height": 252,
+								"par": "1:1",
+								"layer_affinities": [
+									"audio_low"
+								]
+							}
+						}
+					]
+				}
+			},
+			{
+				"uid": "transcode_audio",
+				"kind": "transcode",
+				"task": {
+					"flags": {
+						"split_task": "smart"
+					}
+				},
+				"payload": {
+					"location": {
+						"storage_provider": "s3",
+						"path": "{{destination_mp4s}}"
+					},
+					"targets": [
+						{
+							"file_pattern": "{source_basename}_audio_64kbps{default_extension}",
+							"existing_files": "replace",
+							"container": {
+								"kind": "mp4",
+								"segment_duration": 6
+							},
+							"audio": [
+								{
+									"channels": 2,
+									"codec": "aac_lc",
+									"sample_rate": 48000,
+									"bitrate_kb": 64,
+									"layer_id": "audio_low"
+								}
+							]
+						},
+						{
+							"file_pattern": "{source_basename}_audio_128kbps{default_extension}",
+							"existing_files": "replace",
+							"container": {
+								"kind": "mp4",
+								"segment_duration": 6
+							},
+							"audio": [
+								{
+									"channels": 2,
+									"codec": "aac_lc",
+									"sample_rate": 48000,
+									"bitrate_kb": 128,
+									"layer_id": "audio_high"
+								}
+							]
+						}
+					]
+				}
+			},
+			{
+				"uid": "hls_single_ts",
+				"kind": "package",
+				"payload": {
+					"uid": "main_manifest",
+					"kind": "hls",
+					"location": {
+						"storage_provider": "s3",
+						"path": "{{destination_hls_manifests}}",
+						"attributes": [
+							{
+								"name": "ContentType",
+								"value": "application/x-mpegURL"
+							}
+						]
+					},
+					"file_pattern": "master_manifest.m3u8",
+					"segmentation_mode": "single_ts",
+					"force_original_media": false,
+					"media_location": {
+						"storage_provider": "s3",
+						"path": "{{destination_hls_media}}",
+						"attributes": [
+							{
+								"name": "ContentType",
+								"value": "video/MP2T"
+							}
+						]
+					},
+					"media_file_pattern": "{source_basename}.ts",
+					"hls": {
+						"media_playlist_location": {
+							"storage_provider": "s3",
+							"path": "{{destination_hls_manifests}}"
+						}
+					}
+				}
+			}
+		],
+		"connections": [
+			{
+				"from": [
+					{
+						"element": "source_file"
+					}
+				],
+				"to": {
+					"success": [
+						{
+							"element": "transcode_video"
+						},
+						{
+							"element": "transcode_audio"
+						}
+					]
+				}
+			},
+			{
+				"from": [
+					{
+						"element": "transcode_video"
+					},
+					{
+						"element": "transcode_audio"
+					}
+				],
+				"to": {
+					"success": [
+						{
+							"element": "hls_single_ts"
+						}
+					]
+				}
+			}
+		]
+	}
+}
