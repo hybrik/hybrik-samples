@@ -1,119 +1,118 @@
 {
-  "definitions": {
-    "profile_name": "stitching",
+	"definitions": {
+		"profile_name": "stitching",
 		"type": "features",
-    "category": "stitch_and_trim",
+		"category": "stitch_and_trim",
 		"source1_filename": "bars_and_tone_30sec.mp4",
 		"source2_filename": "tears_of_steel_720p.mov",
-
 		"source_path": "s3://hybrik-examples/public/sources",
 		"destination_basepath": "s3://hybrik-examples/public/output",
 		"source": "{{source_path}}/{{source_filename}}",
 		"destination_path": "{{destination_basepath}}/{{type}}/{{category}}/"
-  },
-  "name": "{{profile_name}}:  {{source2_filename}}",
-  "payload": {
-    "elements": [
-      {
-        "uid": "sources",
-        "kind": "source",
-        "payload": {
-          "kind": "asset_complex",
-          "payload": {
-            "asset_versions": [
-              {
-                "version_uid": "file1",
-                "asset_components": [
-                  {
-                    "component_uid": "audio_video",
-                    "kind": "name",
-                    "name": "{{source1_filename}}",
-                    "location": {
-                      "storage_provider": "s3",
-                      "path": "{{source_path}}"
-                    },
-                    "trim": {
-                      "inpoint_sec": 2,
-                      "outpoint_sec": 7
-                    }
-                  }
-                ]
-              },
-              {
-                "version_uid": "asset",
-                "asset_components": [
-                  {
-                    "component_uid": "file2",
-                    "kind": "name",
-                    "name": "{{source2_filename}}",
-                    "location": {
-                      "storage_provider": "s3",
-                      "path": "{{source_path}}"
-                    },
-                    "trim": {
-                      "inpoint_sec": 30,
-                      "outpoint_sec": 60
-                    }
-                  }
-                ]
-              }
-            ]
-          }
-        }
-      },
-      {
-        "kind": "transcode",
-        "uid": "transcode_task",
-        "payload": {
-          "location": {
-            "storage_provider": "s3",
-            "path": "{{destination_path}}"
-          },
-          "targets": [
-            {
-              "file_pattern": "{{profile_name}}{default_extension}",
-              "existing_files": "replace",
-              "container": {
-                "kind": "mp4",
-                "faststart": true
-              },
-              "video": {
-                "width": 960,
-                "height": 540,
-                "codec": "h264",
-                "profile": "high",
-                "crf": "23"
-              },
-              "audio": [
-                {
-                  "codec": "aac",
-                  "channels": 2,
-                  "sample_rate": 48000,
-                  "sample_size": 16,
-                  "bitrate_kb": 128,
-                  "bitrate_mode": "vbr"
-                }
-              ]
-            }
-          ]
-        }
-      }
-    ],
-    "connections": [
-      {
-        "from": [
-          {
-            "element": "sources"
-          }
-        ],
-        "to": {
-          "success": [
-            {
-              "element": "transcode_task"
-            }
-          ]
-        }
-      }
-    ]
-  }
+	},
+	"name": "{{profile_name}}:  {{source2_filename}}",
+	"payload": {
+		"elements": [
+			{
+				"uid": "sources",
+				"kind": "source",
+				"payload": {
+					"kind": "asset_complex",
+					"payload": {
+						"asset_versions": [
+							{
+								"version_uid": "file1",
+								"asset_components": [
+									{
+										"component_uid": "audio_video",
+										"kind": "name",
+										"name": "{{source1_filename}}",
+										"location": {
+											"storage_provider": "s3",
+											"path": "{{source_path}}"
+										},
+										"trim": {
+											"inpoint_sec": 2,
+											"outpoint_sec": 7
+										}
+									}
+								]
+							},
+							{
+								"version_uid": "asset",
+								"asset_components": [
+									{
+										"component_uid": "file2",
+										"kind": "name",
+										"name": "{{source2_filename}}",
+										"location": {
+											"storage_provider": "s3",
+											"path": "{{source_path}}"
+										},
+										"trim": {
+											"inpoint_sec": 30,
+											"outpoint_sec": 60
+										}
+									}
+								]
+							}
+						]
+					}
+				}
+			},
+			{
+				"kind": "transcode",
+				"uid": "transcode_task",
+				"payload": {
+					"location": {
+						"storage_provider": "s3",
+						"path": "{{destination_path}}"
+					},
+					"targets": [
+						{
+							"file_pattern": "{{profile_name}}{default_extension}",
+							"existing_files": "replace",
+							"container": {
+								"kind": "mp4",
+								"faststart": true
+							},
+							"video": {
+								"width": 960,
+								"height": 540,
+								"codec": "h264",
+								"profile": "high",
+								"crf": "23"
+							},
+							"audio": [
+								{
+									"codec": "aac",
+									"channels": 2,
+									"sample_rate": 48000,
+									"sample_size": 16,
+									"bitrate_kb": 128,
+									"bitrate_mode": "vbr"
+								}
+							]
+						}
+					]
+				}
+			}
+		],
+		"connections": [
+			{
+				"from": [
+					{
+						"element": "sources"
+					}
+				],
+				"to": {
+					"success": [
+						{
+							"element": "transcode_task"
+						}
+					]
+				}
+			}
+		]
+	}
 }

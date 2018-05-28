@@ -1,65 +1,64 @@
 {
-  "definitions": {
-    "profile_name": "copy_folder",
+	"definitions": {
+		"profile_name": "copy_folder",
 		"type": "features",
-    "category": "data_movement",
-				
+		"category": "data_movement",
 		"source_path": "s3://hybrik-examples/public/sources",
 		"destination_basepath": "s3://hybrik-examples/public/output",
 		"destination_path": "{{destination_basepath}}/{{type}}/{{category}}/",
-    "destination": "{{destination_path}}{{profile_name}}"
-  },
-  "name": "{{profile_name}}:  {{source_path}}",
-  "payload": {
-    "elements": [
-      {
-        "uid": "folder_enum",
-        "kind": "folder_enum",
-        "payload": {
-          "source": {
-            "storage_provider": "s3",
-            "path": "{{source_path}}"
-          },
-          "settings": {
-            "pattern_matching": "wildcard",
-            "wildcard": "*",
-            "recursive": true
-          }
-        }
-      },
-      {
-        "kind": "copy",
-        "uid": "copy_task",
-        "payload": {
-          "target": {
-            "location": {
-              "kind": "s3",
-              "path": "{{destination}}/{source_relative_folder}"
-            },
-            "existing_files": "replace",
-            "file_pattern": "%F"
-          },
-          "options": {
-            "delete_source_on_completion": false
-          }
-        }
-      }
-    ],
-    "connections": [
-      {
-        "from": [
-          {
-            "element": "folder_enum"
-          }
-        ],
-        "to": {
-          "success": [
-            {
-              "element": "copy_task"
-            }
-          ]
-        }
-      }
-    ]
-  }
+		"destination": "{{destination_path}}{{profile_name}}"
+	},
+	"name": "{{profile_name}}:  {{source_path}}",
+	"payload": {
+		"elements": [
+			{
+				"uid": "folder_enum",
+				"kind": "folder_enum",
+				"payload": {
+					"source": {
+						"storage_provider": "s3",
+						"path": "{{source_path}}"
+					},
+					"settings": {
+						"pattern_matching": "wildcard",
+						"wildcard": "*",
+						"recursive": true
+					}
+				}
+			},
+			{
+				"kind": "copy",
+				"uid": "copy_task",
+				"payload": {
+					"target": {
+						"location": {
+							"kind": "s3",
+							"path": "{{destination}}/{source_relative_folder}"
+						},
+						"existing_files": "replace",
+						"file_pattern": "%F"
+					},
+					"options": {
+						"delete_source_on_completion": false
+					}
+				}
+			}
+		],
+		"connections": [
+			{
+				"from": [
+					{
+						"element": "folder_enum"
+					}
+				],
+				"to": {
+					"success": [
+						{
+							"element": "copy_task"
+						}
+					]
+				}
+			}
+		]
+	}
 }

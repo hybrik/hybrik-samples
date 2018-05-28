@@ -1,97 +1,96 @@
 {
-  "definitions": {
-    "profile_name": "analyze_black_detection_plus_qc",
+	"definitions": {
+		"profile_name": "analyze_black_detection_plus_qc",
 		"type": "features",
-    "category": "analysis",
+		"category": "analysis",
 		"source_filename": "tears_of_steel_1080p.mov",
-
 		"source_path": "s3://hybrik-examples/public/sources",
 		"source": "{{source_path}}/{{source_filename}}"
-  },
-  "name": "{{profile_name}}:  {{source}}",
-  "payload": {
-    "elements": [
-      {
-        "uid": "source_file",
-        "kind": "source",
-        "payload": {
-          "kind": "asset_url",
-          "payload": {
-            "storage_provider": "s3",
-            "url": "{{source}}"
-          }
-        }
-      },
-      {
-        "uid": "analyze_task",
-        "kind": "analyze",
-        "payload": {
-          "general_properties": {
-            "enabled": true
-          },
-          "deep_properties": {
-            "video": {
-              "black": {
-                "enabled": true,
-                "duration_sec": 5.0,
-                "black_pixel_ratio": 1.0
-              }
-            }
-          }
-        }
-      },
-      {
-        "uid": "qc_task",
-        "kind": "qc",
-        "task": {
-          "retry_method": "fail"
-        },
-        "payload": {
-          "video": {
-            "black_sec": {
-              "enabled": true,
-              "conditions": [
-                [
-                  {
-                    "op": "<=",
-                    "value": 5
-                  }
-                ]
-              ]
-            }
-          }
-        }
-      }
-    ],
-    "connections": [
-      {
-        "from": [
-          {
-            "element": "source_file"
-          }
-        ],
-        "to": {
-          "success": [
-            {
-              "element": "analyze_task"
-            }
-          ]
-        }
-      },
-      {
-        "from": [
-          {
-            "element": "analyze_task"
-          }
-        ],
-        "to": {
-          "success": [
-            {
-              "element": "qc_task"
-            }
-          ]
-        }
-      }
-    ]
-  }
+	},
+	"name": "{{profile_name}}:  {{source}}",
+	"payload": {
+		"elements": [
+			{
+				"uid": "source_file",
+				"kind": "source",
+				"payload": {
+					"kind": "asset_url",
+					"payload": {
+						"storage_provider": "s3",
+						"url": "{{source}}"
+					}
+				}
+			},
+			{
+				"uid": "analyze_task",
+				"kind": "analyze",
+				"payload": {
+					"general_properties": {
+						"enabled": true
+					},
+					"deep_properties": {
+						"video": {
+							"black": {
+								"enabled": true,
+								"duration_sec": 5.0,
+								"black_pixel_ratio": 1.0
+							}
+						}
+					}
+				}
+			},
+			{
+				"uid": "qc_task",
+				"kind": "qc",
+				"task": {
+					"retry_method": "fail"
+				},
+				"payload": {
+					"video": {
+						"black_sec": {
+							"enabled": true,
+							"conditions": [
+								[
+									{
+										"op": "<=",
+										"value": 5
+									}
+								]
+							]
+						}
+					}
+				}
+			}
+		],
+		"connections": [
+			{
+				"from": [
+					{
+						"element": "source_file"
+					}
+				],
+				"to": {
+					"success": [
+						{
+							"element": "analyze_task"
+						}
+					]
+				}
+			},
+			{
+				"from": [
+					{
+						"element": "analyze_task"
+					}
+				],
+				"to": {
+					"success": [
+						{
+							"element": "qc_task"
+						}
+					]
+				}
+			}
+		]
+	}
 }

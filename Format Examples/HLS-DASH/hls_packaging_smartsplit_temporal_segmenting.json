@@ -7,14 +7,11 @@
 		"destination_mp4s": "{{destination_path}}{{profile_name}}/mp4s",
 		"destination_hls_media": "{{destination_path}}{{profile_name}}/hls_media",
 		"destination_hls_manifests": "{{destination_path}}{{profile_name}}/hls_manifests",
-
 		"temporal_segment_duration": 60,
-		
 		"source_path": "s3://hybrik-examples/public/sources",
 		"destination_basepath": "s3://hybrik-examples/public/output",
 		"source": "{{source_path}}/{{source_filename}}",
 		"destination_path": "{{destination_basepath}}/{{type}}/{{category}}/"
-
 	},
 	"name": "{{profile_name}}:  {{source}}",
 	"payload": {

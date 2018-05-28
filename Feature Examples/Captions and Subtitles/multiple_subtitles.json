@@ -1,182 +1,181 @@
 {
-  "definitions": {
-    "profile_name": "multiple_subtitles",
+	"definitions": {
+		"profile_name": "multiple_subtitles",
 		"type": "features",
-    "category": "captions_and_subtitles",
-    "source_filename": "tears_of_steel_720p.mov",
-    "english_subtitle": "TOS-en.scc",
-    "german_subtitle": "TOS-de.srt",
-    "spanish_subtitle": "TOS-es.srt",
-
+		"category": "captions_and_subtitles",
+		"source_filename": "tears_of_steel_720p.mov",
+		"english_subtitle": "TOS-en.scc",
+		"german_subtitle": "TOS-de.srt",
+		"spanish_subtitle": "TOS-es.srt",
 		"source_path": "s3://hybrik-examples/public/sources",
 		"destination_basepath": "s3://hybrik-examples/public/output",
 		"source": "{{source_path}}/{{source_filename}}",
 		"destination_path": "{{destination_basepath}}/{{type}}/{{category}}/"
-  },
-  "name": "{{profile_name}}:  {{source}}",
-  "payload": {
-    "elements": [
-      {
-        "uid": "sources",
-        "kind": "source",
-        "payload": {
-          "kind": "asset_complex",
-          "payload": {
-            "asset_versions": [
-              {
-                "asset_components": [
-                  {
-                    "kind": "name",
-                    "name": "{{source_filename}}",
-                    "location": {
-                      "storage_provider": "s3",
-                      "path": "{{source_path}}"
-                    },
-                    "contents": [
-                      {
-                        "kind": "video"
-                      },
-                      {
-                        "kind": "audio"
-                      }
-                    ],
-                    "trim": {
-                      "inpoint_sec": 180,
-                      "outpoint_sec": 280
-                    }
-                  },
-                  {
-                    "kind": "name",
-                    "name": "{{english_subtitle}}",
-                    "location": {
-                      "storage_provider": "s3",
-                      "path": "{{source_path}}"
-                    },
-                    "contents": [
-                      {
-                        "kind": "subtitle",
-                        "payload": {
-                          "standard": "auto",
-                          "language": "english",
-                          "sync_to_timecode": true
-                        }
-                      }
-                    ],
-                    "trim": {
-                      "inpoint_sec": 180,
-                      "outpoint_sec": 280
-                    }
-                  },
-                  {
-                    "kind": "name",
-                    "name": "{{german_subtitle}}",
-                    "location": {
-                      "storage_provider": "s3",
-                      "path": "{{source_path}}"
-                    },
-                    "contents": [
-                      {
-                        "kind": "subtitle",
-                        "payload": {
-                          "standard": "auto",
-                          "language": "german",
-                          "sync_to_timecode": true
-                        }
-                      }
-                    ],
-                    "trim": {
-                      "inpoint_sec": 180,
-                      "outpoint_sec": 280
-                    }
-                  },
-                  {
-                    "kind": "name",
-                    "name": "{{spanish_subtitle}}",
-                    "location": {
-                      "storage_provider": "s3",
-                      "path": "{{source_path}}"
-                    },
-                    "contents": [
-                      {
-                        "kind": "subtitle",
-                        "payload": {
-                          "standard": "auto",
-                          "language": "spanish",
-                          "sync_to_timecode": true
-                        }
-                      }
-                    ],
-                    "trim": {
-                      "inpoint_sec": 180,
-                      "outpoint_sec": 280
-                    }
-                  }
-                ]
-              }
-            ]
-          }
-        }
-      },
-      {
-        "kind": "transcode",
-        "uid": "transcode_task",
-        "payload": {
-          "location": {
-            "storage_provider": "s3",
-            "path": "{{destination_path}}"
-          },
-          "targets": [
-            {
-              "file_pattern": "{{profile_name}}{default_extension}",
-              "existing_files": "replace",
-              "container": {
-                "kind": "mp4",
-                "faststart": true
-              },
-              "video": {
-                "width": 1200,
-                "codec": "h264",
-                "profile": "high",
-                "crf": "23",
-                "filters": [
-                  {
-                    "kind": "print_subtitle",
-                    "payload": {
-                      "y_offset": "20%"
-                    }
-                  }
-                ]
-              },
-              "audio": [
-                {
-                  "codec": "aac",
-                  "channels": 2,
-                  "sample_rate": 48000,
-                  "sample_size": 16,
-                  "bitrate_kb": 128,
-                  "bitrate_mode": "vbr"
-                }
-              ]
-            }
-          ]
-        }
-      }
-    ],
-    "connections": [
-      {
-        "from": [
-          {
-            "element": "sources"
-          }
-        ],
-        "to": {
-          "success": [
-            {
-              "element": "transcode_task"
-            }
-          ]
-        }
-      }
-    ]
-  }
+	},
+	"name": "{{profile_name}}:  {{source}}",
+	"payload": {
+		"elements": [
+			{
+				"uid": "sources",
+				"kind": "source",
+				"payload": {
+					"kind": "asset_complex",
+					"payload": {
+						"asset_versions": [
+							{
+								"asset_components": [
+									{
+										"kind": "name",
+										"name": "{{source_filename}}",
+										"location": {
+											"storage_provider": "s3",
+											"path": "{{source_path}}"
+										},
+										"contents": [
+											{
+												"kind": "video"
+											},
+											{
+												"kind": "audio"
+											}
+										],
+										"trim": {
+											"inpoint_sec": 180,
+											"outpoint_sec": 280
+										}
+									},
+									{
+										"kind": "name",
+										"name": "{{english_subtitle}}",
+										"location": {
+											"storage_provider": "s3",
+											"path": "{{source_path}}"
+										},
+										"contents": [
+											{
+												"kind": "subtitle",
+												"payload": {
+													"standard": "auto",
+													"language": "english",
+													"sync_to_timecode": true
+												}
+											}
+										],
+										"trim": {
+											"inpoint_sec": 180,
+											"outpoint_sec": 280
+										}
+									},
+									{
+										"kind": "name",
+										"name": "{{german_subtitle}}",
+										"location": {
+											"storage_provider": "s3",
+											"path": "{{source_path}}"
+										},
+										"contents": [
+											{
+												"kind": "subtitle",
+												"payload": {
+													"standard": "auto",
+													"language": "german",
+													"sync_to_timecode": true
+												}
+											}
+										],
+										"trim": {
+											"inpoint_sec": 180,
+											"outpoint_sec": 280
+										}
+									},
+									{
+										"kind": "name",
+										"name": "{{spanish_subtitle}}",
+										"location": {
+											"storage_provider": "s3",
+											"path": "{{source_path}}"
+										},
+										"contents": [
+											{
+												"kind": "subtitle",
+												"payload": {
+													"standard": "auto",
+													"language": "spanish",
+													"sync_to_timecode": true
+												}
+											}
+										],
+										"trim": {
+											"inpoint_sec": 180,
+											"outpoint_sec": 280
+										}
+									}
+								]
+							}
+						]
+					}
+				}
+			},
+			{
+				"kind": "transcode",
+				"uid": "transcode_task",
+				"payload": {
+					"location": {
+						"storage_provider": "s3",
+						"path": "{{destination_path}}"
+					},
+					"targets": [
+						{
+							"file_pattern": "{{profile_name}}{default_extension}",
+							"existing_files": "replace",
+							"container": {
+								"kind": "mp4",
+								"faststart": true
+							},
+							"video": {
+								"width": 1200,
+								"codec": "h264",
+								"profile": "high",
+								"crf": "23",
+								"filters": [
+									{
+										"kind": "print_subtitle",
+										"payload": {
+											"y_offset": "20%"
+										}
+									}
+								]
+							},
+							"audio": [
+								{
+									"codec": "aac",
+									"channels": 2,
+									"sample_rate": 48000,
+									"sample_size": 16,
+									"bitrate_kb": 128,
+									"bitrate_mode": "vbr"
+								}
+							]
+						}
+					]
+				}
+			}
+		],
+		"connections": [
+			{
+				"from": [
+					{
+						"element": "sources"
+					}
+				],
+				"to": {
+					"success": [
+						{
+							"element": "transcode_task"
+						}
+					]
+				}
+			}
+		]
+	}
 }

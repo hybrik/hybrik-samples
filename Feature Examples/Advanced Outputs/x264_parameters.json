@@ -1,81 +1,80 @@
 {
-  "definitions": {
-    "profile_name": "x264_parameters",
+	"definitions": {
+		"profile_name": "x264_parameters",
 		"type": "features",
-    "category": "advanced_outputs",
+		"category": "advanced_outputs",
 		"source_filename": "tears_of_steel_1080p.mov",
-				
 		"source_path": "s3://hybrik-examples/public/sources",
 		"destination_basepath": "s3://hybrik-examples/public/output",
 		"source": "{{source_path}}/{{source_filename}}",
 		"destination_path": "{{destination_basepath}}/{{type}}/{{category}}/"
-  },
-  "name": "{{profile_name}}:  {{source}}",
-  "payload": {
-    "elements": [
-      {
-        "uid": "source_file",
-        "kind": "source",
-        "payload": {
-          "kind": "asset_url",
-          "payload": {
-            "storage_provider": "s3",
-            "url": "{{source}}"
-          }
-        }
-      },
-      {
-        "uid": "transcode_task",
-        "kind": "transcode",
-        "payload": {
-          "location": {
-            "storage_provider": "s3",
-            "path": "{{destination_path}}"
-          },
-          "targets": [
-            {
-              "file_pattern": "{{profile_name}}{default_extension}",
-              "existing_files": "replace",
-              "container": {
-                "kind": "mp4"
-              },
-              "video": {
-                "codec": "h264",
-                "x264_options": "trellis=2:bframes=2:b-adapt=2:weightp=2:psy-rd=1.0:aq-mode=1:aq-strength=1.0:me=umh:subme=10:merange=24:qcomp=0.5:qblur=0.5:cplxblur=20",
-                "width": 720,
-                "height": 480,
-                "bitrate_mode": "vbr",
-                "bitrate_kb": 1200,
-                "max_bitrate_kb": 1340
-              },
-              "audio": [
-                {
-                  "codec": "aac_lc",
-                  "channels": 2,
-                  "sample_rate": 48000,
-                  "bitrate_kb": 96
-                }
-              ]
-            }
-          ]
-        }
-      }
-    ],
-    "connections": [
-      {
-        "from": [
-          {
-            "element": "source_file"
-          }
-        ],
-        "to": {
-          "success": [
-            {
-              "element": "transcode_task"
-            }
-          ]
-        }
-      }
-    ]
-  }
+	},
+	"name": "{{profile_name}}:  {{source}}",
+	"payload": {
+		"elements": [
+			{
+				"uid": "source_file",
+				"kind": "source",
+				"payload": {
+					"kind": "asset_url",
+					"payload": {
+						"storage_provider": "s3",
+						"url": "{{source}}"
+					}
+				}
+			},
+			{
+				"uid": "transcode_task",
+				"kind": "transcode",
+				"payload": {
+					"location": {
+						"storage_provider": "s3",
+						"path": "{{destination_path}}"
+					},
+					"targets": [
+						{
+							"file_pattern": "{{profile_name}}{default_extension}",
+							"existing_files": "replace",
+							"container": {
+								"kind": "mp4"
+							},
+							"video": {
+								"codec": "h264",
+								"x264_options": "trellis=2:bframes=2:b-adapt=2:weightp=2:psy-rd=1.0:aq-mode=1:aq-strength=1.0:me=umh:subme=10:merange=24:qcomp=0.5:qblur=0.5:cplxblur=20",
+								"width": 720,
+								"height": 480,
+								"bitrate_mode": "vbr",
+								"bitrate_kb": 1200,
+								"max_bitrate_kb": 1340
+							},
+							"audio": [
+								{
+									"codec": "aac_lc",
+									"channels": 2,
+									"sample_rate": 48000,
+									"bitrate_kb": 96
+								}
+							]
+						}
+					]
+				}
+			}
+		],
+		"connections": [
+			{
+				"from": [
+					{
+						"element": "source_file"
+					}
+				],
+				"to": {
+					"success": [
+						{
+							"element": "transcode_task"
+						}
+					]
+				}
+			}
+		]
+	}
 }

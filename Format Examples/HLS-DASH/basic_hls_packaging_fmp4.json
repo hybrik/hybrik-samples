@@ -6,7 +6,6 @@
 		"source_filename": "tears_of_steel_720p.mov",
 		"destination_mp4s": "{{destination_path}}{{profile_name}}/mp4s",
 		"destination_hls_manifests": "{{destination_path}}{{profile_name}}/hls_manifests",
-
 		"source_path": "s3://hybrik-examples/public/sources",
 		"destination_basepath": "s3://hybrik-examples/public/output",
 		"source": "{{source_path}}/{{source_filename}}",

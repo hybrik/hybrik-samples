@@ -4,7 +4,6 @@
 		"category": "mp2ts",
 		"source_filename": "tears_of_steel_1080p.mov",
 		"type": "formats",
-
 		"source_path": "s3://hybrik-examples/public/sources",
 		"destination_basepath": "s3://hybrik-examples/public/output",
 		"source": "{{source_path}}/{{source_filename}}",

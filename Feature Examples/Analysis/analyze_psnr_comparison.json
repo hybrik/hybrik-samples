@@ -1,73 +1,72 @@
 {
-  "definitions": {
-    "profile_name": "analyze_psnr_comparison",
+	"definitions": {
+		"profile_name": "analyze_psnr_comparison",
 		"type": "features",
-    "category": "analysis",
+		"category": "analysis",
 		"source_filename": "tears_of_steel_1080p_1920x1080_h265_4800kbs.mp4",
 		"compare_filename": "tears_of_steel_1080p.mov",
-
 		"source_path": "s3://hybrik-examples/public/sources",
 		"source": "{{source_path}}/{{source_filename}}",
-    "compare_asset": "{{source_path}}/{{compare_filename}}"
-  },
-  "name": "{{profile_name}}:  {{source}}",
-  "payload": {
-    "elements": [
-      {
-        "uid": "source_file",
-        "kind": "source",
-        "payload": {
-          "kind": "asset_url",
-          "payload": {
-            "storage_provider": "s3",
-            "url": "{{source}}"
-          }
-        }
-      },
-      {
-        "uid": "analyze_task",
-        "kind": "analyze",
-        "payload": {
-          "compare_asset": {
-            "kind": "asset_url",
-            "payload": {
-              "storage_provider": "s3",
-              "url": "{{compare_asset}}"
-            }
-          },
-          "general_properties": {
-            "enabled": true
-          },
-          "deep_properties": {
-            "audio": {
-              "psnr": {
-                "enabled": true
-              }
-            },
-            "video": {
-              "psnr": {
-                "enabled": true
-              }
-            }
-          }
-        }
-      }
-    ],
-    "connections": [
-      {
-        "from": [
-          {
-            "element": "source_file"
-          }
-        ],
-        "to": {
-          "success": [
-            {
-              "element": "analyze_task"
-            }
-          ]
-        }
-      }
-    ]
-  }
+		"compare_asset": "{{source_path}}/{{compare_filename}}"
+	},
+	"name": "{{profile_name}}:  {{source}}",
+	"payload": {
+		"elements": [
+			{
+				"uid": "source_file",
+				"kind": "source",
+				"payload": {
+					"kind": "asset_url",
+					"payload": {
+						"storage_provider": "s3",
+						"url": "{{source}}"
+					}
+				}
+			},
+			{
+				"uid": "analyze_task",
+				"kind": "analyze",
+				"payload": {
+					"compare_asset": {
+						"kind": "asset_url",
+						"payload": {
+							"storage_provider": "s3",
+							"url": "{{compare_asset}}"
+						}
+					},
+					"general_properties": {
+						"enabled": true
+					},
+					"deep_properties": {
+						"audio": {
+							"psnr": {
+								"enabled": true
+							}
+						},
+						"video": {
+							"psnr": {
+								"enabled": true
+							}
+						}
+					}
+				}
+			}
+		],
+		"connections": [
+			{
+				"from": [
+					{
+						"element": "source_file"
+					}
+				],
+				"to": {
+					"success": [
+						{
+							"element": "analyze_task"
+						}
+					]
+				}
+			}
+		]
+	}
 }

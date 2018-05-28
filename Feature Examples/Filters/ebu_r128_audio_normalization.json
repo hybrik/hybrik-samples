@@ -1,138 +1,136 @@
 {
-  "definitions": {
-    "profile_name": "ebu_r128_audio_normalization",
+	"definitions": {
+		"profile_name": "ebu_r128_audio_normalization",
 		"type": "features",
-    "category": "filters",
+		"category": "filters",
 		"source_filename": "tears_of_steel_1080p.mov",
-
-    "integrated_lufs": -12,
-    "true_peak_dbfs": -2,
-
+		"integrated_lufs": -12,
+		"true_peak_dbfs": -2,
 		"source_path": "s3://hybrik-examples/public/sources",
 		"destination_basepath": "s3://hybrik-examples/public/output",
 		"source": "{{source_path}}/{{source_filename}}",
 		"destination_path": "{{destination_basepath}}/{{type}}/{{category}}/"
-  },
-  "name": "{{profile_name}}:  {{source}}",
-  "payload": {
-    "elements": [
-      {
-        "uid": "source_file",
-        "kind": "source",
-        "payload": {
-          "kind": "asset_url",
-          "payload": {
-            "storage_provider": "s3",
-            "url": "{{source}}"
-          }
-        }
-      },
-      {
-        "uid": "analyze_task",
-        "kind": "analyze",
-        "task": {
-          "retry_method": "fail"
-        },
-        "payload": {
-          "general_properties": {
-            "enabled": true
-          },
-          "deep_properties": {
-            "audio": {
-              "ebur128": {
-                "enabled": true,
-                "target_reference": {
-                  "integrated_lufs": "{{integrated_lufs}}",
-                  "true_peak_dbfs": "{{true_peak_dbfs}}"
-                }
-              },
-              "levels": {
-                "enabled": true
-              },
-              "volume": {
-                "enabled": true
-              }
-            }
-          }
-        }
-      },
-      {
-        "uid": "transcode_task",
-        "kind": "transcode",
-        "payload": {
-          "location": {
-            "storage_provider": "s3",
-            "path": "{{destination_path}}"
-          },
-          "targets": [
-            {
-              "file_pattern": "{{profile_name}}{default_extension}",
-              "existing_files": "replace",
-              "container": {
-                "kind": "mp4"
-              },
-              "video": {
-                "codec": "h264",
-                "width": 720,
-                "height": 480,
-                "bitrate_mode": "vbr",
-                "bitrate_kb": 1200,
-                "max_bitrate_kb": 1340
-              },
-              "audio": [
-                {
-                  "codec": "aac_lc",
-                  "channels": 2,
-                  "sample_rate": 48000,
-                  "bitrate_kb": 96,
-                  "filters": [
-                    {
-                      "kind": "normalize",
-                      "payload": {
-                        "kind": "ebur128",
-                        "payload": {
-                          "allow_unprecise_mode": false,
-                          "integrated_lufs": -12
-                        }
-                      }
-                    }
-                  ]
-                }
-              ]
-            }
-          ]
-        }
-      }
-    ],
-    "connections": [
-      {
-        "from": [
-          {
-            "element": "source_file"
-          }
-        ],
-        "to": {
-          "success": [
-            {
-              "element": "analyze_task"
-            }
-          ]
-        }
-      },
-      {
-        "from": [
-          {
-            "element": "analyze_task"
-          }
-        ],
-        "to": {
-          "success": [
-            {
-              "element": "transcode_task"
-            }
-          ]
-        }
-      }
-    ]
-  }
+	},
+	"name": "{{profile_name}}:  {{source}}",
+	"payload": {
+		"elements": [
+			{
+				"uid": "source_file",
+				"kind": "source",
+				"payload": {
+					"kind": "asset_url",
+					"payload": {
+						"storage_provider": "s3",
+						"url": "{{source}}"
+					}
+				}
+			},
+			{
+				"uid": "analyze_task",
+				"kind": "analyze",
+				"task": {
+					"retry_method": "fail"
+				},
+				"payload": {
+					"general_properties": {
+						"enabled": true
+					},
+					"deep_properties": {
+						"audio": {
+							"ebur128": {
+								"enabled": true,
+								"target_reference": {
+									"integrated_lufs": "{{integrated_lufs}}",
+									"true_peak_dbfs": "{{true_peak_dbfs}}"
+								}
+							},
+							"levels": {
+								"enabled": true
+							},
+							"volume": {
+								"enabled": true
+							}
+						}
+					}
+				}
+			},
+			{
+				"uid": "transcode_task",
+				"kind": "transcode",
+				"payload": {
+					"location": {
+						"storage_provider": "s3",
+						"path": "{{destination_path}}"
+					},
+					"targets": [
+						{
+							"file_pattern": "{{profile_name}}{default_extension}",
+							"existing_files": "replace",
+							"container": {
+								"kind": "mp4"
+							},
+							"video": {
+								"codec": "h264",
+								"width": 720,
+								"height": 480,
+								"bitrate_mode": "vbr",
+								"bitrate_kb": 1200,
+								"max_bitrate_kb": 1340
+							},
+							"audio": [
+								{
+									"codec": "aac_lc",
+									"channels": 2,
+									"sample_rate": 48000,
+									"bitrate_kb": 96,
+									"filters": [
+										{
+											"kind": "normalize",
+											"payload": {
+												"kind": "ebur128",
+												"payload": {
+													"allow_unprecise_mode": false,
+													"integrated_lufs": -12
+												}
+											}
+										}
+									]
+								}
+							]
+						}
+					]
+				}
+			}
+		],
+		"connections": [
+			{
+				"from": [
+					{
+						"element": "source_file"
+					}
+				],
+				"to": {
+					"success": [
+						{
+							"element": "analyze_task"
+						}
+					]
+				}
+			},
+			{
+				"from": [
+					{
+						"element": "analyze_task"
+					}
+				],
+				"to": {
+					"success": [
+						{
+							"element": "transcode_task"
+						}
+					]
+				}
+			}
+		]
+	}
 }

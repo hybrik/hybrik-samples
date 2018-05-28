@@ -8,9 +8,7 @@
 		"caption_filename": "TOS-en.scc",
 		"destination_mp4s": "{{destination_path}}{{profile_name}}/mp4s",
 		"destination_dash_manifests": "{{destination_path}}{{profile_name}}/dash_manifests",
-
 		"segment_duration_sec": 6,
-
 		"source_path": "s3://hybrik-examples/public/sources",
 		"destination_basepath": "s3://hybrik-examples/public/output",
 		"source": "{{source_path}}/{{source_filename}}",
