@@ -1,86 +1,86 @@
 {
-	"definitions": {
-		"profile_name": "180_second_segmenting",
-		"type": "features",
-		"category": "temporal_segmenting",
-		"source_filename": "tears_of_steel_1080p.mov",
+    "definitions": {
+        "profile_name": "180_second_segmenting",
+        "type": "features",
+        "category": "temporal_segmenting",
+        "source_filename": "tears_of_steel_1080p.mov",
 
-		"source_path": "s3://hybrik-examples/public/sources",
-		"destination_basepath": "s3://hybrik-examples/public/output",
-		"source": "{{source_path}}/{{source_filename}}",
-		"destination_path": "{{destination_basepath}}/{{type}}/{{category}}/"
-	},
-	"name": "{{profile_name}}:  {{source}}",
-	"payload": {
-		"elements": [
-			{
-				"uid": "source",
-				"kind": "source",
-				"payload": {
-					"kind": "asset_url",
-					"payload": {
-						"storage_provider": "s3",
-						"url": "{{source}}"
-					}
-				}
-			},
-			{
-				"kind": "transcode",
-				"uid": "transcode_task",
-				"payload": {
-					"location": {
-						"storage_provider": "s3",
-						"path": "{{destination_path}}"
-					},
-					"source_pipeline": {
-						"segmented_rendering": {
-							"duration_sec": 180
-						}
-					},
-					"targets": [
-						{
-							"file_pattern": "{{profile_name}}.mp4",
-							"existing_files": "replace",
-							"container": {
-								"kind": "mp4",
-								"faststart": true
-							},
-							"video": {
-								"height": 1080,
-								"codec": "h264",
-								"profile": "high",
-								"crf": "23"
-							},
-							"audio": [
-								{
-									"codec": "aac",
-									"channels": 2,
-									"sample_rate": 48000,
-									"sample_size": 16,
-									"bitrate_kb": 128,
-									"bitrate_mode": "vbr"
-								}
-							]
-						}
-					]
-				}
-			}
-		],
-		"connections": [
-			{
-				"from": [
-					{
-						"element": "source"
-					}
-				],
-				"to": {
-					"success": [
-						{
-							"element": "transcode_task"
-						}
-					]
-				}
-			}
-		]
-	}
+        "source_path": "s3://hybrik-examples/public/sources",
+        "destination_basepath": "s3://hybrik-examples/public/output",
+        "source": "{{source_path}}/{{source_filename}}",
+        "destination_path": "{{destination_basepath}}/{{type}}/{{category}}/"
+    },
+    "name": "{{profile_name}}:  {{source}}",
+    "payload": {
+        "elements": [
+            {
+                "uid": "source",
+                "kind": "source",
+                "payload": {
+                    "kind": "asset_url",
+                    "payload": {
+                        "storage_provider": "s3",
+                        "url": "{{source}}"
+                    }
+                }
+            },
+            {
+                "kind": "transcode",
+                "uid": "transcode_task",
+                "payload": {
+                    "location": {
+                        "storage_provider": "s3",
+                        "path": "{{destination_path}}"
+                    },
+                    "source_pipeline": {
+                        "segmented_rendering": {
+                            "duration_sec": 180
+                        }
+                    },
+                    "targets": [
+                        {
+                            "file_pattern": "{{profile_name}}.mp4",
+                            "existing_files": "replace",
+                            "container": {
+                                "kind": "mp4",
+                                "faststart": true
+                            },
+                            "video": {
+                                "height": 1080,
+                                "codec": "h264",
+                                "profile": "high",
+                                "crf": "23"
+                            },
+                            "audio": [
+                                {
+                                    "codec": "aac",
+                                    "channels": 2,
+                                    "sample_rate": 48000,
+                                    "sample_size": 16,
+                                    "bitrate_kb": 128,
+                                    "bitrate_mode": "vbr"
+                                }
+                            ]
+                        }
+                    ]
+                }
+            }
+        ],
+        "connections": [
+            {
+                "from": [
+                    {
+                        "element": "source"
+                    }
+                ],
+                "to": {
+                    "success": [
+                        {
+                            "element": "transcode_task"
+                        }
+                    ]
+                }
+            }
+        ]
+    }
 }

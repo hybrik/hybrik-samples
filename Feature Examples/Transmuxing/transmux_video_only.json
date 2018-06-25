@@ -1,75 +1,75 @@
 {
-	"definitions": {
-		"profile_name": "transmux_video_only",
-		"type": "features",
-		"category": "transmuxing",
-		"source_filename": "tears_of_steel_1080p_letterboxed.mp4",
-		"source_path": "s3://hybrik-examples/public/sources",
-		"destination_basepath": "s3://hybrik-examples/public/output",
-		"source": "{{source_path}}/{{source_filename}}",
-		"destination_path": "{{destination_basepath}}/{{type}}/{{category}}/"
-	},
-	"name": "{{profile_name}}:  {{source}}",
-	"payload": {
-		"elements": [
-			{
-				"uid": "source_file",
-				"kind": "source",
-				"payload": {
-					"kind": "asset_url",
-					"payload": {
-						"storage_provider": "s3",
-						"url": "{{source}}"
-					}
-				}
-			},
-			{
-				"uid": "transmux",
-				"kind": "transcode",
-				"payload": {
-					"location": {
-						"storage_provider": "s3",
-						"path": "{{destination_path}}"
-					},
-					"targets": [
-						{
-							"file_pattern": "{{profile_name}}{default_extension}",
-							"existing_files": "replace",
-							"container": {
-								"kind": "mpeg2ts",
-								"faststart": true
-							},
-							"video": {
-								"codec": "copy"
-							},
-							"audio": [
-								{
-									"codec": "aac_lc",
-									"channels": 2,
-									"sample_rate": 48000,
-									"bitrate_kb": 96
-								}
-							]
-						}
-					]
-				}
-			}
-		],
-		"connections": [
-			{
-				"from": [
-					{
-						"element": "source_file"
-					}
-				],
-				"to": {
-					"success": [
-						{
-							"element": "transmux"
-						}
-					]
-				}
-			}
-		]
-	}
+    "definitions": {
+        "profile_name": "transmux_video_only",
+        "type": "features",
+        "category": "transmuxing",
+        "source_filename": "tears_of_steel_1080p_letterboxed.mp4",
+        "source_path": "s3://hybrik-examples/public/sources",
+        "destination_basepath": "s3://hybrik-examples/public/output",
+        "source": "{{source_path}}/{{source_filename}}",
+        "destination_path": "{{destination_basepath}}/{{type}}/{{category}}/"
+    },
+    "name": "{{profile_name}}:  {{source}}",
+    "payload": {
+        "elements": [
+            {
+                "uid": "source_file",
+                "kind": "source",
+                "payload": {
+                    "kind": "asset_url",
+                    "payload": {
+                        "storage_provider": "s3",
+                        "url": "{{source}}"
+                    }
+                }
+            },
+            {
+                "uid": "transmux",
+                "kind": "transcode",
+                "payload": {
+                    "location": {
+                        "storage_provider": "s3",
+                        "path": "{{destination_path}}"
+                    },
+                    "targets": [
+                        {
+                            "file_pattern": "{{profile_name}}{default_extension}",
+                            "existing_files": "replace",
+                            "container": {
+                                "kind": "mpeg2ts",
+                                "faststart": true
+                            },
+                            "video": {
+                                "codec": "copy"
+                            },
+                            "audio": [
+                                {
+                                    "codec": "aac_lc",
+                                    "channels": 2,
+                                    "sample_rate": 48000,
+                                    "bitrate_kb": 96
+                                }
+                            ]
+                        }
+                    ]
+                }
+            }
+        ],
+        "connections": [
+            {
+                "from": [
+                    {
+                        "element": "source_file"
+                    }
+                ],
+                "to": {
+                    "success": [
+                        {
+                            "element": "transmux"
+                        }
+                    ]
+                }
+            }
+        ]
+    }
 }

@@ -1,94 +1,94 @@
 {
-	"definitions": {
-		"profile_name": "mp2es_720x576_mpeg2_50000kbs",
-		"category": "mp2es",
-		"source_filename": "tears_of_steel_720p.mov",
-		"type": "formats",
-		"source_path": "s3://hybrik-examples/public/sources",
-		"destination_basepath": "s3://hybrik-examples/public/output",
-		"source": "{{source_path}}/{{source_filename}}",
-		"destination_path": "{{destination_basepath}}/{{type}}/{{category}}/"
-	},
-	"name": "{{profile_name}}: {{source}}",
-	"payload": {
-		"elements": [
-			{
-				"uid": "source_file",
-				"kind": "source",
-				"payload": {
-					"kind": "asset_url",
-					"payload": {
-						"storage_provider": "s3",
-						"url": "{{source}}",
-						"trim": {
-							"inpoint_sec": 30,
-							"duration_sec": 10
-						}
-					}
-				}
-			},
-			{
-				"uid": "transcode_task",
-				"kind": "transcode",
-				"payload": {
-					"location": {
-						"storage_provider": "s3",
-						"path": "{{destination_path}}"
-					},
-					"targets": [
-						{
-							"file_pattern": "{{profile_name}}{default_extension}",
-							"existing_files": "replace",
-							"container": {
-								"kind": "mp2_elementary"
-							},
-							"video": {
-								"width": 720,
-								"height": 576,
-								"codec": "mpeg2",
-								"bitrate_kb": 50000
-							},
-							"audio": [
-								{
-									"codec": "mp2",
-									"channels": 2,
-									"bitrate_kb": 192
-								}
-							]
-						},
-						{
-							"file_pattern": "{{profile_name}}_audio{default_extension}",
-							"existing_files": "replace",
-							"container": {
-								"kind": "wav"
-							},
-							"audio": [
-								{
-									"codec": "pcm",
-									"channels": 2,
-									"sample_size": 24
-								}
-							]
-						}
-					]
-				}
-			}
-		],
-		"connections": [
-			{
-				"from": [
-					{
-						"element": "source_file"
-					}
-				],
-				"to": {
-					"success": [
-						{
-							"element": "transcode_task"
-						}
-					]
-				}
-			}
-		]
-	}
+    "definitions": {
+        "profile_name": "mp2es_720x576_mpeg2_50000kbs",
+        "category": "mp2es",
+        "source_filename": "tears_of_steel_720p.mov",
+        "type": "formats",
+        "source_path": "s3://hybrik-examples/public/sources",
+        "destination_basepath": "s3://hybrik-examples/public/output",
+        "source": "{{source_path}}/{{source_filename}}",
+        "destination_path": "{{destination_basepath}}/{{type}}/{{category}}/"
+    },
+    "name": "{{profile_name}}: {{source}}",
+    "payload": {
+        "elements": [
+            {
+                "uid": "source_file",
+                "kind": "source",
+                "payload": {
+                    "kind": "asset_url",
+                    "payload": {
+                        "storage_provider": "s3",
+                        "url": "{{source}}",
+                        "trim": {
+                            "inpoint_sec": 30,
+                            "duration_sec": 10
+                        }
+                    }
+                }
+            },
+            {
+                "uid": "transcode_task",
+                "kind": "transcode",
+                "payload": {
+                    "location": {
+                        "storage_provider": "s3",
+                        "path": "{{destination_path}}"
+                    },
+                    "targets": [
+                        {
+                            "file_pattern": "{{profile_name}}{default_extension}",
+                            "existing_files": "replace",
+                            "container": {
+                                "kind": "mp2_elementary"
+                            },
+                            "video": {
+                                "width": 720,
+                                "height": 576,
+                                "codec": "mpeg2",
+                                "bitrate_kb": 50000
+                            },
+                            "audio": [
+                                {
+                                    "codec": "mp2",
+                                    "channels": 2,
+                                    "bitrate_kb": 192
+                                }
+                            ]
+                        },
+                        {
+                            "file_pattern": "{{profile_name}}_audio{default_extension}",
+                            "existing_files": "replace",
+                            "container": {
+                                "kind": "wav"
+                            },
+                            "audio": [
+                                {
+                                    "codec": "pcm",
+                                    "channels": 2,
+                                    "sample_size": 24
+                                }
+                            ]
+                        }
+                    ]
+                }
+            }
+        ],
+        "connections": [
+            {
+                "from": [
+                    {
+                        "element": "source_file"
+                    }
+                ],
+                "to": {
+                    "success": [
+                        {
+                            "element": "transcode_task"
+                        }
+                    ]
+                }
+            }
+        ]
+    }
 }
