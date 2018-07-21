@@ -52,7 +52,7 @@
                                             {
                                                 "kind": "subtitle",
                                                 "payload": {
-                                                    "standard": "auto",
+                                                    "format": "auto",
                                                     "language": "english",
                                                     "sync_to_timecode": true
                                                 }
