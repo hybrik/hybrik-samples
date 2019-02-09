@@ -1,21 +1,17 @@
 {
     "definitions": {
         "profile_name": "hls_advanced_alternate_audio_subtitles",
-        "type": "formats",
-        "category": "hls-dash",
+
+        "source_path": "s3://hybrik-examples/public/sources",
         "source_filename": "tears_of_steel_720p.mov",
         "audio_it_filename": "tears_of_steel_italian_audio.mp4",
         "caption_filename": "TOS-en.scc",
-        "destination_mp4s": "{{destination_path}}{{profile_name}}/fmp4s",
-        "destination_hls_media": "{{destination_path}}{{profile_name}}/hls_media",
-        "destination_hls_manifests": "{{destination_path}}{{profile_name}}/hls_manifests",
-        "segment_duration_sec": 6,
-        "source_path": "s3://hybrik-examples/public/sources",
-        "destination_basepath": "s3://hybrik-examples/public/output",
-        "source": "{{source_path}}/{{source_filename}}",
-        "destination_path": "{{destination_basepath}}/{{type}}/{{category}}/"
+
+        "destination_path": "s3://hybrik-examples/public/output/formats/hls-dash/{{profile_name}}",
+
+        "segment_duration": 6
     },
-    "name": "{{profile_name}}:  {{source_filename}}",
+    "name": "{{profile_name}}: {{source_path}}/{{source_filename}}",
     "payload": {
         "elements": [
             {
@@ -113,7 +109,7 @@
                 "payload": {
                     "location": {
                         "storage_provider": "s3",
-                        "path": "{{destination_mp4s}}"
+                        "path": "{{destination_path}}/mp4s"
                     },
                     "targets": [
                         {
@@ -121,7 +117,7 @@
                             "existing_files": "replace",
                             "container": {
                                 "kind": "fmp4",
-                                "segment_duration": "{{segment_duration_sec}}"
+                                "segment_duration_sec": "{{segment_duration}}"
                             },
                             "video": {
                                 "codec": "h264",
@@ -143,7 +139,7 @@
                             "existing_files": "replace",
                             "container": {
                                 "kind": "fmp4",
-                                "segment_duration": "{{segment_duration_sec}}"
+                                "segment_duration_sec": "{{segment_duration}}"
                             },
                             "video": {
                                 "codec": "h264",
@@ -165,7 +161,7 @@
                             "existing_files": "replace",
                             "container": {
                                 "kind": "fmp4",
-                                "segment_duration": "{{segment_duration_sec}}"
+                                "segment_duration_sec": "{{segment_duration}}"
                             },
                             "video": {
                                 "codec": "h264",
@@ -187,7 +183,7 @@
                             "existing_files": "replace",
                             "container": {
                                 "kind": "fmp4",
-                                "segment_duration": "{{segment_duration_sec}}"
+                                "segment_duration_sec": "{{segment_duration}}"
                             },
                             "audio": [
                                 {
@@ -210,7 +206,7 @@
                             "existing_files": "replace",
                             "container": {
                                 "kind": "fmp4",
-                                "segment_duration": "{{segment_duration_sec}}"
+                                "segment_duration_sec": "{{segment_duration}}"
                             },
                             "audio": [
                                 {
@@ -233,7 +229,7 @@
                             "existing_files": "replace",
                             "container": {
                                 "kind": "fmp4",
-                                "segment_duration": "{{segment_duration_sec}}"
+                                "segment_duration_sec": "{{segment_duration}}"
                             },
                             "audio": [
                                 {
@@ -256,7 +252,7 @@
                             "existing_files": "replace",
                             "container": {
                                 "kind": "fmp4",
-                                "segment_duration": "{{segment_duration_sec}}"
+                                "segment_duration_sec": "{{segment_duration}}"
                             },
                             "audio": [
                                 {
@@ -285,10 +281,11 @@
                     "kind": "hls",
                     "location": {
                         "storage_provider": "s3",
-                        "path": "{{destination_hls_manifests}}"
+                        "path": "{{destination_path}}/hls_manifests"
                     },
                     "file_pattern": "master_manifest.m3u8",
                     "segmentation_mode": "single_ts",
+                    "segment_duration_sec": "{{segment_duration}}",
                     "force_original_media": false,
                     "closed_captions": [
                         {
@@ -300,7 +297,7 @@
                     ],
                     "media_location": {
                         "storage_provider": "s3",
-                        "path": "{{destination_hls_media}}",
+                        "path": "{{destination_path}}/hls_media",
                         "attributes": [
                             {
                                 "name": "ContentType",
@@ -313,7 +310,7 @@
                         "version": 7,
                         "media_playlist_location": {
                             "storage_provider": "s3",
-                            "path": "{{destination_hls_manifests}}",
+                            "path": "{{destination_path}}/hls_manifests",
                             "attributes": [
                                 {
                                     "name": "ContentType",

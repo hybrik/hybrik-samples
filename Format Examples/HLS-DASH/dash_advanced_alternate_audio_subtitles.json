@@ -1,20 +1,17 @@
 {
     "definitions": {
         "profile_name": "dash_advanced_alternate_audio_subtitles",
-        "type": "formats",
-        "category": "hls-dash",
+
+        "source_path": "s3://hybrik-examples/public/sources",
         "source_filename": "tears_of_steel_720p.mov",
         "audio_it_filename": "tears_of_steel_italian_audio.mp4",
         "caption_filename": "TOS-en.scc",
-        "destination_mp4s": "{{destination_path}}{{profile_name}}/mp4s",
-        "destination_dash_manifests": "{{destination_path}}{{profile_name}}/dash_manifests",
-        "segment_duration_sec": 6,
-        "source_path": "s3://hybrik-examples/public/sources",
-        "destination_basepath": "s3://hybrik-examples/public/output",
-        "source": "{{source_path}}/{{source_filename}}",
-        "destination_path": "{{destination_basepath}}/{{type}}/{{category}}/"
+
+        "destination_path": "s3://hybrik-examples/public/output/formats/hls-dash/{{profile_name}}",
+
+        "segment_duration": 6
     },
-    "name": "{{profile_name}}:  {{source_filename}}",
+    "name": "{{profile_name}}: {{source_filename}}",
     "payload": {
         "elements": [
             {
@@ -112,7 +109,7 @@
                 "payload": {
                     "location": {
                         "storage_provider": "s3",
-                        "path": "{{destination_mp4s}}"
+                        "path": "{{destination_path}}/mp4s"
                     },
                     "targets": [
                         {
@@ -120,7 +117,7 @@
                             "existing_files": "replace",
                             "container": {
                                 "kind": "fmp4",
-                                "segment_duration": "{{segment_duration_sec}}"
+                                "segment_duration_sec": "{{segment_duration}}"
                             },
                             "video": {
                                 "codec": "h264",
@@ -142,7 +139,7 @@
                             "existing_files": "replace",
                             "container": {
                                 "kind": "fmp4",
-                                "segment_duration": "{{segment_duration_sec}}"
+                                "segment_duration_sec": "{{segment_duration}}"
                             },
                             "video": {
                                 "codec": "h264",
@@ -164,7 +161,7 @@
                             "existing_files": "replace",
                             "container": {
                                 "kind": "fmp4",
-                                "segment_duration": "{{segment_duration_sec}}"
+                                "segment_duration_sec": "{{segment_duration}}"
                             },
                             "video": {
                                 "codec": "h264",
@@ -186,7 +183,7 @@
                             "existing_files": "replace",
                             "container": {
                                 "kind": "fmp4",
-                                "segment_duration": "{{segment_duration_sec}}"
+                                "segment_duration_sec": "{{segment_duration}}"
                             },
                             "audio": [
                                 {
@@ -209,7 +206,7 @@
                             "existing_files": "replace",
                             "container": {
                                 "kind": "fmp4",
-                                "segment_duration": "{{segment_duration_sec}}"
+                                "segment_duration_sec": "{{segment_duration}}"
                             },
                             "audio": [
                                 {
@@ -232,7 +229,7 @@
                             "existing_files": "replace",
                             "container": {
                                 "kind": "fmp4",
-                                "segment_duration": "{{segment_duration_sec}}"
+                                "segment_duration_sec": "{{segment_duration}}"
                             },
                             "audio": [
                                 {
@@ -255,7 +252,7 @@
                             "existing_files": "replace",
                             "container": {
                                 "kind": "fmp4",
-                                "segment_duration": "{{segment_duration_sec}}"
+                                "segment_duration_sec": "{{segment_duration}}"
                             },
                             "audio": [
                                 {
@@ -284,7 +281,7 @@
                     "kind": "dash",
                     "location": {
                         "storage_provider": "s3",
-                        "path": "{{destination_dash_manifests}}"
+                        "path": "{{destination_path}}/dash_manifests"
                     },
                     "file_pattern": "master_manifest.mpd",
                     "segmentation_mode": "fmp4",
