@@ -1,13 +1,8 @@
 {
     "definitions": {
         "profile_name": "mp2es_720x576_mpeg2_50000kbs",
-        "category": "mp2es",
-        "source_filename": "tears_of_steel_720p.mov",
-        "type": "formats",
-        "source_path": "s3://hybrik-examples/public/sources",
-        "destination_basepath": "s3://hybrik-examples/public/output",
-        "source": "{{source_path}}/{{source_filename}}",
-        "destination_path": "{{destination_basepath}}/{{type}}/{{category}}/"
+        "source": "s3://hybrik-examples/public/sources/tears_of_steel_720p.mov",
+        "destination_path": "s3://hybrik-examples/public/output/formats/mp2es/{{profile_name}}"
     },
     "name": "{{profile_name}}: {{source}}",
     "payload": {
