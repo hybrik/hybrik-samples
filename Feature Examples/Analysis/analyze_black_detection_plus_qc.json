@@ -1,11 +1,7 @@
 {
     "definitions": {
         "profile_name": "analyze_black_detection_plus_qc",
-        "type": "features",
-        "category": "analysis",
-        "source_filename": "tears_of_steel_1080p.mov",
-        "source_path": "s3://hybrik-examples/public/sources",
-        "source": "{{source_path}}/{{source_filename}}"
+        "source": "s3://hybrik-examples/public/sources/tears_of_steel_720p.mov"
     },
     "name": "{{profile_name}}:  {{source}}",
     "payload": {
