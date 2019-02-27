@@ -28,7 +28,7 @@
                 "payload": {
                     "target": {
                         "location": {
-                            "kind": "s3",
+                            "storage_provider": "s3",
                             "path": "{{destination}}/{source_relative_folder}"
                         },
                         "existing_files": "replace",
