@@ -1,12 +1,8 @@
 {
     "definitions": {
         "profile_name": "copy_folder",
-        "type": "features",
-        "category": "data_movement",
         "source_path": "s3://hybrik-examples/public/sources",
-        "destination_basepath": "s3://hybrik-examples/public/output",
-        "destination_path": "{{destination_basepath}}/{{type}}/{{category}}/",
-        "destination": "{{destination_path}}{{profile_name}}"
+        "destination": "s3://hybrik-examples/public/output/features/data_movement/{{profile_name}}"
     },
     "name": "{{profile_name}}:  {{source_path}}",
     "payload": {
@@ -21,7 +17,7 @@
                     },
                     "settings": {
                         "pattern_matching": "wildcard",
-                        "wildcard": "*",
+                        "wildcard": "TOS*",
                         "recursive": true
                     }
                 }

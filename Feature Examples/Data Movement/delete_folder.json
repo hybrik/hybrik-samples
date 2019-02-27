@@ -1,11 +1,7 @@
 {
     "definitions": {
         "profile_name": "delete_folder",
-        "type": "features",
-        "category": "data_movement",
-        "destination_basepath": "s3://hybrik-examples/public/output",
-        "destination_path": "{{destination_basepath}}/{{type}}/{{category}}/",
-        "destination": "{{destination_path}}copy_folder"
+        "destination": "s3://hybrik-examples/public/output/features/data_movement/copy_folder"
     },
     "name": "{{profile_name}}:  {{destination}}",
     "payload": {
