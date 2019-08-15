@@ -1,119 +1,115 @@
 {
-  "definitions": {
-    "profile_name": "auto_crop_filter",
-    "source": "s3://hybrik-examples/public/sources/tears_of_steel_1080p_letterboxed.mp4",
-    "destination_path": "s3://hybrik-examples/public/output/features/filters/{{profile_name}}"
-  },
-  "name": "Auto-crop: {{source}}",
-  "payload": {
-    "elements": [
-      {
-        "uid": "source_file",
-        "kind": "source",
-        "payload": {
-          "kind": "asset_url",
-          "payload": {
-            "storage_provider": "s3",
-            "url": "{{source}}",
-            "trim": {
-              "inpoint_sec": 15,
-              "outpoint_sec": 30
-            }
-          }
-        }
-      },
-      {
-        "uid": "analyze_task",
-        "kind": "analyze",
-        "task": {
-          "retry_method": "fail"
-        },
-        "payload": {
-          "general_properties": {
-            "enabled": true
-          },
-          "deep_properties": {
-            "video": {
-              "black_borders": {
-                "enabled": true
-              }
-            }
-          }
-        }
-      },
-      {
-        "uid": "transcode_task",
-        "kind": "transcode",
-        "task": {
-          "retry_method": "fail"
-        },
-        "payload": {
-          "location": {
-            "storage_provider": "s3",
-            "path": "{{destination_path}}"
-          },
-          "targets": [
+    "definitions": {
+        "profile_name": "auto_crop_filter",
+        "source": "s3://hybrik-examples/public/sources/tears_of_steel_1080p_letterboxed.mp4",
+        "destination_path": "s3://hybrik-examples/public/output/features/filters/{{profile_name}}"
+    },
+    "name": "{{profile_name}}:  {{source}}",
+    "payload": {
+        "elements": [
             {
-              "file_pattern": "{source_basename}_autocropped{default_extension}",
-              "existing_files": "replace",
-              "container": {
-                "kind": "mp4"
-              },
-              "video": {
-                "codec": "h264",
-                "height": 400,
-                "bitrate_mode": "vbr",
-                "bitrate_kb": 1000,
-                "max_bitrate_kb": 1200,
-                "ar_auto_crop": "preserving",
-                "ar_pad_crop_ratio": 1.0,
-                "filters": [
-                  {
-                    "kind": "crop",
+                "uid": "source_file",
+                "kind": "source",
+                "payload": {
+                    "kind": "asset_url",
                     "payload": {
-                      "top": "auto",
-                      "bottom": "auto",
-                      "left": "auto",
-                      "right": "auto",
-                      "use_source_dimensions": true
+                        "storage_provider": "s3",
+                        "url": "{{source}}"
                     }
-                  }
-                ]
-              }
-            }
-          ]
-        }
-      }
-    ],
-    "connections": [
-      {
-        "from": [
-          {
-            "element": "source_file"
-          }
-        ],
-        "to": {
-          "success": [
+                }
+            },
             {
-              "element": "analyze_task"
-            }
-          ]
-        }
-      },
-      {
-        "from": [
-          {
-            "element": "analyze_task"
-          }
-        ],
-        "to": {
-          "success": [
+                "uid": "analyze_task",
+                "kind": "analyze",
+                "task": {
+                    "retry_method": "fail"
+                },
+                "payload": {
+                    "general_properties": {
+                        "enabled": true
+                    },
+                    "deep_properties": {
+                        "video": {
+                            "black_borders": {
+                                "enabled": true
+                            }
+                        }
+                    }
+                }
+            },
             {
-              "element": "transcode_task"
+                "uid": "transcode_task",
+                "kind": "transcode",
+                "task": {
+                    "retry_method": "fail"
+                },
+                "payload": {
+                    "location": {
+                        "storage_provider": "s3",
+                        "path": "{{destination_path}}"
+                    },
+                    "targets": [
+                        {
+                            "file_pattern": "{source_basename}_autocropped{default_extension}",
+                            "existing_files": "replace",
+                            "container": {
+                                "kind": "mp4"
+                            },
+                            "video": {
+                                "codec": "h264",
+                                "height": 400,
+                                "bitrate_mode": "vbr",
+                                "bitrate_kb": 1000,
+                                "max_bitrate_kb": 1200,
+                                "ar_auto_crop": "preserving",
+                                "ar_pad_crop_ratio": 1.0,
+                                "filters": [
+                                    {
+                                        "kind": "crop",
+                                        "payload": {
+                                            "top": "auto",
+                                            "bottom": "auto",
+                                            "left": "auto",
+                                            "right": "auto",
+                                            "use_source_dimensions": true
+                                        }
+                                    }
+                                ]
+                            }
+                        }
+                    ]
+                }
             }
-          ]
-        }
-      }
-    ]
-  }
+        ],
+        "connections": [
+            {
+                "from": [
+                    {
+                        "element": "source_file"
+                    }
+                ],
+                "to": {
+                    "success": [
+                        {
+                            "element": "analyze_task"
+                        }
+                    ]
+                }
+            },
+            {
+                "from": [
+                    {
+                        "element": "analyze_task"
+                    }
+                ],
+                "to": {
+                    "success": [
+                        {
+                            "element": "transcode_task"
+                        }
+                    ]
+                }
+            }
+        ]
+    }
 }
