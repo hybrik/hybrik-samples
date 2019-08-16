@@ -1,13 +1,9 @@
 {
     "definitions": {
         "profile_name": "deinterlacing_filter",
-        "type": "features",
-        "category": "filters",
-        "source_filename": "bicycle_interlaced.avi",
-        "source_path": "s3://hybrik-examples/public/sources",
-        "destination_basepath": "s3://hybrik-examples/public/output",
-        "source": "{{source_path}}/{{source_filename}}",
-        "destination_path": "{{destination_basepath}}/{{type}}/{{category}}/"
+        "source": "s3://hybrik-examples/public/sources/bicycle_interlaced.avi",
+        "destination_path": "s3://hybrik-examples/public/output/features/filters/{{profile_name}}",
+
     },
     "name": "{{profile_name}}:  {{source}}",
     "payload": {
