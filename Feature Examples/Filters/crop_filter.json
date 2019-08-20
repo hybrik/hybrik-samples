@@ -45,7 +45,7 @@
                     },
                     "targets": [
                         {
-                            "file_pattern": "{{profile_name}}default_extension}",
+                            "file_pattern": "{{profile_name}}{default_extension}",
                             "existing_files": "replace",
                             "container": {
                                 "kind": "mp4"
