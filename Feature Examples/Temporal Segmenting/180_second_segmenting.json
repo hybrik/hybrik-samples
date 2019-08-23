@@ -1,20 +1,14 @@
 {
     "definitions": {
         "profile_name": "180_second_segmenting",
-        "type": "features",
-        "category": "temporal_segmenting",
-        "source_filename": "tears_of_steel_1080p.mov",
-
-        "source_path": "s3://hybrik-examples/public/sources",
-        "destination_basepath": "s3://hybrik-examples/public/output",
-        "source": "{{source_path}}/{{source_filename}}",
-        "destination_path": "{{destination_basepath}}/{{type}}/{{category}}/"
+        "source": "s3://hybrik-examples/public/sources/tears_of_steel_1080p.mov",
+        "destination_path": "s3://hybrik-examples/public/output/features/temporal_segmenting/{{profile_name}}"
     },
     "name": "{{profile_name}}:  {{source}}",
     "payload": {
         "elements": [
             {
-                "uid": "source",
+                "uid": "source_file",
                 "kind": "source",
                 "payload": {
                     "kind": "asset_url",
@@ -25,8 +19,8 @@
                 }
             },
             {
-                "kind": "transcode",
                 "uid": "transcode_task",
+                "kind": "transcode",
                 "payload": {
                     "location": {
                         "storage_provider": "s3",
@@ -39,7 +33,7 @@
                     },
                     "targets": [
                         {
-                            "file_pattern": "{{profile_name}}.mp4",
+                            "file_pattern": "{{profile_name}}{default_extension}",
                             "existing_files": "replace",
                             "container": {
                                 "kind": "mp4",
@@ -56,7 +50,6 @@
                                     "codec": "aac",
                                     "channels": 2,
                                     "sample_rate": 48000,
-                                    "sample_size": 16,
                                     "bitrate_kb": 128,
                                     "bitrate_mode": "vbr"
                                 }
@@ -70,7 +63,7 @@
             {
                 "from": [
                     {
-                        "element": "source"
+                        "element": "source_file"
                     }
                 ],
                 "to": {

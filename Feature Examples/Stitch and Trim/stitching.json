@@ -1,14 +1,10 @@
 {
     "definitions": {
         "profile_name": "stitching",
-        "type": "features",
-        "category": "stitch_and_trim",
+        "source_path": "s3://hybrik-examples/public/sources",
         "source1_filename": "bars_and_tone_30sec.mp4",
         "source2_filename": "tears_of_steel_720p.mov",
-        "source_path": "s3://hybrik-examples/public/sources",
-        "destination_basepath": "s3://hybrik-examples/public/output",
-        "source": "{{source_path}}/{{source_filename}}",
-        "destination_path": "{{destination_basepath}}/{{type}}/{{category}}/"
+        "destination_path": "s3://hybrik-examples/public/output/features/stitch_and_trim/{{profile_name}}"
     },
     "name": "{{profile_name}}:  {{source2_filename}}",
     "payload": {

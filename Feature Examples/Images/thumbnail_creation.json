@@ -1,14 +1,8 @@
 {
     "definitions": {
         "profile_name": "thumbnail_creation",
-        "type": "features",
-        "category": "images",
-        "source_filename": "tears_of_steel_1080p.mov",
-        "source_path": "s3://hybrik-examples/public/sources",
-        "destination_basepath": "s3://hybrik-examples/public/output",
-        "source": "{{source_path}}/{{source_filename}}",
-        "destination_path": "{{destination_basepath}}/{{type}}/{{category}}/",
-        "destination": "{{destination_path}}{{profile_name}}"
+        "source": "s3://hybrik-examples/public/sources/tears_of_steel_1080p.mov",
+        "destination_path": "s3://hybrik-examples/public/output/features/images/{{profile_name}}"
     },
     "name": "{{profile_name}}: {{source}}",
     "payload": {
@@ -25,12 +19,12 @@
                 }
             },
             {
-                "uid": "transcode_thumbnails",
+                "uid": "transcode_task",
                 "kind": "transcode",
                 "payload": {
                     "location": {
                         "storage_provider": "s3",
-                        "path": "{{destination}}"
+                        "path": "{{destination_path}}"
                     },
                     "targets": [
                         {
@@ -59,7 +53,7 @@
                 "to": {
                     "success": [
                         {
-                            "element": "transcode_thumbnails"
+                            "element": "transcode_task"
                         }
                     ]
                 }

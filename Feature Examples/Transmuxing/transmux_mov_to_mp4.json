@@ -1,13 +1,8 @@
 {
     "definitions": {
         "profile_name": "transmux_mov_to_mp4",
-        "type": "features",
-        "category": "transmuxing",
-        "source_filename": "tears_of_steel_1080p.mov",
-        "source_path": "s3://hybrik-examples/public/sources",
-        "destination_basepath": "s3://hybrik-examples/public/output",
-        "source": "{{source_path}}/{{source_filename}}",
-        "destination_path": "{{destination_basepath}}/{{type}}/{{category}}/"
+        "source": "s3://hybrik-examples/public/sources/tears_of_steel_1080p.mov",
+        "destination_path": "s3://hybrik-examples/public/output/features/transmuxing/{{profile_name}}"
     },
     "name": "{{profile_name}}:  {{source}}",
     "payload": {
