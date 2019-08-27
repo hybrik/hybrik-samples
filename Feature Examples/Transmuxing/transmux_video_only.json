@@ -19,7 +19,7 @@
                 }
             },
             {
-                "uid": "transmux",
+                "uid": "transmux_task",
                 "kind": "transcode",
                 "payload": {
                     "location": {
@@ -31,8 +31,7 @@
                             "file_pattern": "{{profile_name}}{default_extension}",
                             "existing_files": "replace",
                             "container": {
-                                "kind": "mpeg2ts",
-                                "faststart": true
+                                "kind": "mpeg2ts"
                             },
                             "video": {
                                 "codec": "copy"
@@ -60,7 +59,7 @@
                 "to": {
                     "success": [
                         {
-                            "element": "transmux"
+                            "element": "transmux_task"
                         }
                     ]
                 }

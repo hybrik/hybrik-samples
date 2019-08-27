@@ -23,8 +23,8 @@
                 }
             },
             {
-                "kind": "copy",
                 "uid": "copy_task",
+                "kind": "copy",
                 "payload": {
                     "target": {
                         "location": {

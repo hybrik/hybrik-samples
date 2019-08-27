@@ -19,7 +19,7 @@
                 }
             },
             {
-                "uid": "transmux",
+                "uid": "transmux_task",
                 "kind": "transcode",
                 "payload": {
                     "location": {
@@ -56,7 +56,7 @@
                 "to": {
                     "success": [
                         {
-                            "element": "transmux"
+                            "element": "transmux_task"
                         }
                     ]
                 }

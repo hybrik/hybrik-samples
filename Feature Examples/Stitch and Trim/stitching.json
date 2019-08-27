@@ -84,7 +84,6 @@
                                     "codec": "aac",
                                     "channels": 2,
                                     "sample_rate": 48000,
-                                    "sample_size": 16,
                                     "bitrate_kb": 128,
                                     "bitrate_mode": "vbr"
                                 }

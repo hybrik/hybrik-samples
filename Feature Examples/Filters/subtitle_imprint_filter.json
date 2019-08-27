@@ -59,8 +59,8 @@
                 }
             },
             {
-                "kind": "transcode",
                 "uid": "transcode_task",
+                "kind": "transcode",
                 "payload": {
                     "location": {
                         "storage_provider": "s3",
@@ -75,8 +75,8 @@
                                 "faststart": true
                             },
                             "video": {
-                                "width": 1200,
                                 "codec": "h264",
+                                "width": 1200,
                                 "profile": "high",
                                 "crf": "23",
                                 "filters": [
@@ -93,7 +93,6 @@
                                     "codec": "aac",
                                     "channels": 2,
                                     "sample_rate": 48000,
-                                    "sample_size": 16,
                                     "bitrate_kb": 128,
                                     "bitrate_mode": "vbr"
                                 }
