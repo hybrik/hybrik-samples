@@ -1,214 +1,150 @@
 {
-    "definitions": {
-        "profile_name": "analyze_plus_qc",
-        "source": "s3://hybrik-examples/public/sources/tears_of_steel_720p.mov"
-    },
-    "name": "{{profile_name}}:  {{source}}",
-    "payload": {
-        "elements": [
-            {
-                "uid": "source_file",
-                "kind": "source",
-                "payload": {
-                    "kind": "asset_url",
-                    "payload": {
-                        "storage_provider": "s3",
-                        "url": "{{source}}"
-                    }
-                }
+  "definitions": {
+    "profile_name": "analyze_plus_qc",
+    "source": "s3://hybrik-public/sample_sources/tears_of_steel_720p.mov"
+  },
+  "name": "{{profile_name}}:  {{source}}",
+  "payload": {
+    "elements": [
+      {
+        "uid": "source_file",
+        "kind": "source",
+        "payload": {
+          "kind": "asset_url",
+          "payload": {
+            "storage_provider": "s3",
+            "url": "{{source}}"
+          }
+        }
+      },
+      {
+        "uid": "analyze_task",
+        "kind": "analyze",
+        "payload": {
+          "general_properties": {
+            "enabled": true
+          },
+          "deep_properties": {
+            "video": {
+              "black": {
+                "enabled": true,
+                "is_optional": true,
+                "black_level": 0.03,
+                "duration_sec": 1
+              },
+              "black_borders": {
+                "enabled": true,
+                "is_optional": true
+              }
             },
-            {
-                "uid": "analyze_task",
-                "kind": "analyze",
-                "payload": {
-                    "general_properties": {
-                        "enabled": true
-                    },
-                    "deep_properties": {
-                        "audio": {
-                            "volume": {
-                                "enabled": true
-                            },
-                            "levels": {
-                                "enabled": true
-                            },
-                            "silence": {
-                                "enabled": true,
-                                "duration_sec": 3.0
-                            }
-                        },
-                        "video": {
-                            "black": {
-                                "enabled": true,
-                                "duration_sec": 5.0,
-                                "black_pixel_ratio": 1.0
-                            },
-                            "interlace_mode": {
-                                "enabled": true
-                            }
-                        }
-                    }
-                }
-            },
-            {
-                "uid": "qc_task",
-                "kind": "qc",
-                "task": {
-                    "retry_method": "fail"
-                },
-                "payload": {
-                    "container": {
-                        "size_bytes": {
-                            "enabled": true,
-                            "conditions": [
-                                [
-                                    {
-                                        "op": ">",
-                                        "value": 10000
-                                    }
-                                ]
-                            ]
-                        }
-                    },
-                    "audio": {
-                        "channels": {
-                            "enabled": true,
-                            "conditions": [
-                                [
-                                    {
-                                        "op": ">=",
-                                        "value": 1
-                                    }
-                                ]
-                            ]
-                        },
-                        "sample_rate": {
-                            "enabled": true,
-                            "conditions": [
-                                [
-                                    {
-                                        "op": ">=",
-                                        "value": 11025
-                                    },
-                                    {
-                                        "op": "<=",
-                                        "value": 96000
-                                    }
-                                ]
-                            ]
-                        },
-                        "level_db": {
-                            "enabled": true,
-                            "conditions": [
-                                [
-                                    {
-                                        "op": ">=",
-                                        "value": -60
-                                    }
-                                ]
-                            ]
-                        },
-                        "silence_sec": {
-                            "enabled": true,
-                            "conditions": [
-                                [
-                                    {
-                                        "op": "<",
-                                        "value": 2
-                                    }
-                                ]
-                            ]
-                        }
-                    },
-                    "video": {
-                        "width": {
-                            "enabled": true,
-                            "conditions": [
-                                [
-                                    {
-                                        "op": ">=",
-                                        "value": 320
-                                    }
-                                ]
-                            ]
-                        },
-                        "height": {
-                            "enabled": true,
-                            "conditions": [
-                                [
-                                    {
-                                        "op": ">=",
-                                        "value": 240
-                                    }
-                                ]
-                            ]
-                        },
-                        "black_sec": {
-                            "enabled": true,
-                            "conditions": [
-                                [
-                                    {
-                                        "op": "<=",
-                                        "value": 5
-                                    }
-                                ]
-                            ]
-                        },
-                        "frame_rate": {
-                            "enabled": true,
-                            "conditions": [
-                                [
-                                    {
-                                        "op": "=",
-                                        "value": 24
-                                    }
-                                ]
-                            ]
-                        },
-                        "interlace_mode": {
-                            "enabled": true,
-                            "conditions": [
-                                [
-                                    {
-                                        "op": "=",
-                                        "value": "progressive"
-                                    }
-                                ]
-                            ]
-                        }
-                    }
-                }
+            "audio": {
+              "levels": {
+                "enabled": true,
+                "is_optional": true
+              },
+              "silence": {
+                "enabled": true,
+                "is_optional": true,
+                "noise_db": -60,
+                "duration_sec": 1
+              }
             }
+          }
+        }
+      },
+      {
+        "uid": "qc_task",
+        "kind": "qc",
+        "task": {
+          "retry_method": "fail"
+        },
+        "payload": {
+          "conditions": {
+            "pass": [
+              {
+                "condition": "general_properties.container.size_kb > 10000",
+                "message_pass": "PASS: Source file size is greater than 10 megabytes, size = {general_properties.container.size_kb} kb.",
+                "message_fail": "FAIL: Source file size is less than or equal to 10 megabytes, size = {general_properties.container.size_kb} kb."
+              },
+              {
+                "condition": "general_properties.video.width >= 1920",
+                "message_pass": "PASS: Video frame width is greater than or equal to 1920, width is {general_properties.video.width} pixels.",
+                "message_fail": "FAIL: Video frame width is less than 1920, width is {general_properties.video.width} pixels."
+              },
+              {
+                "condition": "general_properties.video.height >= 1080",
+                "message_pass": "PASS: Video frame height is greater than or equal to 1080, height is {general_properties.video.height} pixels.",
+                "message_fail": "FAIL: Video frame height is less than 1080, height is {general_properties.video.height} pixels."
+              },
+              {
+                "condition": "general_properties.audio.size() >= 1",
+                "message_pass": "PASS: Number of audio tracks is greater than or equal to 1, there are {general_properties.audio.size()} tracks",
+                "message_fail": "FAIL: There are no audio tracks."
+              },
+              {
+                "condition": "general_properties.audio[0].sample_rate >= 44100",
+                "message_pass": "PASS: Audio sample rate is greater than or equal to 44.1 kHz, sample rate is {general_properties.audio[0].sample_rate} Hz.",
+                "message_fail": "FAIL: Audio sample rate is less than 44.1 kHz, sample rate is {general_properties.audio[0].sample_rate} Hz."
+              },
+              {
+                "condition": "deep_properties.video.black.size() == 0 || deep_properties.video.black.max('duration') <= 5",
+                "message_pass": "PASS: Longest black segment is shorter than 5 seconds.",
+                "message_fail": "FAIL: At least one black segment is longer than or equal to 5 seconds."
+              },
+              {
+                "condition": "deep_properties.video.black_borders.top == 0 && deep_properties.video.black_borders.bottom == 0",
+                "message_pass": "PASS: Video letterboxing is 0 pixels.",
+                "message_fail": "FAIL: Video letterboxing is more than 0 pixels, top = {deep_properties.video.black_borders.top} pixels, bottom = {deep_properties.video.black_borders.bottom} pixels."
+              },
+              {
+                "condition": "deep_properties.video.black_borders.left == 0 && deep_properties.video.black_borders.right == 0",
+                "message_pass": "PASS: Video pillarboxing is 0 pixels.",
+                "message_fail": "FAIL: Video pillarboxing is more than 0 pixels, left = {deep_properties.video.black_borders.left} pixels, right = {deep_properties.video.black_borders.right} pixels."
+              },
+              {
+                "condition": "deep_properties.audio[0].levels.rms_level_db >= -60",
+                "message_pass": "PASS: Audio RMS level is higher than or equal to -60 dB, level is {deep_properties.audio[0].levels.rms_level_db} dB.",
+                "message_fail": "FAIL: Audio level is lower than -60dB, level is {deep_properties.audio[0].levels.rms_level_db} dB."
+              },
+              {
+                "condition": "deep_properties.audio[0].silence.size() == 0 || deep_properties.audio[0].silence.max('duration') <= 5",
+                "message_pass": "PASS: Longest audio silence is shorter than 5 seconds.",
+                "message_fail": "FAIL: At least one audio silence is longer than or equal to 5 seconds."
+              }
+            ]
+          }
+        }
+      }
+    ],
+    "connections": [
+      {
+        "from": [
+          {
+            "element": "source_file"
+          }
         ],
-        "connections": [
+        "to": {
+          "success": [
             {
-                "from": [
-                    {
-                        "element": "source_file"
-                    }
-                ],
-                "to": {
-                    "success": [
-                        {
-                            "element": "analyze_task"
-                        }
-                    ]
-                }
-            },
-            {
-                "from": [
-                    {
-                        "element": "analyze_task"
-                    }
-                ],
-                "to": {
-                    "success": [
-                        {
-                            "element": "qc_task"
-                        }
-                    ]
-                }
+              "element": "analyze_task"
             }
-        ]
-    }
+          ]
+        }
+      },
+      {
+        "from": [
+          {
+            "element": "analyze_task"
+          }
+        ],
+        "to": {
+          "success": [
+            {
+              "element": "qc_task"
+            }
+          ]
+        }
+      }
+    ]
+  }
 }
