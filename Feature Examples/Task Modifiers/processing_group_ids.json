@@ -1,0 +1,423 @@
+{
+    "definitions": {
+        "descriptor": "processing_group_ids",
+        "source_path": "s3://hybrik-public/sample_sources",
+        "source_file_name": "tears_of_steel_720p.mov",
+        "destination_path": "s3://hybrik-examples/public/output/feature_examples/task_modifiers/{{descriptor}}",
+        "destination_hls_media": "{{destination_path}}/hls_media",
+        "destination_hls_manifests": "{{destination_path}}/manifests",
+        "destination_dash_media": "{{destination_path}}/dash_media",
+        "destination_dash_manifests": "{{destination_path}}/manifests",
+        "caption_file_path": "{{source_path}}",
+        "caption_file_name": "TOS-en.srt",
+        "segment_duration": 6
+    },
+    "name": "{{descriptor}}",
+    "task_tags": [],
+    "payload": {
+        "elements": [
+            {
+                "uid": "source_file",
+                "kind": "source",
+                "payload": {
+                    "kind": "asset_complex",
+                    "payload": {
+                        "asset_versions": [
+                            {
+                                "version_uid": "audio_video",
+                                "asset_components": [
+                                    {
+                                        "component_uid": "audio_video",
+                                        "kind": "name",
+                                        "name": "{{source_file_name}}",
+                                        "location": {
+                                            "storage_provider": "s3",
+                                            "path": "{{source_path}}",
+                                            "access": {}
+                                        },
+                                        "trim": {
+                                            "outpoint_sec": 30
+                                        },
+                                        "contents": [
+                                            {
+                                                "kind": "video"
+                                            },
+                                            {
+                                                "kind": "audio"
+                                            }
+                                        ]
+                                    },
+                                    {
+                                        "kind": "name",
+                                        "component_uid": "subtitles",
+                                        "name": "{{caption_file_name}}",
+                                        "location": {
+                                            "storage_provider": "s3",
+                                            "path": "{{caption_file_path}}"
+                                        },
+                                        "contents": [
+                                            {
+                                                "kind": "subtitle",
+                                                "payload": {
+                                                    "format": "srt",
+                                                    "language": "eng",
+                                                    "sync_to_timecode": true
+                                                }
+                                            }
+                                        ]
+                                    }
+                                ]
+                            }
+                        ]
+                    }
+                }
+            },
+            {
+                "uid": "transcode_h264_h265",
+                "kind": "transcode",
+                "task": {
+                    "retry_method": "retry",
+                    "retry": {
+                        "count": 3,
+                        "delay_sec": 30
+                    },
+                    "tags": []
+                },
+                "payload": {
+                    "location": {
+                        "storage_provider": "s3",
+                        "path": "{{destination_path}}/mp4s"
+                    },
+                    "targets": [
+                        {
+                            "processing_group_ids": [
+                                "hls",
+                                "dash_h265"
+                            ],
+                            "file_pattern": "{source_basename}_3200_720p_h265{default_extension}",
+                            "existing_files": "replace",
+                            "container": {
+                                "kind": "fmp4",
+                                "segment_duration_sec": "{{segment_duration}}"
+                            },
+                            "video": {
+                                "height": 720,
+                                "codec": "h265",
+                                "profile": "main",
+                                "bitrate_kb": 3200,
+                                "layer_affinities": [
+                                    "audio"
+                                ]
+                            }
+                        },
+                        {
+                            "processing_group_ids": [
+                                "hls",
+                                "dash_h265"
+                            ],
+                            "file_pattern": "{source_basename}_2000_540p_h265{default_extension}",
+                            "existing_files": "replace",
+                            "container": {
+                                "kind": "fmp4",
+                                "segment_duration_sec": "{{segment_duration}}"
+                            },
+                            "video": {
+                                
+                                "height": 540,
+                                "codec": "h265",
+                                "bitrate_mode": "cbr",
+                                "profile": "main",
+                                "bitrate_kb": 2000,
+                                "par": "1:1",
+                                "layer_affinities": [
+                                    "audio"
+                                ]
+                            }
+                        },
+                        {
+                            "processing_group_ids": [
+                                "hls",
+                                "dash_h264"
+                            ],
+                            "file_pattern": "{source_basename}_3500_720p_h264{default_extension}",
+                            "existing_files": "replace",
+                            "container": {
+                                "kind": "fmp4",
+                                "segment_duration_sec": "{{segment_duration}}"
+                            },
+                            "video": {
+                                "height": 720,
+                                "codec": "h264",
+                                "profile": "high",
+                                "bitrate_kb": 3500,
+                                "layer_affinities": [
+                                    "audio"
+                                ]
+                            }
+                        },
+                        {
+                            "processing_group_ids": [
+                                "hls",
+                                "dash_h264"
+                            ],
+                            "file_pattern": "{source_basename}_2000_540p_h264{default_extension}",
+                            "existing_files": "replace",
+                            "container": {
+                                "kind": "fmp4",
+                                "segment_duration_sec": "{{segment_duration}}"
+                            },
+                            "video": {
+                                "height": 540,
+                                "codec": "h264",
+                                "profile": "high",
+                                "bitrate_kb": 2000,
+                                "max_bitrate_kb": 3000,
+                                "layer_affinities": [
+                                    "audio"
+                                ]
+                            }
+                        },
+                        {
+                            "processing_group_ids": [
+                                "hls",
+                                "dash_h265",
+                                "dash_h264"
+                            ],
+                            "file_pattern": "{source_basename}_audio{default_extension}",
+                            "existing_files": "replace",
+                            "container": {
+                                "kind": "fmp4",
+                                "segment_duration_sec": "{{segment_duration}}"
+                            },
+                            "audio": [
+                                {
+                                    "channels": 2,
+                                    "codec": "aac",
+                                    "sample_rate": 48000,
+                                    "bitrate_kb": 128,
+                                    "sample_size": 24,
+                                    "bitrate_mode": "cbr",
+                                    "language": "eng",
+                                    "layer_id": "audio",
+                                    "source": [
+                                        {
+                                            "track": 0
+                                        }
+                                    ]
+                                }
+                            ]
+                        },
+                        {
+                            "processing_group_ids": [
+                                "hls",
+                                "dash_h265",
+                                "dash_h264"
+                            ],
+                            "file_pattern": "{source_basename}.vtt",
+                            "existing_files": "replace",
+                            "container": {
+                                "kind": "webvtt"
+                            },
+                            "subtitle": [
+                                {
+                                    "format": "webvtt",
+                                    "language": "eng"
+                                }
+                            ]
+                        }
+                    ]
+                }
+            },
+            {
+                "uid": "dash_package_h265",
+                "kind": "package",
+                "task": {
+                    "extended": {
+                        "start_payload_filter": {
+                            "processing_group_ids": [
+                                "dash_h265"
+                            ]
+                        }
+                    },
+                    "retry_method": "retry",
+                    "retry": {
+                        "count": 3,
+                        "delay_sec": 30
+                    },
+
+                    "name": "package_dash_h265"
+                },
+                "payload": {
+                    "uid": "main_manifest",
+                    "kind": "dash",
+                    "location": {
+                        "storage_provider": "s3",
+                        "path": "{{destination_dash_manifests}}",
+                        "attributes": [
+                            {
+                                "name": "ContentType",
+                                "value": "application/dash+xml"
+                            }
+                        ]
+                    },
+                    "file_pattern": "master-hevc.mpd",
+                    "segmentation_mode": "fmp4",
+                    "force_original_media": false,
+                    "media_location": {
+                        "path": "{{destination_dash_media}}",
+                        "storage_provider": "s3",
+                        "attributes": [
+                            {
+                                "name": "ContentType",
+                                "value": "video/mp4"
+                            }
+                        ]
+                    },
+                    "dash": {
+                        "subtitle_container": "webvtt"
+                    }
+                }
+            },
+            {
+                "uid": "hls_package_h264_h265",
+                "kind": "package",
+                "task": {
+                    "extended": {
+                        "start_payload_filter": {
+                            "processing_group_ids": [
+                                "hls"
+                            ]
+                        }
+                    },
+                    "retry_method": "retry",
+                    "retry": {
+                        "count": 3,
+                        "delay_sec": 30
+                    },
+                    "name": "hls_package_h264_h265"
+                },
+                "payload": {
+                    "uid": "main_manifest",
+                    "kind": "hls",
+                    "location": {
+                        "storage_provider": "s3",
+                        "path": "{{destination_hls_manifests}}",
+                        "attributes": [
+                            {
+                                "name": "ContentType",
+                                "value": "application/x-mpegURL"
+                            }
+                        ]
+                    },
+                    "file_pattern": "master.m3u8",
+                    "segmentation_mode": "fmp4",
+                    "force_original_media": false,
+                    "media_location": {
+                        "storage_provider": "s3",
+                        "path": "{{destination_hls_media}}",
+                        "attributes": [
+                            {
+                                "name": "ContentType",
+                                "value": "video/mp4"
+                            }
+                        ]
+                    },
+                    "hls": {
+                        "media_playlist_location": {
+                            "storage_provider": "s3",
+                            "path": "{{destination_hls_manifests}}"
+                        }
+                    }
+                }
+            },
+            {
+                "uid": "dash_package_h264",
+                "kind": "package",
+                "task": {
+                    "extended": {
+                        "start_payload_filter": {
+                            "processing_group_ids": [
+                                "dash_h264"
+                            ]
+                        }
+                    },
+                    "retry_method": "retry",
+                    "retry": {
+                        "count": 5,
+                        "delay_sec": 5
+                    },
+                    "tags": [],
+                    "priority": 254,
+                    "name": "package_dash_h264"
+                },
+                "payload": {
+                    "uid": "main_manifest",
+                    "kind": "dash",
+                    "location": {
+                        "storage_provider": "s3",
+                        "path": "{{destination_dash_manifests}}",
+                        "attributes": [
+                            {
+                                "name": "ContentType",
+                                "value": "application/dash+xml"
+                            }
+                        ]
+                    },
+                    "file_pattern": "master-h264.mpd",
+                    "segmentation_mode": "fmp4",
+                    "force_original_media": false,
+                    "media_location": {
+                        "path": "{{destination_dash_media}}",
+                        "storage_provider": "s3",
+                        "attributes": [
+                            {
+                                "name": "ContentType",
+                                "value": "video/mp4"
+                            }
+                        ]
+                    },
+                    "dash": {
+                        "subtitle_container": "webvtt"
+                    }
+                }
+            }
+        ],
+        "connections": [
+            {
+                "from": [
+                    {
+                        "element": "source_file"
+                    }
+                ],
+                "to": {
+                    "success": [
+                        {
+                            "element": "transcode_h264_h265"
+                        }
+                    ]
+                }
+            },
+            {
+                "from": [
+                    {
+                        "element": "transcode_h264_h265"
+                    }
+                ],
+                "to": {
+                    "success": [
+                        {
+                            "element": "hls_package_h264_h265"
+                        },
+                        {
+                            "element": "dash_package_h264"
+                        },
+                        {
+                            "element": "dash_package_h265"
+                        }
+                    ]
+                }
+            }
+        ]
+    },
+    "priority": "100"
+}
