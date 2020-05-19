@@ -1,0 +1,94 @@
+{
+    "definitions": {
+        "descriptor": "analyze_audio_psnr",
+        "analyze_file_url": "s3://hybrik-examples/public/sources/tears_of_steel_720p.mov",
+        "master_file_url": "s3://hybrik-examples/public/sources/TOS_spoken_1920x1080p24_2tk_ch_positions_5.1_2.0.mov",
+        "destination_path": "s3://hybrik-examples/public/output/feature_examples/analysis/{{descriptor}}"
+    },
+    "name": "{{descriptor}}: {{analyze_file_url}}",
+    "payload": {
+        "elements": [
+            {
+                "uid": "source_file",
+                "kind": "source",
+                "payload": {
+                    "kind": "asset_url",
+                    "payload": {
+                        "storage_provider": "s3",
+                        "url": "{{analyze_file_url}}"
+                    }
+                }
+            },
+            {
+                "uid": "analyze_task",
+                "kind": "analyze",
+                "payload": {
+                    "reports": [
+                        {
+                            "create_condition": "always",
+                            "file_pattern": "{source_basename}_audio_psnr_report.pdf",
+                            "location": {
+                                "storage_provider": "s3",
+                                "path": "{{destination_path}}"
+                            }
+                        }
+                    ],
+                    "compare_asset": {
+                        "kind": "asset_url",
+                        "payload": {
+                            "storage_provider": "s3",
+                            "url": "{{master_file_url}}",
+                            "contents": [
+                                {
+                                    "kind": "audio",
+                                    "mode": "complete_map",
+                                    "map": [
+                                        {
+                                            "input": {
+                                                "track": 0
+                                            },
+                                            "output": {
+                                                "track": 0
+                                            }
+                                        }
+                                    ]
+                                }
+                            ]
+                        }
+                    },
+                    "general_properties": {
+                        "enabled": true
+                    },
+                    "deep_properties": {
+                        "audio": [
+                            {
+                                "track_selector": {
+                                    "index": 0
+                                },
+                                "psnr": {
+                                    "enabled": true
+                                }
+                            }
+                        ]
+                    }
+                }
+            }
+        ],
+        "connections": [
+            {
+                "from": [
+                    {
+                        "element": "source_file"
+                    }
+                ],
+                "to": {
+                    "success": [
+                        {
+                            "element": "analyze_task"
+                        }
+                    ]
+                }
+            }
+        ]
+    }
+}

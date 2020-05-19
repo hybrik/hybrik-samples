@@ -1,10 +1,10 @@
 {
     "definitions": {
-        "profile_name": "auto_crop_filter",
+        "descriptor": "auto_crop_filter_remove_letterbox",
         "source": "s3://hybrik-examples/public/sources/tears_of_steel_1080p_letterboxed.mp4",
-        "destination_path": "s3://hybrik-examples/public/output/features/filters/{{profile_name}}"
+        "destination_path": "s3://hybrik-examples/public/output/feature_examples/filters/{{descriptor}}"
     },
-    "name": "{{profile_name}}:  {{source}}",
+    "name": "{{descriptor}}: {{source}}",
     "payload": {
         "elements": [
             {
@@ -44,26 +44,10 @@
                     "retry_method": "fail"
                 },
                 "payload": {
-                    "location": {
-                        "storage_provider": "s3",
-                        "path": "{{destination_path}}"
-                    },
-                    "targets": [
-                        {
-                            "file_pattern": "{source_basename}_autocropped{default_extension}",
-                            "existing_files": "replace",
-                            "container": {
-                                "kind": "mp4"
-                            },
-                            "video": {
-                                "codec": "h264",
-                                "height": 400,
-                                "bitrate_mode": "vbr",
-                                "bitrate_kb": 1000,
-                                "max_bitrate_kb": 1200,
-                                "ar_auto_crop": "preserving",
-                                "ar_pad_crop_ratio": 1.0,
-                                "filters": [
+                    "source_pipeline": {
+                        "filters": [
+                            {
+                                "video": [
                                     {
                                         "kind": "crop",
                                         "payload": {
@@ -76,6 +60,40 @@
                                     }
                                 ]
                             }
+                        ]
+                    },
+                    "location": {
+                        "storage_provider": "s3",
+                        "path": "{{destination_path}}"
+                    },
+                    "targets": [
+                        {
+                            "container": {
+                                "kind": "mp4"
+                            },
+                            "existing_files": "replace",
+                            "file_pattern": "{source_basename}_letterbox_removed{default_extension}",
+                            "video": {
+                                "codec": "h264",
+                                "bitrate_mode": "cbr",
+                                "profile": "high",
+                                "level": "4.1",
+                                "preset": "fast",
+                                "bitrate_kb": "1500",
+                                "par": "1",
+                                "overrides": {
+                                    "height": "(source.video.height) - (analyzer.deep_properties.video.black_borders.top) - (analyzer.deep_properties.video.black_borders.bottom)",
+                                    "width": "round(source.video.width * source.video.par)"
+                                }
+                            },
+                            "audio": [
+                                {
+                                    "channels": 2,
+                                    "codec": "aac",
+                                    "sample_rate": 48000,
+                                    "bitrate_kb": 128
+                                }
+                            ]
                         }
                     ]
                 }

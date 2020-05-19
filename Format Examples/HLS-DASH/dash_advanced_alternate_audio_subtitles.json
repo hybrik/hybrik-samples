@@ -1,17 +1,14 @@
 {
     "definitions": {
-        "profile_name": "dash_advanced_alternate_audio_subtitles",
-
+        "descriptor": "dash_advanced_alternate_audio_subtitles",
         "source_path": "s3://hybrik-examples/public/sources",
         "source_filename": "tears_of_steel_720p.mov",
         "audio_it_filename": "tears_of_steel_italian_audio.mp4",
         "caption_filename": "TOS-en.scc",
-
-        "destination_path": "s3://hybrik-examples/public/output/formats/hls-dash/{{profile_name}}",
-
+        "destination_path": "s3://hybrik-examples/public/output/format_examples/hls-dash/{{descriptor}}",
         "segment_duration": 6
     },
-    "name": "{{profile_name}}: {{source_filename}}",
+    "name": "{{descriptor}}: {{source_filename}}",
     "payload": {
         "elements": [
             {

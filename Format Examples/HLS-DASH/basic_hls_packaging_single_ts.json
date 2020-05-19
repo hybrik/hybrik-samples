@@ -1,11 +1,11 @@
 {
     "definitions": {
-        "profile_name": "basic_hls_packaging_single_ts",
+        "descriptor": "basic_hls_packaging_single_ts",
         "source": "s3://hybrik-examples/public/sources/tears_of_steel_720p.mov",
-        "destination_path": "s3://hybrik-examples/public/output/formats/hls-dash/{{profile_name}}",
+        "destination_path": "s3://hybrik-examples/public/output/format_examples/hls-dash/{{descriptor}}",
         "segment_duration": 6
     },
-    "name": "{{profile_name}}: {{source}}",
+    "name": "{{descriptor}}: {{source}}",
     "payload": {
         "elements": [
             {

@@ -1,0 +1,182 @@
+{
+  "definitions": {
+    "descriptor": "transcode_xdcam_output_example",
+    "source_path": "s3://hybrik-examples/public/sources",
+    "source_file": "TOS_spoken_1920x1080p24_1tk_ch_positions_5.1.mov",
+    "source_scc_file": "TOS-en.scc",
+    "destination_path": "s3://hybrik-examples/public/output/feature_examples/transcoding/{{descriptor}}",
+    "output_filename": "{{descriptor}}{default_extension}"
+  },
+  "name": "{{descriptor}}: {{source_file}}",
+  "payload": {
+    "elements": [
+      {
+        "uid": "source",
+        "kind": "source",
+        "payload": {
+          "kind": "asset_complex",
+          "payload": {
+            "kind": "sequence",
+            "asset_versions": [
+              {
+                "version_uid": "av",
+                "asset_components": [
+                  {
+                    "location": {
+                      "path": "{{source_path}}",
+                      "storage_provider": "s3"
+                    },
+                    "kind": "name",
+                    "name": "{{source_file}}",
+                    "component_uid": "main"
+                  },
+                  {
+                    "kind": "name",
+                    "location": {
+                      "storage_provider": "s3",
+                      "path": "{{source_path}}"
+                    },
+                    "name": "{{source_scc_file}}",
+                    "component_uid": "scc",
+                    "contents": [
+                      {
+                        "kind": "closed_caption",
+                        "payload": {
+                          "format": "scc",
+                          "language": "eng"
+                        }
+                      }
+                    ]
+                  }
+                ]
+              }
+            ]
+          }
+        }
+      },
+      {
+        "uid": "transcode_task",
+        "kind": "transcode",
+        "task": {
+          "name": "taskname",
+          "retry_method": "retry",
+          "retry": {
+            "count": 2,
+            "delay_sec": 10
+          }
+        },
+        "payload": {
+          "targets": [
+            {
+              "uid": "xdcam",
+              "location": {
+                "storage_provider": "s3",
+                "path": "{{destination_path}}"
+              },
+              "file_pattern": "{{output_filename}}",
+              "existing_files": "replace",
+              "compliance": "xdcam_hd_422",
+              "container": {
+                "kind": "mxf"
+              },
+              "video": {
+                "width": 1920,
+                "height": 1080,
+                "interlace_mode": "tff",
+                "frame_rate": 29.97,
+                "closed_captions": {
+                  "enable_cea608": true,
+                  "enable_cea708": true,
+                  "enable_smpte436m": true,
+                  "enable_a53": true
+                },
+                "filters": [
+                  {
+                    "kind": "telecine",
+                    "payload": {
+                      "interlace_mode": "tff",
+                      "pattern": "23"
+                    }
+                  }
+                ]
+              },
+              "audio": [
+                {
+            "codec": "pcm",
+            "channels": 1,
+            "sample_size": 24,
+            "sample_rate": 48000,
+            "language": "eng",
+            "track_name": "5.1 - L"
+          },
+          {
+            "codec": "pcm",
+            "channels": 1,
+            "sample_size": 24,
+            "sample_rate": 48000,
+            "language": "eng",
+            "track_name": "5.1 - R"
+          },
+          {
+            "codec": "pcm",
+            "channels": 1,
+            "sample_size": 24,
+            "sample_rate": 48000,
+            "language": "eng",
+            "track_name": "5.1 - C"
+          },
+          {
+            "codec": "pcm",
+            "channels": 1,
+            "sample_size": 24,
+            "sample_rate": 48000,
+            "language": "eng",
+            "track_name": "5.1 - LFE"
+          },
+          {
+            "codec": "pcm",
+            "channels": 1,
+            "sample_size": 24,
+            "sample_rate": 48000,
+            "language": "eng",
+            "track_name": "5.1 - Ls"
+          },
+          {
+            "codec": "pcm",
+            "channels": 1,
+            "sample_size": 24,
+            "sample_rate": 48000,
+            "language": "eng",
+            "track_name": "5.1 - Rs"
+          }
+              ],
+              "timecode": [
+                {
+                  "source": "start_value",
+                  "force_drop": true,
+                  "start_value": "01:00:00;00"
+                }
+              ]
+            }
+          ]
+        }
+      }
+    ],
+    "connections": [
+      {
+        "from": [
+          {
+            "element": "source"
+          }
+        ],
+        "to": {
+          "success": [
+            {
+              "element": "transcode_task"
+            }
+          ]
+        }
+      }
+    ]
+  }
+}

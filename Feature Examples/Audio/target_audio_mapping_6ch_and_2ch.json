@@ -1,0 +1,112 @@
+{
+  "definitions": {
+    "descriptor": "target_audio_mapping_6ch_and_2ch",
+    "source_path": "s3://hybrik-examples/public/sources",
+    "source_file": "TOS_spoken_1920x1080p24_2tk_ch_positions_5.1_2.0.mov",
+    "destination_path": "s3://hybrik-examples/public/output/feature_examples/audio/{{descriptor}}"
+  },
+  "name": "{{descriptor}}: {{source_file}}",
+  "payload": {
+    "elements": [
+      {
+        "uid": "source",
+        "kind": "source",
+        "payload": {
+          "kind": "asset_complex",
+          "payload": {
+            "kind": "sequence",
+            "asset_versions": [
+              {
+                "version_uid": "0",
+                "asset_components": [
+                  {
+                    "location": {
+                      "storage_provider": "s3",
+                      "path": "{{source_path}}"
+                    },
+                    "kind": "name",
+                    "name": "{{source_file}}",
+                    "component_uid": "source_0"
+                  }
+                ]
+              }
+            ]
+          }
+        }
+      },
+      {
+        "uid": "transcode_task",
+        "kind": "transcode",
+        "payload": {
+          "location": {
+            "storage_provider": "s3",
+            "path": "{{destination_path}}"
+          },
+          "targets": [
+            {
+              "file_pattern": "target_C_2-channel.mov",
+              "existing_files": "replace",
+              "container": {
+                "kind": "mov"
+              },
+              "audio": [
+                {
+                  "codec": "pcm",
+                  "channels": 2,
+                  "source": [
+                    {
+                      "track": 1
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "file_pattern": "target_D_2-channel.mov",
+              "existing_files": "replace",
+              "container": {
+                "kind": "mov"
+              },
+              "audio": [
+                {
+                  "codec": "pcm",
+                  "channels": 2,
+                  "source": [
+                    {
+                      "track": 1
+                    }
+                  ]
+                },
+                {
+                  "codec": "pcm",
+                  "channels": 6,
+                  "source": [
+                    {
+                      "track": 0
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        }
+      }
+    ],
+    "connections": [
+      {
+        "from": [
+          {
+            "element": "source"
+          }
+        ],
+        "to": {
+          "success": [
+            {
+              "element": "transcode_task"
+            }
+          ]
+        }
+      }
+    ]
+  }
+}

@@ -1,0 +1,247 @@
+{
+	"definitions": {
+		"descriptor": "connections_array_example",
+		"source_url": "s3://hybrik-examples/public/sources/bars_and_tone_30sec_2.0.mp4",
+		"destination_path": "s3://hybrik-examples/public/output/feature_examples/hybrik_json/{{descriptor}}",
+		"email_address": "some.person@domain.com"
+	},
+	"name": "{{descriptor}}: {{source_url}}",
+	"payload": {
+		"elements": [
+			{
+				"uid": "source",
+				"kind": "source",
+				"payload": {
+					"kind": "asset_url",
+					"payload": {
+						"storage_provider": "s3",
+						"url": "{{source_url}}"
+					}
+				}
+			},
+			{
+				"uid": "analyze_general",
+				"kind": "analyze",
+				"payload": {
+					"general_properties": {
+						"enabled": true
+					}
+				}
+			},
+			{
+				"uid": "qc_task",
+				"kind": "qc",
+				"payload": {
+					"conditions": {
+						"pass": [
+							{
+								"condition": "source.audio.length >= 1",
+								"message_pass": "passed qc - this source contains {source.audio.length} audio tracks.",
+								"message_fail": "FAILED QC - source file has no valid audio configurations for stereo output."
+							},
+							{
+								"condition": "source.audio[0].channels == 2",
+								"message_pass": "passed qc - audio track 1 of this source contains {source.audio[0].channels} audio channels.",
+								"message_fail": "FAILED qc - audio track 1 of this source contains {source.audio[0].channels} audio channels."
+							}
+						]
+					}
+				}
+			},
+			{
+				"uid": "transcode_a",
+				"kind": "transcode",
+				"task": {
+
+				},
+				"payload": {
+					"location": {
+						"storage_provider": "s3",
+						"path": "{{destination_path}}"
+					},
+					"targets": [
+						{
+							"file_pattern": "start_to_end_800kbps{default_extension}",
+							"existing_files": "replace",
+							"container": {
+								"kind": "mp4"
+							},
+							"video": {
+								"codec": "h264",
+								"bitrate_kb": 800,
+								"profile": "high",
+								"level": "3.1",
+								"height": 486,
+								"par": "1:1"
+							},
+							"audio": [
+								{
+									"channels": 2,
+									"codec": "aac_lc",
+									"sample_rate": 48000,
+									"bitrate_kb": 64,
+									"layer_id": "audio_low"
+								}
+							]
+						}
+					]
+				}
+			},
+			{
+				"uid": "transcode_b",
+				"kind": "transcode",
+				"task": {
+
+				},
+				"payload": {
+					"source_pipeline": {
+						"trim": {
+							"inpoint_sec": "20",
+							"outpoint_sec": "40"
+						}
+					},
+					"location": {
+						"storage_provider": "s3",
+						"path": "{{destination_path}}"
+					},
+					"targets": [
+						{
+							"file_pattern": "middle_800kbps{default_extension}",
+							"existing_files": "replace",
+							"container": {
+								"kind": "mp4"
+							},
+							"video": {
+								"codec": "h264",
+								"bitrate_kb": 800,
+								"profile": "high",
+								"level": "3.1",
+								"height": 486,
+								"par": "1:1"
+							},
+							"audio": [
+								{
+									"channels": 2,
+									"codec": "aac_lc",
+									"sample_rate": 48000,
+									"bitrate_kb": 64,
+									"layer_id": "audio_low"
+								}
+							]
+						}
+					]
+				}
+			},
+			{
+				"uid": "qc_error_notify_task",
+				"kind": "notify",
+				"payload": {
+					"notify_method": "email",
+					"email": {
+						"recipients": "some.person@domain.com",
+						"subject": "Job {job_id} has failed qc.",
+						"body": "Hybrik job {job_id} was not processed. QC failed."
+					}
+				}
+			},
+			{
+				"uid": "transcode_success_notify",
+				"kind": "notify",
+				"payload": {
+					"notify_method": "email",
+					"email": {
+						"recipients": "{{email_address}}",
+						"subject": "Well done! Job {job_id} completed.",
+						"body": "Hybrik job {job_id} was successful."
+					}
+				}
+			},
+			{
+				"uid": "transcode_fail_notify",
+				"kind": "notify",
+				"payload": {
+					"notify_method": "email",
+					"email": {
+						"recipients": "{{email_address}}",
+						"subject": "Job {job_id} had an error in a transcode task.",
+						"body": "Hybrik job {job_id} was not completed due to a transcode error."
+					}
+				}
+			}
+		],
+		"connections": [
+			{
+				"from": [
+					{
+						"element": "source"
+					}
+				],
+				"to": {
+					"success": [
+						{
+							"element": "analyze_general"
+						}
+					]
+				}
+			},
+			{
+				"from": [
+					{
+						"element": "analyze_general"
+					}
+				],
+				"to": {
+					"success": [
+						{
+							"element": "qc_task"
+						}
+					]
+				}
+			},
+			{
+				"from": [
+					{
+						"element": "qc_task"
+					}
+				],
+				"to": {
+					"success": [
+						{
+							"element": "transcode_a"
+						},
+						{
+							"element": "transcode_b"
+						}
+					],
+					"error": [
+						{
+							"element": "qc_error_notify_task"
+						}
+					]
+				}
+			},
+			{
+				"from": [
+					{
+						"element": "transcode_a"
+					},
+					{
+						"element": "transcode_b"
+					}
+				],
+				"to": {
+					"success": [
+						{
+							"element": "transcode_success_notify"
+						}
+					],
+					"error": [
+						{
+							"element": "transcode_fail_notify"
+						}
+					]
+				}
+			}
+		]
+	}
+}

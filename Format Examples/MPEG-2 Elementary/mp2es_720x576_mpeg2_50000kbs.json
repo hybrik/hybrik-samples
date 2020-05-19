@@ -1,10 +1,10 @@
 {
     "definitions": {
-        "profile_name": "mp2es_720x576_mpeg2_50000kbs",
+        "descriptor": "mp2es_720x576_mpeg2_50000kbs",
         "source": "s3://hybrik-examples/public/sources/tears_of_steel_720p.mov",
-        "destination_path": "s3://hybrik-examples/public/output/formats/mp2es/{{profile_name}}"
+        "destination_path": "s3://hybrik-examples/public/output/format_examples/mp2es/{{descriptor}}"
     },
-    "name": "{{profile_name}}: {{source}}",
+    "name": "{{descriptor}}: {{source}}",
     "payload": {
         "elements": [
             {
@@ -32,7 +32,7 @@
                     },
                     "targets": [
                         {
-                            "file_pattern": "{{profile_name}}{default_extension}",
+                            "file_pattern": "{{descriptor}}{default_extension}",
                             "existing_files": "replace",
                             "container": {
                                 "kind": "mp2_elementary"
@@ -52,7 +52,7 @@
                             ]
                         },
                         {
-                            "file_pattern": "{{profile_name}}_audio{default_extension}",
+                            "file_pattern": "{{descriptor}}_audio{default_extension}",
                             "existing_files": "replace",
                             "container": {
                                 "kind": "wav"

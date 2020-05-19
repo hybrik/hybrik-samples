@@ -1,15 +1,24 @@
 {
     "definitions": {
-        "profile_name": "copy_folder",
-        "source_path": "s3://hybrik-examples/public/sources",
-        "destination": "s3://hybrik-examples/public/output/features/data_movement/{{profile_name}}"
+        "descriptor": "copy_task_folder",
+        "match_pattern": "*",
+        "recursive": false,
+        "source_path": "s3://hybrik-examples/public/sources/short_adaptive_bitrate_sources",
+        "destination_path": "s3://hybrik-examples/public/output/feature_examples/data_movement/{{descriptor}}/short_adaptive_bitrate_sources"
     },
-    "name": "{{profile_name}}:  {{source_path}}",
+    "name": "{{descriptor}}",
     "payload": {
         "elements": [
             {
-                "uid": "folder_enum",
+                "uid": "source_folder_enum",
                 "kind": "folder_enum",
+                "task": {
+                    "retry_method": "retry",
+                    "retry": {
+                        "count": 2,
+                        "delay_sec": 30
+                    }
+                },
                 "payload": {
                     "source": {
                         "storage_provider": "s3",
@@ -17,22 +26,26 @@
                     },
                     "settings": {
                         "pattern_matching": "wildcard",
-                        "wildcard": "TOS*",
-                        "recursive": true
+                        "wildcard": "{{match_pattern}}",
+                        "recursive": "{{recursive}}",
+                        "files_per_job":  50
                     }
                 }
             },
             {
                 "uid": "copy_task",
                 "kind": "copy",
+                "task": {
+                    "retry_method": "fail"
+                },
                 "payload": {
                     "target": {
                         "location": {
                             "storage_provider": "s3",
-                            "path": "{{destination}}/{source_relative_folder}"
+                            "path": "{{destination_path}}"
                         },
                         "existing_files": "replace",
-                        "file_pattern": "%F"
+                        "file_pattern": "{source_name}"
                     },
                     "options": {
                         "delete_source_on_completion": false
@@ -44,13 +57,13 @@
             {
                 "from": [
                     {
-                        "element": "folder_enum"
+                        "element": "source_folder_enum"
                     }
                 ],
                 "to": {
                     "success": [
                         {
-                            "element": "copy_task"
+                            "element": "copy_task" 
                         }
                     ]
                 }
@@ -58,3 +71,8 @@
         ]
     }
 }
+    
+
+
+
+        

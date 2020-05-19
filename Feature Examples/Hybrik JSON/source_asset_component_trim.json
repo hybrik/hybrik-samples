@@ -1,0 +1,126 @@
+{
+    "definitions": {
+        "descriptor": "asset_component_trim",
+        "video_source": "tears_of_steel_720p.mov",
+        "audio_source": "tears_of_steel_italian_audio.mp4",
+        "source_path": "s3://hybrik-examples/public/sources",
+        "file_pattern": "{{descriptor}}",
+        "destination_path": "s3://hybrik-examples/public/output/feature_examples/hybrik_json/{{descriptor}}"
+    },
+    "name": "{{descriptor}}: {{video_source}}",
+    "payload": {
+        "elements": [
+            {
+                "uid": "sources",
+                "kind": "source",
+                "payload": {
+                    "kind": "asset_complex",
+                    "payload": {
+                        "kind": "sequence",
+                        "asset_versions": [
+                            {
+                                "version_uid": "video",
+                                "asset_components": [
+                                    {
+                                        "kind": "name",
+                                        "component_uid": "video_source",
+                                        "name": "{{video_source}}",
+                                        "location": {
+                                            "storage_provider": "s3",
+                                            "path": "{{source_path}}"
+                                        },
+                                        "contents": [
+                                            {
+                                                "kind": "video"
+                                            }
+                                        ],
+                                        "trim": {
+                                            "inpoint_sec": 0,
+                                            "outpoint_sec": 30
+                                        }
+                                    },
+                                    {
+                                        "kind": "name",
+                                        "component_uid": "stereo_audio",
+                                        "name": "{{audio_source}}",
+                                        "location": {
+                                            "storage_provider": "s3",
+                                            "path": "{{source_path}}"
+                                        },
+                                        "contents": [
+                                            {
+                                                "kind": "audio"
+                                            }
+                                        ],
+                                        "trim": {
+                                            "inpoint": "track_begin",
+                                            "reference_media_track": "video"
+                                        }
+                                    }
+                                ]
+                            }
+                        ]
+                    }
+                }
+            },
+            {
+                "uid": "transcode_task_mezzanine",
+                "kind": "transcode",
+                "task": {
+                    "retry_method": "retry",
+                    "retry": {
+                        "count": 1,
+                        "delay_sec": 30
+                    }
+                },
+                "payload": {
+                    "location": {
+                        "storage_provider": "s3",
+                        "path": "{{destination_path}}"
+                    },
+                    "targets": [
+                        {
+                            "file_pattern": "{{file_pattern}}.mov",
+                            "existing_files": "replace",
+                            "container": {
+                                "kind": "mov"
+                            },
+                            "video": {
+                                "codec": "prores",
+                                "profile": "apch",
+                                "interlace_mode": "progressive",
+                                "frame_rate": 24,
+                                "width": 1280,
+                                "height": 720
+                            },
+                            "audio": [
+                                {
+                                    "codec": "pcm",
+                                    "channels": 2,
+                                    "sample_size": 24,
+                                    "sample_rate": 48000
+                                }
+                            ]
+                        }
+                    ]
+                }
+            }
+        ],
+        "connections": [
+            {
+                "from": [
+                    {
+                        "element": "sources"
+                    }
+                ],
+                "to": {
+                    "success": [
+                        {
+                            "element": "transcode_task_mezzanine"
+                        }
+                    ]
+                }
+            }
+        ]
+    }
+}

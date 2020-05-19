@@ -1,0 +1,80 @@
+{
+    "definitions": {
+        "descriptor": "simple_dockerhub_ffmpeg_example",
+        "source": "s3://hybrik-examples/public/sources/TOS_spoken_1920x1080p24_2tk_ch_positions_5.1_2.0.mov",
+        "destination": "s3://hybrik-examples/public/output/feature_examples/advanced_outputs/{{descriptor}}",
+        "out_filename": "myoutput.mp4",
+        "dockerhub_user": "TODO",
+        "dockerhub_password": "TODO"
+    },
+    "name": "{{descriptor}}",
+    "payload": {
+        "elements": [
+            {
+                "uid": "source_file",
+                "kind": "source",
+                "payload": {
+                    "kind": "asset_url",
+                    "payload": {
+                        "storage_provider": "s3",
+                        "url": "{{source}}"
+                    }
+                }
+            },
+            {
+                "uid": "script_task",
+                "kind": "script",
+                "payload": {
+                    "kind": "docker",
+                    "payload": {
+                        "targets": [
+                            {
+                                "placeholder": "output1",
+                                "location": {
+                                    "storage_provider": "s3",
+                                    "path": "{{destination}}"
+                                },
+                                "file_pattern": "{{out_filename}}",
+                                "include_in_result": true,
+                                "size_hint": "{source_size}"
+                            }
+                        ],
+                        "commands": [
+                            {
+                                "docker_image": {
+                                    "image_urn": "jrottenberg/ffmpeg:centos",
+                                    "registry": {
+                                        "kind": "dockerhub",
+                                        "access": {
+                                            "username": "{{dockerhub_user}}",
+                                            "password": "{{dockerhub_password}}"
+                                        }
+                                    }
+                                },
+                                "command_line": "-y -i {source_0_0} -f mp4 {output1}",
+                                "preserve_stdout": true,
+                                "preserve_stderr": true
+                            }
+                        ]
+                    }
+                }
+            }
+        ],
+        "connections": [
+            {
+                "from": [
+                    {
+                        "element": "source_file"
+                    }
+                ],
+                "to": {
+                    "success": [
+                        {
+                            "element": "script_task"
+                        }
+                    ]
+                }
+            }
+        ]
+    }
+}

@@ -1,0 +1,150 @@
+{
+    "definitions": {
+        "descriptor": "source_multi_to_package_example",
+        "source_path": "s3://hybrik-examples/public/sources/short_adaptive_bitrate_sources",
+        "source_file_audio_high": "tears_of_steel_audio_high_128kbps.mp4",
+        "source_file_audio_low": "tears_of_steel_audio_low_64kbps.mp4",
+        "source_file_video_1": "tears_of_steel_1200kbps_360p.mp4",
+        "source_file_video_2": "tears_of_steel_4200kbps_720p.mp4",
+        "source_file_video_3": "tears_of_steel_12000kbps_1080p.mp4",
+        "source_file_subtitles": "tears_of_steel_1080p_subs.vtt",
+        "destination_path": "s3://hybrik-examples/public/output/feature_examples/hybrik_json/{{descriptor}}"
+    },
+    "name": "{{descriptor}}: {{source_file_video_1}}",
+    "payload": {
+        "elements": [
+            {
+                "uid": "all_sources",
+                "kind": "source",
+                "payload": {
+                    "kind": "asset_complex",
+                    "payload": {
+                        "kind": "multi",
+                        "asset_versions": [
+                            {
+                                "version_uid": "main",
+                                "asset_components": [
+                                    {
+                                        "kind": "name",
+                                        "component_uid": "video1",
+                                        "name": "{{source_file_video_1}}",
+                                        "location": {
+                                            "storage_provider": "s3",
+                                            "path": "{{source_path}}"
+                                        }
+                                    },
+                                    {
+                                        "kind": "name",
+                                        "component_uid": "video2",
+                                        "name": "{{source_file_video_2}}",
+                                        "location": {
+                                            "storage_provider": "s3",
+                                            "path": "{{source_path}}"
+                                        }
+                                    },
+                                    {
+                                        "kind": "name",
+                                        "component_uid": "video3",
+                                        "name": "{{source_file_video_3}}",
+                                        "location": {
+                                            "storage_provider": "s3",
+                                            "path": "{{source_path}}"
+                                        }
+                                    },
+                                    {
+                                        "kind": "name",
+                                        "component_uid": "audio_low",
+                                        "name": "{{source_file_audio_low}}",
+                                        "location": {
+                                            "storage_provider": "s3",
+                                            "path": "{{source_path}}"
+                                        },
+                                        "contents": [
+                                            {
+                                                "kind": "audio",
+                                                "language": "english"
+                                            }
+                                        ]
+                                    },
+                                    {
+                                        "kind": "name",
+                                        "component_uid": "audio_high",
+                                        "name": "{{source_file_audio_high}}",
+                                        "location": {
+                                            "storage_provider": "s3",
+                                            "path": "{{source_path}}"
+                                        },
+                                        "contents": [
+                                            {
+                                                "kind": "audio",
+                                                "language": "english"
+                                            }
+                                        ]
+                                    },
+                                    {
+                                        "kind": "name",
+                                        "component_uid": "subtitles",
+                                        "name": "{{source_file_subtitles}}",
+                                        "location": {
+                                            "storage_provider": "s3",
+                                            "path": "{{source_path}}"
+                                        },
+                                        "contents": [
+                                            {
+                                                "kind": "subtitle",
+                                                "payload": {
+                                                    "standard": "auto",
+                                                    "language": "english",
+                                                    "category": "default"
+                                                }
+                                            }
+                                        ]
+                                    }
+                                ]
+                            }
+                        ]
+                    }
+                }
+            },
+            {
+                "uid": "package_task",
+                "kind": "package",
+                "payload": {
+                    "uid": "main_manifest",
+                    "kind": [
+                        "dash",
+                        "hls"
+                    ],
+                    "location": {
+                        "storage_provider": "s3",
+                        "path": "{{destination_path}}"
+                    },
+                    "segmentation_mode": "fmp4",
+                    "dash": {
+                        "file_pattern": "manifest.mpd"
+                    },
+                    "hls": {
+                        "file_pattern": "manifest.m3u8",
+                        "version": 6
+                    }
+                }
+            }
+        ],
+        "connections": [
+            {
+                "from": [
+                    {
+                        "element": "all_sources"
+                    }
+                ],
+                "to": {
+                    "success": [
+                        {
+                            "element": "package_task"
+                        }
+                    ]
+                }
+            }
+        ]
+    }
+}

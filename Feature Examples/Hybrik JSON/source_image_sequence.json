@@ -1,0 +1,89 @@
+{
+    "definitions": {
+        "descriptor": "source_image_sequence_example",
+        "image_filepattern": "dvd_bounce_%04d.png",
+        "source_path": "s3://hybrik-examples/public/sources/png_sequence",
+        "file_pattern": "{{descriptor}}{default_extension}",
+        "destination_path": "s3://hybrik-examples/public/output/feature_examples/hybrik_json/{{descriptor}}"
+    },
+    "name": "{{descriptor}}: {{image_filepattern}}",
+    "payload": {
+        "elements": [
+            {
+                "uid": "sources",
+                "kind": "source",
+                "payload": {
+                    "kind": "asset_complex",
+                    "payload": {
+                        "asset_versions": [
+                            {
+                                "location": {
+                                    "storage_provider": "s3",
+                                    "path": "{{source_path}}"
+                                },
+                                "asset_components": [
+                                    {
+                                        "kind": "image_sequence",
+                                        "image_sequence": {
+                                            "base": "{{image_filepattern}}",
+                                            "frame_rate": 24
+                                        }
+                                    }
+                                ]
+                            }
+                        ]
+                    }
+                }
+            },
+            {
+                "uid": "transcode_task",
+                "kind": "transcode",
+                "task": {
+                    "retry_method": "retry",
+                    "retry": {
+                        "count": 1,
+                        "delay_sec": 30
+                    }
+                },
+                "payload": {
+                    "location": {
+                        "storage_provider": "s3",
+                        "path": "{{destination_path}}"
+                    },
+                    "targets": [
+                        {
+                            "file_pattern": "{{file_pattern}}",
+                            "existing_files": "replace",
+                            "container": {
+                                "kind": "mp4"
+                            },
+                            "video": {
+                                "codec": "h264",
+                                "width": 1280,
+                                "height": 720,
+                                "frame_rate": 24,
+                                "bitrate_kb": 1000
+                            }
+                        }
+                    ]
+                }
+            }
+        ],
+        "connections": [
+            {
+                "from": [
+                    {
+                        "element": "sources"
+                    }
+                ],
+                "to": {
+                    "success": [
+                        {
+                            "element": "transcode_task"
+                        }
+                    ]
+                }
+            }
+        ]
+    }
+}

@@ -1,10 +1,10 @@
 {
     "definitions": {
-        "profile_name": "mp4_512x288_h264_800kbs",
+        "descriptor": "mp4_512x288_h264_800kbs",
         "source": "s3://hybrik-examples/public/sources/tears_of_steel_720p.mov",
-        "destination_path": "s3://hybrik-examples/public/output/formats/mp4/{{profile_name}}"
+        "destination_path": "s3://hybrik-examples/public/output/format_examples/mp4/{{descriptor}}"
     },
-    "name": "{{profile_name}}:  {{source}}",
+    "name": "{{descriptor}}: {{source}}",
     "payload": {
         "elements": [
             {
@@ -32,7 +32,7 @@
                     },
                     "targets": [
                         {
-                            "file_pattern": "{{profile_name}}{default_extension}",
+                            "file_pattern": "{{descriptor}}{default_extension}",
                             "existing_files": "replace",
                             "container": {
                                 "kind": "mp4"

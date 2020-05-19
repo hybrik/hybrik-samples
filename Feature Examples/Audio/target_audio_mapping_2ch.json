@@ -1,0 +1,133 @@
+{
+  "definitions": {
+    "descriptor": "target_audio_mapping_2ch",
+    "source_path": "s3://hybrik-examples/public/sources",
+    "source_file": "tears_of_steel_720p.mov",
+    "destination_path": "s3://hybrik-examples/public/output/feature_examples/audio/{{descriptor}}"
+  },
+  "name": "{{descriptor}}: {{source_file}}",
+  "payload": {
+    "elements": [
+      {
+        "uid": "source",
+        "kind": "source",
+        "payload": {
+          "kind": "asset_complex",
+          "payload": {
+            "kind": "sequence",
+            "asset_versions": [
+              {
+                "version_uid": "0",
+                "asset_components": [
+                  {
+                    "location": {
+                      "storage_provider": "s3",
+                      "path": "{{source_path}}"
+                    },
+                    "kind": "name",
+                    "name": "{{source_file}}",
+                    "component_uid": "source_0",
+                    "contents": [
+                      {
+                        "kind": "video",
+                        "payload": {
+
+                        }
+                      },
+                      {
+                        "kind": "audio",
+                        "payload": {
+                          "language": "eng"
+                        }
+                      }
+                    ]
+                  }
+                ]
+              }
+            ]
+          }
+        }
+      },
+      {
+        "uid": "transcode_task",
+        "kind": "transcode",
+        "payload": {
+          "location": {
+            "storage_provider": "s3",
+            "path": "{{destination_path}}"
+          },
+          "targets": [
+            {
+              "file_pattern": "targetA_2-channel.mov",
+              "existing_files": "replace",
+              "container": {
+                "kind": "mov"
+              },
+              "audio": [
+                {
+                  "codec": "pcm",
+                  "channels": 2,
+                  "source": [
+                    {
+                      "track": 0,
+                      "channel": 0
+                    },
+                    {
+                      "track": 0,
+                      "channel": 1
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "file_pattern": "targetB_2-track.mov",
+              "existing_files": "replace",
+              "container": {
+                "kind": "mov"
+              },
+              "audio": [
+                {
+                  "codec": "pcm",
+                  "channels": 1,
+                  "source": [
+                    {
+                      "track": 0,
+                      "channel": 0
+                    }
+                  ]
+                },
+                {
+                  "codec": "pcm",
+                  "channels": 1,
+                  "source": [
+                    {
+                      "track": 0,
+                      "channel": 1
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        }
+      }
+    ],
+    "connections": [
+      {
+        "from": [
+          {
+            "element": "source"
+          }
+        ],
+        "to": {
+          "success": [
+            {
+              "element": "transcode_task"
+            }
+          ]
+        }
+      }
+    ]
+  }
+}

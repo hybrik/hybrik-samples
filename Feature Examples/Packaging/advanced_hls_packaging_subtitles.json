@@ -1,0 +1,392 @@
+{
+    "definitions": {
+        "descriptor": "advanced_hls_packaging_subtitles",
+        "source_path": "s3://hybrik-examples/public/sources",
+        "source_name": "tears_of_steel_720p.mov",
+        "audio_it_path": "{{source_path}}",
+        "audio_it_name": "tears_of_steel_italian_audio.mp4",
+        "subtitle_path": "{{source_path}}",
+        "eng_subtitle_name": "TOS-en.vtt",
+        "it_subtitle_name": "TOS-it.srt",
+        "root_destination": "s3://hybrik-examples/public/output/feature_examples/packaging/{{descriptor}}",
+        "destination_mp4s": "{{root_destination}}/transcoded_media",
+        "destination_hls_media": "{{root_destination}}/hls_media",
+        "destination_hls_manifests": "{{root_destination}}/hls_manifests"
+    },
+    "name": "{{descriptor}}: {{source_name}}",
+    "payload": {
+        "elements": [
+            {
+                "uid": "source_file",
+                "kind": "source",
+                "payload": {
+                    "kind": "asset_complex",
+                    "payload": {
+                        "asset_versions": [
+                            {
+                                "version_uid": "audio_video",
+                                "asset_components": [
+                                    {
+                                        "component_uid": "audio_video",
+                                        "kind": "name",
+                                        "name": "{{source_name}}",
+                                        "location": {
+                                            "storage_provider": "s3",
+                                            "path": "{{source_path}}"
+                                        },
+                                        "contents": [
+                                            {
+                                                "kind": "video"
+                                            },
+                                            {
+                                                "kind": "audio",
+                                                "map": [
+                                                    {
+                                                        "input": {
+                                                            "track": 0
+                                                        },
+                                                        "output": {
+                                                            "track": 0
+                                                        }
+                                                    }
+                                                ]
+                                            }
+                                        ]
+                                    },
+                                    {
+                                        "component_uid": "audio_it",
+                                        "kind": "name",
+                                        "name": "{{audio_it_name}}",
+                                        "location": {
+                                            "storage_provider": "s3",
+                                            "path": "{{audio_it_path}}"
+                                        },
+                                        "contents": [
+                                            {
+                                                "kind": "audio",
+                                                "map": [
+                                                    {
+                                                        "input": {
+                                                            "track": 0
+                                                        },
+                                                        "output": {
+                                                            "track": 1
+                                                        }
+                                                    }
+                                                ]
+                                            }
+                                        ]
+                                    },
+                                    {
+                                        "component_uid": "eng_subs",
+                                        "kind": "name",
+                                        "name": "{{eng_subtitle_name}}",
+                                        "location": {
+                                            "storage_provider": "s3",
+                                            "path": "{{subtitle_path}}"
+                                        },
+                                        "contents": [
+                                            {
+                                                "kind": "subtitle",
+                                                "payload": {
+                                                    "format": "webvtt",
+                                                    "language": "english"
+                                                }
+                                            }
+                                        ]
+                                    },
+                                    {
+                                        "component_uid": "it_subs",
+                                        "kind": "name",
+                                        "name": "{{it_subtitle_name}}",
+                                        "location": {
+                                            "storage_provider": "s3",
+                                            "path": "{{subtitle_path}}"
+                                        },
+                                        "contents": [
+                                            {
+                                                "kind": "subtitle",
+                                                "payload": {
+                                                    "format": "webvtt",
+                                                    "language": "italian"
+                                                }
+                                            }
+                                        ]
+                                    }
+                                ]
+                            }
+                        ]
+                    }
+                }
+            },
+            {
+                "uid": "transcode_all_renditions",
+                "kind": "transcode",
+                "task": {
+                    "retry_method": "fail"
+                },
+                "payload": {
+                    "location": {
+                        "storage_provider": "s3",
+                        "path": "{{destination_mp4s}}"
+                    },
+                    "targets": [
+                        {
+                            "file_pattern": "{source_basename}_800kbps{default_extension}",
+                            "existing_files": "replace",
+                            "container": {
+                                "kind": "fmp4",
+                                "segment_duration": 6
+                            },
+                            "video": {
+                                "codec": "h264",
+                                "bitrate_mode": "cbr",
+                                "use_scene_detection": false,
+                                "bitrate_kb": 800,
+                                "vbv_buffer_size_kb": 800,
+                                "profile": "high",
+                                "level": "3.1",
+                                "height": 486,
+                                "par": "1:1",
+                                "layer_affinities": [
+                                    "audio_high"
+                                ]
+                            }
+                        },
+                        {
+                            "file_pattern": "{source_basename}_400kbps{default_extension}",
+                            "existing_files": "replace",
+                            "container": {
+                                "kind": "fmp4",
+                                "segment_duration": 6
+                            },
+                            "video": {
+                                "codec": "h264",
+                                "bitrate_mode": "cbr",
+                                "use_scene_detection": false,
+                                "bitrate_kb": 400,
+                                "vbv_buffer_size_kb": 400,
+                                "profile": "main",
+                                "level": "3.0",
+                                "height": 360,
+                                "par": "1:1",
+                                "layer_affinities": [
+                                    "audio_low"
+                                ]
+                            }
+                        },
+                        {
+                            "file_pattern": "{source_basename}_200kbps{default_extension}",
+                            "existing_files": "replace",
+                            "container": {
+                                "kind": "fmp4",
+                                "segment_duration": 6
+                            },
+                            "video": {
+                                "codec": "h264",
+                                "bitrate_mode": "cbr",
+                                "use_scene_detection": false,
+                                "bitrate_kb": 200,
+                                "vbv_buffer_size_kb": 200,
+                                "profile": "baseline",
+                                "level": "3.0",
+                                "height": 252,
+                                "par": "1:1",
+                                "layer_affinities": [
+                                    "audio_low"
+                                ]
+                            }
+                        },
+                        {
+                            "file_pattern": "{source_basename}_audio_en_64kbps{default_extension}",
+                            "existing_files": "replace",
+                            "container": {
+                                "kind": "fmp4",
+                                "segment_duration": 6
+                            },
+                            "audio": [
+                                {
+                                    "channels": 2,
+                                    "codec": "aac_lc",
+                                    "sample_rate": 48000,
+                                    "bitrate_kb": 64,
+                                    "layer_id": "audio_low",
+                                    "language": "english",
+                                    "source": [
+                                        {
+                                            "track": 0
+                                        }
+                                    ]
+                                }
+                            ]
+                        },
+                        {
+                            "file_pattern": "{source_basename}_audio_en_128kbps{default_extension}",
+                            "existing_files": "replace",
+                            "container": {
+                                "kind": "fmp4",
+                                "segment_duration": 6
+                            },
+                            "audio": [
+                                {
+                                    "channels": 2,
+                                    "codec": "aac_lc",
+                                    "sample_rate": 48000,
+                                    "bitrate_kb": 128,
+                                    "layer_id": "audio_high",
+                                    "language": "english",
+                                    "source": [
+                                        {
+                                            "track": 0
+                                        }
+                                    ]
+                                }
+                            ]
+                        },
+                        {
+                            "file_pattern": "{source_basename}_audio_it_64kbps{default_extension}",
+                            "existing_files": "replace",
+                            "container": {
+                                "kind": "fmp4",
+                                "segment_duration": 6
+                            },
+                            "audio": [
+                                {
+                                    "channels": 2,
+                                    "codec": "aac_lc",
+                                    "sample_rate": 48000,
+                                    "bitrate_kb": 64,
+                                    "layer_id": "audio_low",
+                                    "language": "italian",
+                                    "source": [
+                                        {
+                                            "track": 1
+                                        }
+                                    ]
+                                }
+                            ]
+                        },
+                        {
+                            "file_pattern": "{source_basename}_audio_it_128kbps{default_extension}",
+                            "existing_files": "replace",
+                            "container": {
+                                "kind": "fmp4",
+                                "segment_duration": 6
+                            },
+                            "audio": [
+                                {
+                                    "channels": 2,
+                                    "codec": "aac_lc",
+                                    "sample_rate": 48000,
+                                    "bitrate_kb": 128,
+                                    "layer_id": "audio_high",
+                                    "language": "italian",
+                                    "source": [
+                                        {
+                                            "track": 1
+                                        }
+                                    ]
+                                }
+                            ]
+                        },
+                        {
+                            "file_pattern": "{source_basename}_subs_en.vtt",
+                            "existing_files": "replace",
+                            "container": {
+                                "kind": "webvtt"
+                            },
+                            "subtitle": [
+                                {
+                                    "kind": "webvtt",
+                                    "language": "english"
+                                }
+                            ]
+                        },
+                        {
+                            "file_pattern": "{source_basename}_subs_it.vtt",
+                            "existing_files": "replace",
+                            "container": {
+                                "kind": "webvtt"
+                            },
+                            "subtitle": [
+                                {
+                                    "kind": "webvtt",
+                                    "language": "italian"
+                                }
+                            ]
+                        }
+                    ]
+                }
+            },
+            {
+                "uid": "hls_fmp4_package",
+                "kind": "package",
+                "payload": {
+                    "uid": "main_manifest",
+                    "kind": "hls",
+                    "location": {
+                        "storage_provider": "s3",
+                        "path": "{{destination_hls_manifests}}"
+                    },
+                    "file_pattern": "master_manifest.m3u8",
+                    "segmentation_mode": "fmp4",
+                    "force_original_media": false,
+                    "media_location": {
+                        "storage_provider": "s3",
+                        "path": "{{destination_hls_media}}",
+                        "attributes": [
+                            {
+                                "name": "ContentType",
+                                "value": "video/mp4"
+                            }
+                        ]
+                    },
+                    "media_file_pattern": "{source_basename}.mp4",
+                    "hls": {
+                        "version": 7,
+                        "media_playlist_location": {
+                            "storage_provider": "s3",
+                            "path": "{{destination_hls_manifests}}",
+                            "attributes": [
+                                {
+                                    "name": "ContentType",
+                                    "value": "application/x-mpegURL"
+                                }
+                            ]
+                        }
+                    }
+                }
+            }
+        ],
+        "connections": [
+            {
+                "from": [
+                    {
+                        "element": "source_file"
+                    }
+                ],
+                "to": {
+                    "success": [
+                        {
+                            "element": "transcode_all_renditions"
+                        }
+                    ]
+                }
+            },
+            {
+                "from": [
+                    {
+                        "element": "transcode_all_renditions"
+                    }
+                ],
+                "to": {
+                    "success": [
+                        {
+                            "element": "hls_fmp4_package"
+                        }
+                    ]
+                }
+            }
+        ]
+    }
+}

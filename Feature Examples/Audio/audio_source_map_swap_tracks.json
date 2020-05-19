@@ -1,0 +1,143 @@
+{
+    "definitions": {
+        "descriptor": "audio_source_map_swap_tracks",
+        "source_path": "s3://hybrik-examples/public/sources",
+        "source_filename": "tears_of_steel_1080p.mov",
+        "alternate_audio": "tears_of_steel_italian_audio.mp4",
+        "destination_path": "s3://hybrik-examples/public/output/feature_examples/audio/{{descriptor}}"
+    },
+    "name": "{{descriptor}}: {{source_filename}}",
+    "payload": {
+        "elements": [
+            {
+                "uid": "sources",
+                "kind": "source",
+                "payload": {
+                    "kind": "asset_complex",
+                    "payload": {
+                        "asset_versions": [
+                            {
+                                "version_uid": "asset",
+                                "asset_components": [
+                                    {
+                                        "component_uid": "source_filename",
+                                        "kind": "name",
+                                        "name": "{{source_filename}}",
+                                        "location": {
+                                            "storage_provider": "s3",
+                                            "path": "{{source_path}}"
+                                        },
+                                        "contents": [
+                                            {
+                                                "kind": "video"
+                                            },
+                                            {
+                                                "kind": "audio",
+                                                "map": [
+                                                    {
+                                                        "input": {
+                                                            "track": 0
+                                                        },
+                                                        "output": {
+                                                            "track": 1
+                                                        }
+                                                    }
+                                                ]
+                                            }
+                                        ]
+                                    },
+                                    {
+                                        "component_uid": "source_filename",
+                                        "kind": "name",
+                                        "name": "{{alternate_audio}}",
+                                        "location": {
+                                            "storage_provider": "s3",
+                                            "path": "{{source_path}}"
+                                        },
+                                        "contents": [
+                                            {
+                                                "kind": "audio",
+                                                "map": [
+                                                    {
+                                                        "input": {
+                                                            "track": 0
+                                                        },
+                                                        "output": {
+                                                            "track": 0
+                                                        }
+                                                    }
+                                                ]
+                                            }
+                                        ]
+                                    }
+                                ]
+                            }
+                        ]
+                    }
+                }
+            },
+            {
+                "uid": "transcode_task",
+                "kind": "transcode",
+                "payload": {
+                    "location": {
+                        "storage_provider": "s3",
+                        "path": "{{destination_path}}"
+                    },
+                    "targets": [
+                        {
+                            "file_pattern": "{source_basename}_audio_swap{default_extension}",
+                            "container": {
+                                "kind": "mp4",
+                                "faststart": true
+                            },
+                            "video": {
+                                "enabled": true,
+                                "codec": "h264",
+                                "profile": "high",
+                                "crf": "26"
+                            },
+                            "audio": [
+                                {
+                                    "codec": "aac",
+                                    "channels": 2,
+                                    "sample_rate": 48000,
+                                    "sample_size": 16,
+                                    "bitrate_kb": 128,
+                                    "bitrate_mode": "vbr",
+                                    "language": "ita"
+                                },
+                                {
+                                    "codec": "aac",
+                                    "channels": 2,
+                                    "sample_rate": 48000,
+                                    "sample_size": 16,
+                                    "bitrate_kb": 128,
+                                    "bitrate_mode": "vbr",
+                                    "language": "eng"
+                                }
+                            ],
+                            "existing_files": "replace"
+                        }
+                    ]
+                }
+            }
+        ],
+        "connections": [
+            {
+                "from": [
+                    {
+                        "element": "sources"
+                    }
+                ],
+                "to": {
+                    "success": [
+                        {
+                            "element": "transcode_task"
+                        }
+                    ]
+                }
+            }
+        ]
+    }
+}

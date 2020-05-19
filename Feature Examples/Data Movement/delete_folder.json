@@ -1,9 +1,9 @@
 {
     "definitions": {
-        "profile_name": "delete_folder",
-        "destination": "s3://hybrik-examples/public/output/features/data_movement/copy_folder"
+        "descriptor": "delete_folder",
+        "delete_folder": "s3://hybrik-examples/public/output/feature_examples/data_movement/copy_folder"
     },
-    "name": "{{profile_name}}:  {{destination}}",
+    "name": "{{descriptor}}: {{delete_folder}}",
     "payload": {
         "elements": [
             {
@@ -12,7 +12,7 @@
                 "payload": {
                     "source": {
                         "storage_provider": "s3",
-                        "path": "{{destination}}"
+                        "path": "{{delete_folder}}"
                     },
                     "settings": {
                         "pattern_matching": "wildcard",

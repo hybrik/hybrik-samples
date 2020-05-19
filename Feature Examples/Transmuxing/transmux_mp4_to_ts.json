@@ -1,10 +1,10 @@
 {
     "definitions": {
-        "profile_name": "transmux_mp4_to_ts",
+        "descriptor": "transmux_mp4_to_ts",
         "source": "s3://hybrik-examples/public/sources/tears_of_steel_1080p_letterboxed.mp4",
-        "destination_path": "s3://hybrik-examples/public/output/features/transmuxing/{{profile_name}}"
+        "destination_path": "s3://hybrik-examples/public/output/feature_examples/transmuxing/{{descriptor}}"
     },
-    "name": "{{profile_name}}:  {{source}}",
+    "name": "{{descriptor}}: {{source}}",
     "payload": {
         "elements": [
             {
@@ -28,7 +28,7 @@
                     },
                     "targets": [
                         {
-                            "file_pattern": "{{profile_name}}{default_extension}",
+                            "file_pattern": "{{descriptor}}{default_extension}",
                             "existing_files": "replace",
                             "container": {
                                 "kind": "mpeg2ts"

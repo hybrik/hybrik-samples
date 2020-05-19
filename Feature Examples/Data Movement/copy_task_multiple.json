@@ -1,0 +1,89 @@
+{
+    "definitions": {
+        "descriptor": "copy_task_multiple",
+        "source_directory": "s3://hybrik-examples/public/sources/short_adaptive_bitrate_sources",
+        "destination_path": "s3://hybrik-examples/public/output/feature_examples/data_movement/{{descriptor}}"
+    },
+    "name": "{{descriptor}}: {{source_directory}}",
+    "payload": {
+        "elements": [
+            {
+                "uid": "source_file",
+                "kind": "source",
+                "payload": {
+                    "kind": "asset_complex",
+                    "payload": {
+                        "kind": "multi",
+                        "asset_versions": [
+                            {
+                                "version_uid": "to_copy",
+                                "location": {
+                                    "storage_provider": "s3",
+                                    "path": "{{source_directory}}"
+                                },
+                                "asset_components": [
+                                    {
+                                        "kind": "name",
+                                        "name": "tears_of_steel_12000kbps_1080p.mp4",
+                                        "component_uid": "1"
+                                    },
+                                    {
+                                        "kind": "name",
+                                        "name": "tears_of_steel_audio_high_128kbps.mp4",
+                                        "component_uid": "2"
+                                    },
+                                    {
+                                        "kind": "name",
+                                        "name": "tears_of_steel_1080p_subs.vtt",
+                                        "component_uid": "3"
+                                    }
+                                ]
+                            }
+                        ]
+                    }
+                }
+            },
+            {
+                "uid": "copy_task",
+                "kind": "copy",
+                "task": {
+                    "retry_method": "fail"
+                },
+                "payload": {
+                    "target": {
+                        "location": {
+                            "storage_provider": "s3",
+                            "path": "{{destination_path}}"
+                        },
+                        "existing_files": "replace",
+                        "file_pattern": "{source_name}"
+                    },
+                    "options": {
+                        "delete_source_on_completion": false
+                    }
+                }
+            }
+        ],
+        "connections": [
+            {
+                "from": [
+                    {
+                        "element": "source_file"
+                    }
+                ],
+                "to": {
+                    "success": [
+                        {
+                            "element": "copy_task" 
+                        }
+                    ]
+                }
+            }
+        ]
+    }
+}
+    
+
+
+
+        

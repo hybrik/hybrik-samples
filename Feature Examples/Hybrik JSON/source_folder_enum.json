@@ -1,0 +1,92 @@
+{
+    "definitions": {
+        "descriptor": "folder_enum_source_example",
+        "source_path": "s3://hybrik-examples/public/sources/mixed_sources",
+        "destination_path": "s3://hybrik-examples/public/output/feature_examples/hybrik_json/{{descriptor}}"
+    },
+    "name": "{{descriptor}}: {{source_path}}",
+    "payload": {
+        "elements": [
+            {
+                "uid": "folder_enum",
+                "kind": "folder_enum",
+                "task": {
+                    "retry_method": "retry",
+                    "retry": {
+                        "count": 1,
+                        "delay_sec": 30
+                    }
+                },
+                "payload": {
+                    "source": {
+                        "storage_provider": "s3",
+                        "path": "{{source_path}}"
+                    },
+                    "settings": {
+                        "pattern_matching": "wildcard",
+                        "wildcard": "*",
+                        "recursive": true,
+                        "files_per_job": 1
+                    }
+                }
+            },
+            {
+                "uid": "transcode",
+                "kind": "transcode",
+                "task": {
+                    "retry": {
+                        "count": 1,
+                        "delay_sec": 30
+                    },
+                    "name": "transcode"
+                },
+                "payload": {
+                    "location": {
+                        "storage_provider": "s3",
+                        "path": "{{destination_path}}"
+                    },
+                    "targets": [
+                        {
+                            "file_pattern": "{source_basename}.mp4",
+                            "existing_files": "replace",
+                            "container": {
+                                "kind": "mp4"
+                            },
+                            "video": {
+                                "codec": "h264",
+                                "width": 640,
+                                "height": 360,
+                                "frame_rate": 23.976,
+                                "bitrate_kb": 600
+                            },
+                            "audio": [
+                                {
+                                    "codec": "aac",
+                                    "channels": 2,
+                                    "sample_rate": 44100,
+                                    "bitrate_kb": 128
+                                }
+                            ]
+                        }
+                    ]
+                }
+            }
+        ],
+        "connections": [
+            {
+                "from": [
+                    {
+                        "element": "folder_enum"
+                    }
+                ],
+                "to": {
+                    "success": [
+                        {
+                            "element": "transcode"
+                        }
+                    ]
+                }
+            }
+        ]
+    }
+}

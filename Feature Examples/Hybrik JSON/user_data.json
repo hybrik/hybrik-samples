@@ -1,0 +1,107 @@
+{
+    "definitions": {
+        "descriptor": "user_data_example",
+        "source_filename": "bars_and_tone_30sec_2.0.mp4",
+        "source_path": "s3://hybrik-examples/public/sources",
+        "source": "{{source_path}}/{{source_filename}}",
+        "file_pattern": "{{descriptor}}{default_extension}",
+        "destination_path": "s3://hybrik-examples/public/output/feature_examples/hybrik_json/{{descriptor}}"
+    },
+    "name": "{{descriptor}}",
+    "user_data":  {
+        "some string": "This is my own string in my user_data!",
+        "some object": {
+            "my_id":10101,
+            "my_val":9292992,
+            "my_obj": { "a":1,"b":2,"c":3}
+        },
+        "some array": [
+            4,18,15,"hello world",16,23,42
+        ],
+        "some_null": null,
+        "billing_id": 12345
+    },
+    "payload": {
+        "elements": [
+            {
+                "uid": "source_file",
+                "kind": "source",
+                "payload": {
+                    "kind": "asset_url",
+                    "payload": {
+                        "storage_provider": "s3",
+                        "url": "{{source}}",
+                        "trim": {
+                            "outpoint_sec": 10
+                        },
+                        "contents": [
+                            { 
+                                "kind": "video"
+                            },
+                            { 
+                                "kind": "audio"
+                            }
+                        ]
+                    }
+                }
+            },
+            {
+                "uid": "transcode_task",
+                "kind": "transcode",
+                "payload":
+                {
+                    "options": {
+                        "pipeline": {
+                            "licenses": [
+                            ]
+                        }
+                    },
+                    "location": {
+                        "storage_provider": "s3",
+                        "path": "{{destination_path}}"
+                    },
+                    "targets": [
+                        {
+                            "file_pattern": "{{file_pattern}}",
+                            "existing_files": "replace",
+                            "container": {
+                                "kind": "mp4"
+                            },
+                            "video": {
+                                "codec": "h264",
+                                "width": 1280,
+                                "height": 720,
+                                "bitrate_kb": 1000
+                            },
+                            "audio": [
+                                {
+                                    "codec": "aac",
+                                    "channels": 2,
+                                    "sample_rate": 44100,
+                                    "bitrate_kb": 128
+                                }
+                            ]
+                        }
+                    ]
+                }
+            }
+        ],
+        "connections": [
+            {
+                "from": [
+                    {
+                        "element": "source_file"
+                    }
+                ],
+                "to":
+                {
+                    "success": [
+                        {
+                            "element": "transcode_task"
+                        }
+                    ]
+                }
+            }
+        ]
+    }
+}

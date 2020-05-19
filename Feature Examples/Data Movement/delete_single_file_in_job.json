@@ -1,0 +1,182 @@
+{
+    "definitions": {
+        "descriptor": "delete_temporary_file_by_name_job_example",
+        "source_path": "s3://hybrik-examples/public/sources/short_adaptive_bitrate_sources",
+        "source_name": "tears_of_steel_12000kbps_1080p.mp4",
+        "subtitle_path": "{{source_path}}",
+        "subtitle_name": "tears_of_steel_1080p_subs.vtt",
+        "destination_path": "s3://hybrik-examples/public/output/feature_examples/data_movement/{{descriptor}}",
+        "temp_file": "temp.mp4"
+    },
+    "name": "{{descriptor}}: {{temp_file}}",
+    "payload": {
+        "elements": [
+            {
+                "uid": "sources",
+                "kind": "source",
+                "payload": {
+                    "kind": "asset_complex",
+                    "payload": {
+                        "asset_versions": [
+                            {
+                                "asset_components": [
+                                    {
+                                        "kind": "name",
+                                        "name": "{{source_name}}",
+                                        "location": {
+                                            "storage_provider": "s3",
+                                            "path": "{{source_path}}"
+                                        },
+                                        "contents": [
+                                            {
+                                                "kind": "video"
+                                            },
+                                            {
+                                                "kind": "audio"
+                                            }
+                                        ]
+                                    },
+                                    {
+                                        "component_uid": "subtitle",
+                                        "kind": "name",
+                                        "name": "{{subtitle_name}}",
+                                        "location": {
+                                            "storage_provider": "s3",
+                                            "path": "{{subtitle_path}}"
+                                        },
+                                        "contents": [
+                                            {
+                                                "kind": "subtitle",
+                                                "payload": {
+                                                    "format": "auto"
+                                                }
+                                            }
+                                        ]
+                                    }
+                                ]
+                            }
+                        ]
+                    }
+                }
+            },
+            {
+                "uid": "burn_in_subtitles",
+                "kind": "transcode",
+                "payload": {
+                    "location": {
+                        "storage_provider": "s3",
+                        "path": "{{destination_path}}"
+                    },
+                    "targets": [
+                        {
+                            "file_pattern": "{{temp_file}}",
+                            "existing_files": "replace",
+                            "container": {
+                                "kind": "mp4"
+                            },
+                            "video": {
+                                "codec": "h264",
+                                "width": 1280,
+                                "height": 720,
+                                "bitrate_mode": "vbr",
+                                "bitrate_kb": 3000,
+                                "max_bitrate_kb": 3600,
+                                "filters": [
+                                    {
+                                        "kind": "print_subtitle",
+                                        "payload": {
+                                            "imprint_style": "closed_caption"
+                                        }
+                                    }
+                                ]
+                            }
+                        }
+                    ]
+                }
+            },
+            {
+                "uid": "extract_burned_thumbnail_images",
+                "kind": "transcode",
+                "payload": {
+                    "location": {
+                        "storage_provider": "s3",
+                        "path": "{{destination_path}}"
+                    },
+                    "targets": [
+                        {
+                            "file_pattern": "{source_basename}_burned_thumbnails_%05d.jpg",
+                            "existing_files": "replace",
+                            "video": {
+                                "codec": "jpeg",
+                                "width": 300,
+                                "qscale": 6,
+                                "image_sequence": {
+                                    "start_number": 0,
+                                    "total_number": 10
+                                }
+                            }
+                        }
+                    ]
+                }
+            },
+            {
+                "uid": "delete_temp_file",
+                "kind": "delete_asset",
+                "payload": {
+                    "asset_selector": "config",
+                    "asset": {
+                        "kind": "asset_url",
+                        "payload": {
+                            "storage_provider": "s3",
+                            "url": "{{destination_path}}/{{temp_file}}"
+                        }
+                    }
+                }
+            }
+        ],
+        "connections": [
+            {
+                "from": [
+                    {
+                        "element": "sources"
+                    }
+                ],
+                "to": {
+                    "success": [
+                        {
+                            "element": "burn_in_subtitles"
+                        }
+                    ]
+                }
+            },
+            {
+                "from": [
+                    {
+                        "element": "burn_in_subtitles"
+                    }
+                ],
+                "to": {
+                    "success": [
+                        {
+                            "element": "extract_burned_thumbnail_images"
+                        }
+                    ]
+                }
+            },
+            {
+                "from": [
+                    {
+                        "element": "extract_burned_thumbnail_images"
+                    }
+                ],
+                "to": {
+                    "success": [
+                        {
+                            "element": "delete_temp_file"
+                        }
+                    ]
+                }
+            }
+        ]
+    }
+}   

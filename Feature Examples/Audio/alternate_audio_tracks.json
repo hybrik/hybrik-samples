@@ -1,12 +1,12 @@
 {
     "definitions": {
-        "profile_name": "alternate_audio_tracks",
+        "descriptor": "alternate_audio_tracks",
         "source_path": "s3://hybrik-examples/public/sources",
         "source_filename": "tears_of_steel_1080p.mov",
         "alternate_audio": "tears_of_steel_italian_audio.mp4",
-        "destination_path": "s3://hybrik-examples/public/output/features/audio/{{profile_name}}"
+        "destination_path": "s3://hybrik-examples/public/output/feature_examples/audio/{{descriptor}}"
     },
-    "name": "{{profile_name}}:  {{source_filename}}",
+    "name": "{{descriptor}}: {{source_filename}}",
     "payload": {
         "elements": [
             {

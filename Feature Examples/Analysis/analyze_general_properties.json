@@ -1,9 +1,10 @@
 {
     "definitions": {
-        "profile_name": "analyze_general_properties",
-        "source": "s3://hybrik-examples/public/sources/tears_of_steel_720p.mov"
+        "descriptor": "analyze_general_properties",
+        "source_path": "s3://hybrik-examples/public/sources",
+        "source_file": "tears_of_steel_720p.mov"
     },
-    "name": "{{profile_name}}:  {{source}}",
+    "name": "{{descriptor}}: {{source_file}}",
     "payload": {
         "elements": [
             {
@@ -13,7 +14,7 @@
                     "kind": "asset_url",
                     "payload": {
                         "storage_provider": "s3",
-                        "url": "{{source}}"
+                        "url": "{{source_path}}/{{source_file}}"
                     }
                 }
             },

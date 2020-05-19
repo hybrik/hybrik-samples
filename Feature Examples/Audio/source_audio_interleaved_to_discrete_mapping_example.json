@@ -1,0 +1,243 @@
+{
+    "definitions": {
+        "descriptor": "source_audio_interleaved_to_discrete_mapping_example_with_designators",
+        "source_path": "s3://hybrik-examples/public/sources",
+        "source_file": "meridian_1920x1080p59.94_h264_audio-2tk_5.1_LtRt.mov",
+        "destination_path": "s3://hybrik-examples/public/output/feature_examples/audio/{{descriptor}}"
+    },
+    "name": "{{descriptor}}: {{source_file}}",
+    "payload": {
+        "elements": [
+            {
+                "uid": "source",
+                "kind": "source",
+                "payload": {
+                    "kind": "asset_complex",
+                    "payload": {
+                        "kind": "sequence",
+                        "asset_versions": [
+                            {
+                                "version_uid": "0",
+                                "asset_components": [
+                                    {
+                                        "location": {
+                                            "storage_provider": "s3",
+                                            "path": "{{source_path}}"
+                                        },
+                                        "kind": "name",
+                                        "name": "{{source_file}}",
+                                        "component_uid": "source_0",
+                                        "contents": [
+                                            {
+                                                "kind": "video"
+                                            },
+                                            {
+                                                "kind": "audio",
+                                                "map": [
+                                                    {
+                                                        "input": {
+                                                            "track": 0,
+                                                            "channel": 0
+                                                        },
+                                                        "output": {
+                                                            "track": 0,
+                                                            "channel": 0
+                                                        }
+                                                    },
+                                                    {
+                                                        "input": {
+                                                            "track": 0,
+                                                            "channel": 1
+                                                        },
+                                                        "output": {
+                                                            "track": 1,
+                                                            "channel": 0
+                                                        }
+                                                    },
+                                                    {
+                                                        "input": {
+                                                            "track": 0,
+                                                            "channel": 2
+                                                        },
+                                                        "output": {
+                                                            "track": 2,
+                                                            "channel": 0
+                                                        }
+                                                    },
+                                                    {
+                                                        "input": {
+                                                            "track": 0,
+                                                            "channel": 3
+                                                        },
+                                                        "output": {
+                                                            "track": 3,
+                                                            "channel": 0
+                                                        }
+                                                    },
+                                                    {
+                                                        "input": {
+                                                            "track": 0,
+                                                            "channel": 4
+                                                        },
+                                                        "output": {
+                                                            "track": 4,
+                                                            "channel": 0
+                                                        }
+                                                    },
+                                                    {
+                                                        "input": {
+                                                            "track": 0,
+                                                            "channel": 5
+                                                        },
+                                                        "output": {
+                                                            "track": 5,
+                                                            "channel": 0
+                                                        }
+                                                    },
+                                                    {
+                                                        "input": {
+                                                            "track": 1,
+                                                            "channel": 0
+                                                        },
+                                                        "output": {
+                                                            "track": 6,
+                                                            "channel": 0
+                                                        }
+                                                    },
+                                                    {
+                                                        "input": {
+                                                            "track": 1,
+                                                            "channel": 1
+                                                        },
+                                                        "output": {
+                                                            "track": 6,
+                                                            "channel": 1
+                                                        }
+                                                    }
+                                                ]
+                                            }
+                                        ]
+                                    }
+                                ]
+                            }
+                        ]
+                    }
+                }
+            },
+            {
+                "uid": "transcode_task",
+                "kind": "transcode",
+                "payload": {
+                    "location": {
+                        "storage_provider": "s3",
+                        "path": "{{destination_path}}"
+                    },
+                    "targets": [
+                        {
+                            "file_pattern": "{{descriptor}}{default_extension}",
+                            "existing_files": "replace",
+                            "container": {
+                                "kind": "mov"
+                            },
+                            "video": {
+                                "codec": "prores",
+                                "profile": "apco",
+                                "width": 1280,
+                                "height": 720
+                            },
+                            "audio": [
+                                {
+                                    "codec": "pcm",
+                                    "channels": 1,
+                                    "sample_rate": 48000,
+                                    "sample_size": 24,
+                                    "track_name": "left",
+                                    "channel_designators": [
+                                        "left"
+                                    ]
+                                },
+                                {
+                                    "codec": "pcm",
+                                    "channels": 1,
+                                    "sample_rate": 48000,
+                                    "sample_size": 24,
+                                    "track_name": "right",
+                                    "channel_designators": [
+                                        "right"
+                                    ]
+                                },
+                                {
+                                    "codec": "pcm",
+                                    "channels": 1,
+                                    "sample_rate": 48000,
+                                    "sample_size": 24,
+                                    "track_name": "center",
+                                    "channel_designators": [
+                                        "center"
+                                    ]
+                                },
+                                {
+                                    "codec": "pcm",
+                                    "channels": 1,
+                                    "sample_rate": 48000,
+                                    "sample_size": 24,
+                                    "track_name": "lfe",
+                                    "channel_designators": [
+                                        "lfe_screen"
+                                    ]
+                                },
+                                {
+                                    "codec": "pcm",
+                                    "channels": 1,
+                                    "sample_rate": 48000,
+                                    "sample_size": 24,
+                                    "track_name": "ls",
+                                    "channel_designators": [
+                                        "left_surround"
+                                    ]
+                                },
+                                {
+                                    "codec": "pcm",
+                                    "channels": 1,
+                                    "sample_rate": 48000,
+                                    "sample_size": 24,
+                                    "track_name": "rs",
+                                    "channel_designators": [
+                                        "left_surround"
+                                    ]
+                                },
+                                {
+                                    "codec": "pcm",
+                                    "channels": 2,
+                                    "sample_rate": 48000,
+                                    "sample_size": 24,
+                                    "track_name": "Stereo",
+                                    "channel_designators": [
+                                        "left_total",
+                                        "right_total"
+                                    ]
+                                }
+                            ]
+                        }
+                    ]
+                }
+            }
+        ],
+        "connections": [
+            {
+                "from": [
+                    {
+                        "element": "source"
+                    }
+                ],
+                "to": {
+                    "success": [
+                        {
+                            "element": "transcode_task"
+                        }
+                    ]
+                }
+            }
+        ]
+    }
+}

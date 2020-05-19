@@ -1,10 +1,10 @@
 {
     "definitions": {
-        "profile_name": "delete_file",
-        "source_filename": "tears_of_steel_720p.mov",
-        "destination": "s3://hybrik-examples/public/output/features/data_movement/copy_file/{{source_filename}}"
+        "descriptor": "delete_file",
+        "delete_file": "tears_of_steel_720p.mov",
+        "destination": "s3://hybrik-examples/public/output/feature_examples/data_movement/copy_file/{{delete_file}}"
     },
-    "name": "{{profile_name}}:  {{destination}}",
+    "name": "{{descriptor}}: {{destination}}",
     "payload": {
         "elements": [
             {

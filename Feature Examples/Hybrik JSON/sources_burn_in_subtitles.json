@@ -1,0 +1,123 @@
+{
+    "definitions": {
+        "descriptor": "simple_print_subtitles_example",
+        "source_path": "s3://hybrik-examples/public/sources",
+        "source_name": "tears_of_steel_1080p.mov",
+        "subtitles_path": "{{source_path}}",
+        "subtitles_name": "TOS-en.srt",
+        "destination_path": "s3://hybrik-examples/public/output/feature_examples/hybrik_json/{{descriptor}}",
+        "file_pattern": "{{descriptor}}{default_extension}"
+    },
+    "name": "{{descriptor}}: {{source_name}}",
+    "payload": {
+        "elements": [
+            {
+                "uid": "sources",
+                "kind": "source",
+                "payload": {
+                    "kind": "asset_complex",
+                    "payload": {
+                        "asset_versions": [
+                            {
+                                "asset_components": [
+                                    {
+                                        "kind": "name",
+                                        "name": "{{source_name}}",
+                                        "location": {
+                                            "storage_provider": "s3",
+                                            "path": "{{source_path}}"
+                                        },
+                                        "contents": [
+                                            {
+                                                "kind": "video"
+                                            },
+                                            {
+                                                "kind": "audio"
+                                            }
+                                        ]
+                                    },
+                                    {
+                                        "component_uid": "caption1",
+                                        "kind": "name",
+                                        "name": "{{subtitles_name}}",
+                                        "location": {
+                                            "storage_provider": "s3",
+                                            "path": "{{subtitles_path}}"
+                                        },
+                                        "contents": [
+                                            {
+                                                "kind": "subtitle",
+                                                "payload": {
+                                                    "format": "auto"
+                                                }
+                                            }
+                                        ]
+                                    }
+                                ]
+                            }
+                        ]
+                    }
+                }
+            },
+            {
+                "uid": "transcode_task",
+                "kind": "transcode",
+                "payload": {
+                    "location": {
+                        "storage_provider": "s3",
+                        "path": "{{destination_path}}"
+                    },
+                    "targets": [
+                        {
+                            "file_pattern": "{{file_pattern}}",
+                            "existing_files": "replace",
+                            "container": {
+                                "kind": "mp4"
+                            },
+                            "video": {
+                                "codec": "h264",
+                                "width": 1280,
+                                "height": 720,
+                                "bitrate_mode": "vbr",
+                                "bitrate_kb": 3000,
+                                "max_bitrate_kb": 3600,
+                                "filters": [
+                                    {
+                                        "kind": "print_subtitle",
+                                        "payload": {
+                                            "imprint_style": "closed_caption"
+                                        }
+                                    }
+                                ]
+                            },
+                            "audio": [
+                                {
+                                    "codec": "aac",
+                                    "channels": 2,
+                                    "sample_rate": 48000,
+                                    "bitrate_kb": 96
+                                }
+                            ]
+                        }
+                    ]
+                }
+            }
+        ],
+        "connections": [
+            {
+                "from": [
+                    {
+                        "element": "sources"
+                    }
+                ],
+                "to": {
+                    "success": [
+                        {
+                            "element": "transcode_task"
+                        }
+                    ]
+                }
+            }
+        ]
+    }
+}

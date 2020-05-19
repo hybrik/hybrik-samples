@@ -1,0 +1,139 @@
+{
+    "definitions": {
+        "descriptor": "source_embedding_multi_language_captions",
+        "source_path": "s3://hybrik-examples/public/sources",
+        "source_name": "tears_of_steel_720p.mov",
+        "captions_path": "{{source_path}}",
+        "captions_en_name": "TOS-en.scc",
+        "captions_es_name": "TOS-es.scc",
+        "destination_path": "s3://hybrik-examples/public/output/feature_examples/hybrik_json/{{descriptor}}",
+        "file_pattern": "{{descriptor}}{default_extension}"
+    },
+    "name": "{{descriptor}}: {{source_name}}",
+    "payload": {
+        "elements": [
+            {
+                "uid": "sources",
+                "kind": "source",
+                "payload": {
+                    "kind": "asset_complex",
+                    "payload": {
+                        "asset_versions": [
+                            {
+                                "asset_components": [
+                                    {
+                                        "kind": "name",
+                                        "name": "{{source_name}}",
+                                        "location": {
+                                            "storage_provider": "s3",
+                                            "path": "{{source_path}}"
+                                        },
+                                        "contents": [
+                                            {
+                                                "kind": "video"
+                                            },
+                                            {
+                                                "kind": "audio"
+                                            }
+                                        ]
+                                    },
+                                    {
+                                        "component_uid": "caption",
+                                        "kind": "name",
+                                        "name": "{{captions_en_name}}",
+                                        "location": {
+                                            "storage_provider": "s3",
+                                            "path": "{{captions_path}}"
+                                        },
+                                        "contents": [
+                                            {
+                                                "kind": "closed_caption",
+                                                "payload": {
+                                                    "format": "scc0",
+                                                    "language": "english"
+                                                }
+                                            }
+                                        ]
+                                    },
+                                    {
+                                        "component_uid": "caption",
+                                        "kind": "name",
+                                        "name": "{{captions_es_name}}",
+                                        "location": {
+                                            "storage_provider": "s3",
+                                            "path": "{{captions_path}}"
+                                        },
+                                        "contents": [
+                                            {
+                                                "kind": "closed_caption",
+                                                "payload": {
+                                                    "format": "scc1",
+                                                    "language": "spanish"
+                                                }
+                                            }
+                                        ]
+                                    }
+                                ]
+                            }
+                        ]
+                    }
+                }
+            },
+            {
+                "uid": "transcode_task",
+                "kind": "transcode",
+                "payload": {
+                    "location": {
+                        "storage_provider": "s3",
+                        "path": "{{destination_path}}"
+                    },
+                    "targets": [
+                        {
+                            "file_pattern": "{{file_pattern}}",
+                            "existing_files": "replace",
+                            "container": {
+                                "kind": "mp4"
+                            },
+                            "video": {
+                                "codec": "h264",
+                                "width": 1280,
+                                "height": 720,
+                                "bitrate_mode": "vbr",
+                                "bitrate_kb": 3000,
+                                "max_bitrate_kb": 3600,
+                                "closed_captions": {
+                                    "enable_cea608": true,
+                                    "enable_cea708": true
+                                }
+                            },
+                            "audio": [
+                                {
+                                    "codec": "aac",
+                                    "channels": 2,
+                                    "sample_rate": 48000,
+                                    "bitrate_kb": 96
+                                }
+                            ]
+                        }
+                    ]
+                }
+            }
+        ],
+        "connections": [
+            {
+                "from": [
+                    {
+                        "element": "sources"
+                    }
+                ],
+                "to": {
+                    "success": [
+                        {
+                            "element": "transcode_task"
+                        }
+                    ]
+                }
+            }
+        ]
+    }
+}

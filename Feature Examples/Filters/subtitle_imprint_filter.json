@@ -1,12 +1,12 @@
 {
     "definitions": {
-        "profile_name": "subtitle_imprint",
+        "descriptor": "subtitle_imprint",
         "source_path": "s3://hybrik-examples/public/sources",
         "source": "s3://hybrik-examples/public/sources/tears_of_steel_720p.mov",
         "subtitle": "TOS-en.srt",
-        "destination_path": "s3://hybrik-examples/public/output/features/filters/{{profile_name}}"
+        "destination_path": "s3://hybrik-examples/public/output/feature_examples/filters/{{descriptor}}"
     },
-    "name": "{{profile_name}}:  {{source}}",
+    "name": "{{descriptor}}: {{source}}",
     "payload": {
         "elements": [
             {
@@ -68,7 +68,7 @@
                     },
                     "targets": [
                         {
-                            "file_pattern": "{{profile_name}}{default_extension}",
+                            "file_pattern": "{{descriptor}}{default_extension}",
                             "existing_files": "replace",
                             "container": {
                                 "kind": "mp4",

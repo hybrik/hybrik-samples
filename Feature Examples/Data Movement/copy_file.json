@@ -1,10 +1,10 @@
 {
     "definitions": {
-        "profile_name": "copy_file",
+        "descriptor": "copy_file",
         "source": "s3://hybrik-examples/public/sources/tears_of_steel_720p.mov",
-        "destination": "s3://hybrik-examples/public/output/features/data_movement/{{profile_name}}"
+        "destination": "s3://hybrik-examples/public/output/feature_examples/data_movement/{{descriptor}}"
     },
-    "name": "{{profile_name}}:  {{source}}",
+    "name": "{{descriptor}}: {{source}}",
     "payload": {
         "elements": [
             {

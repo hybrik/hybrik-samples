@@ -1,12 +1,12 @@
 {
     "definitions": {
-        "profile_name": "fadein_fadeout_filter",
+        "descriptor": "fadein_fadeout_filter",
         "source": "s3://hybrik-examples/public/sources/tears_of_steel_1080p.mov",
-        "destination_path": "s3://hybrik-examples/public/output/features/filters/{{profile_name}}",
+        "destination_path": "s3://hybrik-examples/public/output/feature_examples/filters/{{descriptor}}",
         "fade_in_duration": 2,
         "fade_out_duration": 3
     },
-    "name": "{{profile_name}}:  {{source}}",
+    "name": "{{descriptor}}: {{source}}",
     "payload": {
         "elements": [
             {
@@ -30,7 +30,7 @@
                     },
                     "targets": [
                         {
-                            "file_pattern": "{{profile_name}}{default_extension}",
+                            "file_pattern": "{{descriptor}}{default_extension}",
                             "existing_files": "replace",
                             "container": {
                                 "kind": "mp4"

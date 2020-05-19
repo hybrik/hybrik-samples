@@ -1,10 +1,10 @@
 {
     "definitions": {
-        "profile_name": "xdcam_imx50_mxf_720x480_mpeg2_50000kbs",
+        "descriptor": "xdcam_imx50_mxf_720x480_mpeg2_50000kbs",
         "source": "s3://hybrik-examples/public/sources/tears_of_steel_720p.mov",
-        "destination_path": "s3://hybrik-examples/public/output/formats/mxf/{{profile_name}}"
+        "destination_path": "s3://hybrik-examples/public/output/format_examples/mxf/{{descriptor}}"
     },
-    "name": "{{profile_name}}: {{source}}",
+    "name": "{{descriptor}}: {{source}}",
     "payload": {
         "elements": [
             {
@@ -35,7 +35,7 @@
                     },
                     "targets": [
                         {
-                            "file_pattern": "{{profile_name}}{default_extension}",
+                            "file_pattern": "{{descriptor}}{default_extension}",
                             "existing_files": "replace",
                             "compliance": "xdcam_imx",
                             "container": {

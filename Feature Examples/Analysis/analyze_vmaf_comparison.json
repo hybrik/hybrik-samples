@@ -1,10 +1,11 @@
 {
     "definitions": {
-        "profile_name": "analyze_vmaf_comparison",
-        "source": "s3://hybrik-examples/public/sources/tears_of_steel_1080p_1920x1080_h265_4800kbs.mp4",
-        "compare": "s3://hybrik-examples/public/sources/tears_of_steel_720p.mov"
+        "descriptor": "analyze_vmaf_with_results_file",
+        "source_path": "s3://hybrik-examples/public/sources",
+        "source_file": "tears_of_steel_4k.mov",
+        "destination_path": "s3://hybrik-examples/public/output/feature_examples/analysis/{{descriptor}}"
     },
-    "name": "{{profile_name}}:  {{source}}",
+    "name": "{{descriptor}}: {{source_file}}",
     "payload": {
         "elements": [
             {
@@ -14,33 +15,83 @@
                     "kind": "asset_url",
                     "payload": {
                         "storage_provider": "s3",
-                        "url": "{{source}}"
+                        "url": "{{source_path}}/{{source_file}}"
                     }
+                }
+            },
+            {
+                "uid": "transcode_task",
+                "kind": "transcode",
+                "task": {
+                    "retry_method": "fail"
+                },
+                "payload": {
+                    "location": {
+                        "storage_provider": "s3",
+                        "path": "{{destination_path}}"
+                    },
+                    "targets": [
+                        {
+                            "file_pattern": "{source_basename}_720p.mp4",
+                            "existing_files": "replace",
+                            "container": {
+                                "kind": "mp4"
+                            },
+                            "video": {
+                                "codec": "h264",
+                                "width": 1280,
+                                "height": 720,
+                                "frame_rate": 23.976,
+                                "bitrate_kb": 2500
+                            },
+                            "audio": [
+                                {
+                                    "codec": "heaac_v2",
+                                    "channels": 2,
+                                    "sample_rate": 44100,
+                                    "bitrate_kb": 128
+                                }
+                            ]
+                        }
+                    ]
                 }
             },
             {
                 "uid": "analyze_task",
                 "kind": "analyze",
+                "task": {
+                    "retry_method": "fail"
+                },
                 "payload": {
+                    "general_properties": {
+                        "enabled": true
+                    },
                     "compare_asset": {
                         "kind": "asset_url",
                         "payload": {
                             "storage_provider": "s3",
-                            "url": "{{compare}}"
+                            "url": "{{source_path}}/{{source_file}}"
                         }
                     },
-                    "general_properties": {
-                        "enabled": true
-                    },
                     "deep_properties": {
-                        "audio": {
-                            "psnr": {
-                                "enabled": true
-                            }
-                        },
                         "video": {
+                            "settings": {
+                                "comparative": {
+                                    "size_selector": "compare_asset",
+                                    "scaler": {
+                                        "algorithm": "bicubic"
+                                    }
+                                }
+                            },
                             "vmaf": {
-                                "enabled": true
+                                "enabled": true,
+                                "results_file": {
+                                    "file_pattern": "{source_basename}_VMAF_results_analysis.json",
+                                    "location": {
+                                        "storage_provider": "s3",
+                                        "path": "{{destination_path}}"
+                                    }
+                                }
                             }
                         }
                     }
@@ -52,6 +103,20 @@
                 "from": [
                     {
                         "element": "source_file"
+                    }
+                ],
+                "to": {
+                    "success": [
+                        {
+                            "element": "transcode_task"
+                        }
+                    ]
+                }
+            },
+            {
+                "from": [
+                    {
+                        "element": "transcode_task"
                     }
                 ],
                 "to": {

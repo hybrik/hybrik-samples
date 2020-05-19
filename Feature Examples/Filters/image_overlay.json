@@ -1,11 +1,11 @@
 {
     "definitions": {
-        "profile_name": "image_overlay",
+        "descriptor": "image_overlay",
         "source": "s3://hybrik-examples/public/sources/tears_of_steel_1080p.mov",
-        "destination_path": "s3://hybrik-examples/public/output/features/filters/{{profile_name}}",
+        "destination_path": "s3://hybrik-examples/public/output/feature_examples/filters/{{descriptor}}",
         "image_overlay": "s3://hybrik-examples/public/sources/hybrik_logo_bottom_right.png"
     },
-    "name": "{{profile_name}}:  {{source}}",
+    "name": "{{descriptor}}: {{source}}",
     "payload": {
         "elements": [
             {
@@ -29,7 +29,7 @@
                     },
                     "targets": [
                         {
-                            "file_pattern": "{{profile_name}}{default_extension}",
+                            "file_pattern": "{{descriptor}}{default_extension}",
                             "existing_files": "replace",
                             "container": {
                                 "kind": "mp4"

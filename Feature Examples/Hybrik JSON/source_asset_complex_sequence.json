@@ -1,0 +1,184 @@
+{
+    "definitions": {
+        "descriptor": "asset_complex_example",
+        "source_0_filename": "bars_and_tone_30sec_2.0.mp4",
+        "source_1_filename": "tears_of_steel_720p.mov",
+        "source_2_filename": "tears_of_steel_italian_audio.mp4",
+        "source_path": "s3://hybrik-examples/public/sources",
+        "file_pattern": "{{descriptor}}{default_extension}",
+        "destination_path": "s3://hybrik-examples/public/output/feature_examples/hybrik_json/{{descriptor}}"
+    },
+    "name": "{{descriptor}}",
+    "payload": {
+        "elements": [
+            {
+                "uid": "sources",
+                "kind": "source",
+                "payload": {
+                    "kind": "asset_complex",
+                    "payload": {
+                        "kind": "sequence",
+                        "asset_versions": [
+                            {
+                                "version_uid": "first_in_sequence",
+                                "asset_components": [
+                                    {
+                                        "kind": "name",
+                                        "name": "{{source_0_filename}}",
+                                        "location": {
+                                            "storage_provider": "s3",
+                                            "path": "{{source_path}}"
+                                        },
+                                        "contents": [
+                                            {
+                                                "kind": "video"
+                                            },
+                                            {
+                                                "kind": "audio",
+                                                "map": [
+                                                    {
+                                                        "input": {
+                                                            "track": 0,
+                                                            "channel": 0
+                                                        },
+                                                        "output": {
+                                                            "track": 0,
+                                                            "channel": 0
+                                                        }
+                                                    },
+                                                    {
+                                                        "input": {
+                                                            "track": 0,
+                                                            "channel": 1
+                                                        },
+                                                        "output": {
+                                                            "track": 0,
+                                                            "channel": 1
+                                                        }
+                                                    }
+                                                ]
+                                            }
+                                        ],
+                                        "trim": {
+                                            "inpoint_sec": 0,
+                                            "outpoint_sec": 30
+                                        }
+                                    }
+                                ]
+                            },
+                            {
+                                "version_uid": "second_in_sequence",
+                                "asset_components": [
+                                    {
+                                        "kind": "name",
+                                        "name": "{{source_1_filename}}",
+                                        "location": {
+                                            "storage_provider": "s3",
+                                            "path": "{{source_path}}"
+                                        },
+                                        "contents": [
+                                            {
+                                                "kind": "video"
+                                            }
+                                        ]
+                                    },
+                                    {
+                                        "kind": "name",
+                                        "name": "{{source_2_filename}}",
+                                        "location": {
+                                            "storage_provider": "s3",
+                                            "path": "{{source_path}}"
+                                        },
+                                        "contents": [
+                                            {
+                                                "kind": "audio",
+                                                "map": [
+                                                    {
+                                                        "input": {
+                                                            "track": 0,
+                                                            "channel": 0
+                                                        },
+                                                        "output": {
+                                                            "track": 0,
+                                                            "channel": 0
+                                                        }
+                                                    },
+                                                    {
+                                                        "input": {
+                                                            "track": 0,
+                                                            "channel": 1
+                                                        },
+                                                        "output": {
+                                                            "track": 0,
+                                                            "channel": 1
+                                                        }
+                                                    }
+                                                ]
+                                            }
+                                        ]
+                                    }
+                                ]
+                            }
+                        ]
+                    }
+                }
+            },
+            {
+                "uid": "transcode_task",
+                "kind": "transcode",
+                "task": {
+                    "retry_method": "retry",
+                    "retry": {
+                        "count": 1,
+                        "delay_sec": 30
+                    }
+                },
+                "payload": {
+                    "location": {
+                        "storage_provider": "s3",
+                        "path": "{{destination_path}}"
+                    },
+                    "targets": [
+                        {
+                            "file_pattern": "{{file_pattern}}",
+                            "existing_files": "replace",
+                            "container": {
+                                "kind": "mp4"
+                            },
+                            "video": {
+                                "codec": "h264",
+                                "width": 1280,
+                                "height": 720,
+                                "bitrate_kb": 1000
+                            },
+                            "audio": [
+                                {
+                                    "codec": "aac",
+                                    "channels": 2,
+                                    "sample_rate": 44100,
+                                    "bitrate_kb": 128
+                                }
+                            ]
+                        }
+                    ]
+                }
+            }
+        ],
+        "connections": [
+            {
+                "from": [
+                    {
+                        "element": "sources"
+                    }
+                ],
+                "to": {
+                    "success": [
+                        {
+                            "element": "transcode_task"
+                        }
+                    ]
+                }
+            }
+        ]
+    }
+}

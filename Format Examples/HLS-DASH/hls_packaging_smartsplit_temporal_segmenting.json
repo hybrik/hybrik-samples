@@ -1,13 +1,13 @@
 {
     "definitions": {
-        "profile_name": "hls_packaging_smartsplit_temporal_segmenting",
+        "descriptor": "hls_packaging_smartsplit_temporal_segmenting",
         "source": "s3://hybrik-examples/public/sources/tears_of_steel_720p.mov",
-        "destination_path": "s3://hybrik-examples/public/output/formats/hls-dash/{{profile_name}}",
+        "destination_path": "s3://hybrik-examples/public/output/format_examples/hls-dash/{{descriptor}}",
 
         "temporal_segment_duration": 60,
         "segment_duration": 6
     },
-    "name": "{{profile_name}}: {{source}}",
+    "name": "{{descriptor}}: {{source}}",
     "payload": {
         "elements": [
             {
