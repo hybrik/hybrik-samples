@@ -148,6 +148,7 @@
                         ]
                     },
                     "file_pattern": "master_manifest.m3u8",
+                    "segmentation_mode": "fmp4",
                     "force_original_media": true,
                     "hls": {
                         "media_playlist_location": {
