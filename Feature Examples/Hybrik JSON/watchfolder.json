@@ -1,0 +1,95 @@
+{
+  "definitions": {
+    "watchfolder_path": "s3://hybrik/watch_folder",
+    "destination": "s3://hybrik/watch_folder_path_output"
+  },
+  "name": "watchfolder_path Example",
+  "payload": {
+    "elements": [
+      {
+        "uid": "watchfolder_source",
+        "kind": "watchfolder",
+        "task": {
+          "retry_method": "retry",
+          "retry": {
+            "count": -1,
+            "delay_sec": 2
+          },
+          "tags": [
+            "WATCH_FOLDER"
+          ]
+        },
+        "payload": {
+          "source": {
+            "storage_provider": "s3",
+            "path": "{{watchfolder_path}}"
+          },
+          "settings": {
+            "key": "watch_folder_1",
+            "frequency": 5,
+            "pattern_matching": "wildcard",
+            "wildcard": "*",
+            "recursive": true,
+            "ignore_preexisting_files": true
+          }
+        }
+      },
+      {
+        "uid": "transcode_task",
+        "kind": "transcode",
+        "task": {
+          "retry_method": "fail"
+        },
+        "payload": {
+          "location": {
+            "storage_provider": "s3",
+            "path": "{{destination}}/{source_basename}"
+          },
+          "targets": [
+            {
+              "file_pattern": "{source_basename}-640x360-H264-1500kb.mp4",
+              "existing_files": "replace",
+              "container": {
+                "kind": "mp4",
+                "faststart": true
+              },
+              "video": {
+                "width": 640,
+                "height": 360,
+                "codec": "h264",
+                "profile": "main",
+                "level": "3.0",
+                "bitrate_kb": 1500,
+                "interlace_mode": "progressive"
+              },
+              "audio": [
+                {
+                  "codec": "aac_lc",
+                  "channels": 2,
+                  "sample_rate": 48000,
+                  "bitrate_kb": 128
+                }
+              ]
+            }
+          ]
+        }
+      }
+    ],
+    "connections": [
+      {
+        "from": [
+          {
+            "element": "watchfolder_source"
+          }
+        ],
+        "to": {
+          "success": [
+            {
+              "element": "transcode_task"
+            }
+          ]
+        }
+      }
+    ]
+  }
+}
