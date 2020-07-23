@@ -26,11 +26,11 @@
           },
           "settings": {
             "key": "watch_folder_1",
-            "frequency": 5,
+            "interval_sec": 120,
             "pattern_matching": "wildcard",
             "wildcard": "*",
             "recursive": true,
-            "ignore_preexisting_files": true
+            "process_existing_files": false
           }
         }
       },
