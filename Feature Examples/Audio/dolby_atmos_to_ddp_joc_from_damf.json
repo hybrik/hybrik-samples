@@ -1,0 +1,137 @@
+{
+    "definitions": {
+        "descriptor": "dolby_atmos_to_ddp_joc_from_damf",
+        "source_path": "s3://download.opencontent.netflix.com/Meridian/audio/DAMF",
+        "source_audio": "Meridian.atmos.audio",
+        "source_atmos": "Meridian.atmos",
+        "source_metadata": "Meridian.atmos.metadata",
+        "bitrate_kb": 448,
+        "metering_mode": "1770-4",
+        "dialogue_intelligence": false,
+        "speech_threshold": 100,
+        "preferred_downmix_mode": "loro",
+        "loro_center_mix_level": -3,
+        "loro_surround_mix_level": -3,
+        "ltrt_center_mix_level": -3,
+        "ltrt_surround_mix_level": -3,
+        "drc_profile": "film_standard",
+        "destination_path": "s3://hybrik-examples/public/output/format_examples/audio/{{descriptor}}",
+        "file_pattern": "{{descriptor}}",
+        "loro_ltrt_center_mix_level": -3
+    },
+    "name": "{{descriptor}}",
+    "payload": {
+        "elements": [
+            {
+                "uid": "source",
+                "kind": "source",
+                "payload": {
+                    "kind": "asset_complex",
+                    "payload": {
+                        "kind": "sequence",
+                        "asset_versions": [
+                            {
+                                "version_uid": "a1",
+                                "location": {
+                                    "storage_provider": "s3",
+                                    "path": "{{source_path}}"
+                                },
+                                "asset_components": [
+                                    {
+                                        "kind": "name",
+                                        "name": "{{source_audio}}"
+                                    },
+                                    {
+                                        "kind": "name",
+                                        "name": "{{source_atmos}}"
+                                    },
+                                    {
+                                        "kind": "name",
+                                        "name": "{{source_metadata}}"
+                                    }
+                                ]
+                            }
+                        ]
+                    }
+                }
+            },
+            {
+                "uid": "dolby_audio_encoder",
+                "kind": "dolby_audio_encoder",
+                "task": {
+                    "retry_method": "fail"
+                },
+                "payload": {
+                    "location": {
+                        "storage_provider": "s3",
+                        "path": "{{destination_path}}"
+                    },
+                    "targets": [
+                        {
+                            "file_pattern": "{{file_pattern}}.eac3",
+                            "existing_files": "replace",
+                            "container": {
+                                "kind": "elementary"
+                            },
+                            "audio": [
+                                {
+                                    "codec": "ddp_joc",
+                                    "bitrate_kb": "{{bitrate_kb}}",
+                                    "filters": [
+                                        {
+                                            "audio_filter": {
+                                                "kind": "loudness",
+                                                "payload": {
+                                                    "metering_mode": "{{metering_mode}}",
+                                                    "dialogue_intelligence": "{{dialogue_intelligence}}",
+                                                    "speech_threshold": "{{speech_threshold}}"
+                                                }
+                                            }
+                                        },
+                                        {
+                                            "audio_filter": {
+                                                "kind": "drc",
+                                                "payload": {
+                                                    "line_mode_drc_profile": "{{drc_profile}}",
+                                                    "rf_mode_drc_profile": "{{drc_profile}}"
+                                                }
+                                            }
+                                        },
+                                        {
+                                            "audio_filter": {
+                                                "kind": "downmix",
+                                                "payload": {
+                                                    "loro_center_mix_level": "{{loro_center_mix_level}}",
+                                                    "loro_surround_mix_level": "{{loro_surround_mix_level}}",
+                                                    "ltrt_center_mix_level": "{{ltrt_center_mix_level}}",
+                                                    "ltrt_surround_mix_level": "{{ltrt_surround_mix_level}}",
+                                                    "preferred_downmix_mode": "{{preferred_downmix_mode}}"
+                                                }
+                                            }
+                                        }
+                                    ]
+                                }
+                            ]
+                        }
+                    ]
+                }
+            }
+        ],
+        "connections": [
+            {
+                "from": [
+                    {
+                        "element": "source"
+                    }
+                ],
+                "to": {
+                    "success": [
+                        {
+                            "element": "dolby_audio_encoder"
+                        }
+                    ]
+                }
+            }
+        ]
+    }
+}
