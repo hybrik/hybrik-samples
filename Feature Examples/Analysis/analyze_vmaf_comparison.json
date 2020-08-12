@@ -41,7 +41,6 @@
                                 "codec": "h264",
                                 "width": 1280,
                                 "height": 720,
-                                "frame_rate": 23.976,
                                 "bitrate_kb": 2500
                             },
                             "audio": [
