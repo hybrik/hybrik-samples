@@ -1,0 +1,197 @@
+{
+    "definitions": {
+        "source_path": "s3://hybrik-examples/public/sources",
+        "source_file": "tears_of_steel_720p_timecode_burn.mp4",
+        "destination_path": "s3://hybrik-examples/public/output/feature_examples/transcoding/{{descriptor}}",
+        "descriptor": "extractng_thumbnails_examples"
+    },
+    "name": "{{descriptor}}: {{source_file}}",
+    "payload": {
+        "elements": [
+            {
+                "uid": "source_file",
+                "kind": "source",
+                "payload": {
+                    "kind": "asset_url",
+                    "payload": {
+                        "storage_provider": "s3",
+                        "url": "{{source_path}}/{{source_file}}"
+                    }
+                }
+            },
+            {
+                "uid": "transcode_task",
+                "kind": "transcode",
+                "task": {
+                    "retry_method": "fail"
+                },
+                "payload": {
+                    "location": {
+                        "storage_provider": "s3",
+                        "path": "{{destination_path}}"
+                    },
+                    "targets": [
+                         {
+                            "file_pattern": "{source_basename}_thumbnails_every_10percent_%05d.jpg",
+                            "existing_files": "replace",
+                            "video": {
+                                "codec": "jpeg",
+                                "width": 256,
+                                "height": 144,
+                                "qscale": 6,
+                                "image_sequence": {
+                                    "start_number": 0,
+                                    "total_number": 10
+                                }
+                            }
+                        },
+                        {
+                            "file_pattern": "{source_basename}_thumbnail_single_30sec.png",
+                            "existing_files": "replace",
+                            "video": {
+                                "codec": "png",
+                                "width": 256,
+                                "height": 144,
+                                "image_sequence": {
+                                    "total_number": 1,
+                                    "offset_sec": 30
+                                }
+                            }
+                        },
+                        {
+                            "file_pattern": "{source_basename}_thumbnail_single_45sec.jpg",
+                            "existing_files": "replace",
+                            "video": {
+                                "codec": "jpeg",
+                                "width": 256,
+                                "height": 144,
+                                "qscale": 6,
+                                "image_sequence": {
+                                    "total_number": 1,
+                                    "offset_sec": 45
+                                }
+                            }
+                        },
+                        { 
+                            "file_pattern": "{source_basename}_thumbnails_20frames_total_offset10s_%03d.png",
+                            "existing_files": "replace",
+                            "video": {
+                                "codec": "png",
+                                "width": 512,
+                                "height": 384,
+                                "image_sequence": {
+                                    "total_number": 20,
+                                    "offset_sec": 10
+                                }
+                            }
+                        },
+                        {
+                            "file_pattern": "{source_basename}_thumbnail_single_20percent.jpg",
+                            "existing_files": "replace",
+                            "video": {
+                                "codec": "jpeg",
+                                "width": 256,
+                                "height": 144,
+                                "qscale": 6,
+                                "image_sequence": {
+                                    "total_number": 1,
+                                    "relative_offset": 0.2
+                                }
+                            }
+                        },
+                        {
+                            "file_pattern": "{source_basename}_thumbnails_every_20percent_relative_offset_20percent-%04d.jpg",
+                            "existing_files": "replace",
+                            "video": {
+                                "codec": "jpeg",
+                                "width": 256,
+                                "height": 144,
+                                "qscale": 6,
+                                "image_sequence": {
+                                    "start_number": 1,
+                                    "relative_offset": 0.2,
+                                    "total_number": 20
+                                }
+                            }
+                        },
+                        {
+                            "file_pattern": "{source_basename}_thumbnails_every_5percent_relative_offset_20percent-%04d.jpg",
+                            "existing_files": "replace",
+                            "video": {
+                                "codec": "jpeg",
+                                "width": 256,
+                                "height": 144,
+                                "qscale": 6,
+                                "image_sequence": {
+                                    "start_number": 0,
+                                    "relative_offset": 0.2,
+                                    "total_number": 5
+                                }
+                            }
+                        },
+                        {
+                            "file_pattern": "{source_basename}_thumbnails_every_10seconds_offset_10sec_%05d.png",
+                            "existing_files": "replace",
+                            "video": {
+                                "codec": "png",
+                                "width": 256,
+                                "height": 144,
+                                "frame_rate": "1/10",
+                                "image_sequence": {
+                                    "start_number": 0,
+                                    "offset_sec": 10
+                                }
+                            }
+                        },
+                        {
+                            "file_pattern": "{source_basename}_thumbnails_every_10seconds_framerate_%05d.png",
+                            "existing_files": "replace",
+                            "video": {
+                                "codec": "png",
+                                "width": 256,
+                                "height": 144,
+                                "frame_rate": "1/10",
+                                "image_sequence": {
+                                    "start_number": 0
+                                }
+                            }
+                        },
+                       
+                        {
+                            "file_pattern": "{source_basename}_thumbnails_every_second_%05d.jpg",
+                            "existing_files": "replace",
+                            "video": {
+                                "codec": "jpeg",
+                                "width": 256,
+                                "height": 144,
+                                "frame_rate": 1,
+                                "image_sequence": {
+                                    "start_number": 0
+                                }
+                            }
+                        }
+                    ]
+                }
+            }
+        ],
+        "connections": [
+            {
+                "from": [
+                    {
+                        "element": "source_file"
+                    }
+                ],
+                "to": {
+                    "success": [
+                        {
+                            "element": "transcode_task"
+                        }
+                    ]
+                }
+            }
+        ]
+    }
+}
+
+
+
