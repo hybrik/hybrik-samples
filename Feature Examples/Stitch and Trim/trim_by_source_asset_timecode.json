@@ -1,0 +1,79 @@
+{
+    "definitions": {
+        "descriptor": "trim_by_source_asset_timecode: {{source_file}}",
+        "source_path": "s3://hybrik-examples/public/sources",
+        "source_file": "TOS_spoken_1920x1080p24_1tk_ch_positions_5.1_1hour_start.mov",
+        "destination_path": "s3://hybrik-examples/public/output/feature_examples/stitch_and_trim/{{descriptor}}"
+    },
+    "name": "{{descriptor}}: {{source_file}}",
+    "payload": {
+        "elements": [
+            {
+                "uid": "source_file",
+                "kind": "source",
+                "payload": {
+                    "kind": "asset_url",
+                    "payload": {
+                        "storage_provider": "s3",
+                        "url": "{{source_path}}/{{source_file}}",
+                        "trim": {
+                            "inpoint_asset_tc": "01:01:30:00",
+                            "outpoint_asset_tc": "01:02:30:00"
+                        }
+                    }
+                }
+            },
+            {
+                "uid": "transcode_task",
+                "kind": "transcode",
+                "payload": {
+                    "location": {
+                        "storage_provider": "s3",
+                        "path": "{{destination_path}}"
+                    },
+                    "targets": [
+                        {
+                            "file_pattern": "{{descriptor}}{default_extension}",
+                            "existing_files": "replace",
+                            "container": {
+                                "kind": "mp4"
+                            },
+                            "video": {
+                                "codec": "h264",
+                                "width": 720,
+                                "height": 480,
+                                "bitrate_mode": "vbr",
+                                "bitrate_kb": 1200,
+                                "max_bitrate_kb": 1340
+                            },
+                            "audio": [
+                                {
+                                    "codec": "aac_lc",
+                                    "channels": 2,
+                                    "sample_rate": 48000,
+                                    "bitrate_kb": 96
+                                }
+                            ]
+                        }
+                    ]
+                }
+            }
+        ],
+        "connections": [
+            {
+                "from": [
+                    {
+                        "element": "source_file"
+                    }
+                ],
+                "to": {
+                    "success": [
+                        {
+                            "element": "transcode_task"
+                        }
+                    ]
+                }
+            }
+        ]
+    }
+}
