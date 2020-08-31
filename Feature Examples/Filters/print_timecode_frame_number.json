@@ -1,0 +1,97 @@
+{
+    "definitions": {
+        "descriptor": "print_timecode_frame_number_example",
+        "source_path": "s3://hybrik-examples/public/sources",
+        "source_name": "TOS_spoken_1920x1080p24_1tk_ch_positions_5.1.mov",
+        "destination_path": "s3://hybrik-examples/public/output/feature_examples/filters/print_timecode"
+    },
+    "name": "{{descriptor}}: {{source_name}}",
+    "payload": {
+        "elements": [
+            {
+                "uid": "source",
+                "kind": "source",
+                "payload": {
+                    "kind": "asset_url",
+                    "payload": {
+                        "storage_provider": "s3",
+                        "url": "{{source_path}}/{{source_name}}",
+                        "trim": {
+                            "duration_sec": 60
+                        }
+                    }
+                }
+            },
+            {
+                "uid": "transcode_task",
+                "kind": "transcode",
+                "task": {
+                    "retry_method": "fail"
+                },
+                "payload": {
+                    "location": {
+                        "storage_provider": "s3",
+                        "path": "{{destination_path}}"
+                    },
+                    "targets": [
+                        {
+                            "file_pattern": "{{descriptor}}.mp4",
+                            "existing_files": "replace",
+                            "container": {
+                                "kind": "mp4"
+                            },
+                            "video": {
+                                "codec": "h264",
+                                "width": 1280,
+                                "height": 720,
+                                "bitrate_kb": 1000,
+                                "profile": "baseline",
+
+                                "filters": [
+                                    {
+                                        "kind": "print_timecode",
+                                        "payload": {
+                                            "y": "(h/4)*3",
+                                            "x": "(w-text_w)/2",
+                                            "border_size": 16,
+                                            "font": "sans",
+                                            "font_color": "white",
+                                            "background_color": "black",
+                                            "font_size": 32,
+                                            "timecode_kind": "frame_nr",
+                                            "timecode_source": "media"
+                                        }
+                                    }
+                                ]
+                            },
+                            "audio": [
+                                {
+                                    "codec": "aac",
+                                    "channels": 2,
+                                    "sample_rate": 44100,
+                                    "bitrate_kb": 192
+                                }
+                            ]
+                        }
+                    ]
+                }
+            }
+        ],
+        "connections": [
+            {
+                "from": [
+                    {
+                        "element": "source"
+                    }
+                ],
+                "to": {
+                    "success": [
+                        {
+                            "element": "transcode_task"
+                        }
+                    ]
+                }
+            }
+        ]
+    }
+}
