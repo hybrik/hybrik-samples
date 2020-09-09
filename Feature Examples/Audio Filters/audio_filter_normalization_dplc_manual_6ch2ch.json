@@ -94,7 +94,9 @@
                       "kind": "normalize",
                       "payload": {
                         "kind": "dplc",
-                        "analyzer_track_index": 0
+                        "payload": {
+                          "analyzer_track_index": 0
+                        }
                       }
                     }
                   ]
@@ -109,7 +111,9 @@
                       "kind": "normalize",
                       "payload": {
                         "kind": "dplc",
-                        "analyzer_track_index": 1
+                        "payload": {
+                          "analyzer_track_index": 1
+                        }
                       }
                     }
                   ]
