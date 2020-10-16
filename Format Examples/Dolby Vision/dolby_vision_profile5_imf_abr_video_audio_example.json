@@ -1,6 +1,6 @@
 {
   "definitions": {
-    "descriptor": "dolby_vision_profile5_imf_abr_example",
+    "descriptor": "dolby_vision_profile5_imf_abr_video_audio_example",
     "source_url": "s3://download.opencontent.netflix.com/SolLevante/imf/SolLevante_IMF_DolbyVision_PQP3D65_UHD_24fps/CPL_0a207596-a0f5-458a-811e-a97a4286d00c.xml",
     "destination_path": "s3://hybrik-examples/public/output/format_examples/dolby_vision/{{descriptor}}",
     "segmented_rendering": {
@@ -547,6 +547,60 @@
         }
       },
       {
+        "uid": "audio_5.1_and_2.0",
+        "kind": "transcode",
+        "task": {
+          "tags": "{{transcode_tags}}",
+          "name": "Audio Encode"
+        },
+        "payload": {
+          "location": {
+            "storage_provider": "s3",
+            "path": "{{destination_path}}/mp4muxer"
+          },
+          "targets": [
+            {
+              "file_pattern": "audio_384kbps_ac3_elementary.mp4",
+              "existing_files": "replace",
+              "container": {
+                "kind": "mp4"
+              },
+              "audio": [
+                {
+                  "codec": "ac3",
+                  "bitrate_kb": 384,
+                  "channels": 6,
+                  "source": [
+                    {
+                      "track": 0
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "file_pattern": "audio_192kbps_ac3_elementary.mp4",
+              "existing_files": "replace",
+              "container": {
+                "kind": "mp4"
+              },
+              "audio": [
+                {
+                  "codec": "ac3",
+                  "bitrate_kb": 192,
+                  "channels": 2,
+                  "source": [
+                    {
+                      "track": 1
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        }
+      },
+      {
         "uid": "delete_temp_folder",
         "kind": "delete_asset",
         "task": {
@@ -574,6 +628,9 @@
           "success": [
             {
               "element": "mezzanine_qc"
+            },
+            {
+              "element": "audio_5.1_and_2.0"
             }
           ]
         }

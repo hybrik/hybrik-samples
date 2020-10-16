@@ -1,35 +1,30 @@
 {
   "definitions": {
-    "descriptor": "dolby_vision_profile5_imf_720p_short_example",
+    "descriptor": "dolby_vision_profile8.1_single_720p_video_only_example",
     "source_url": "s3://download.opencontent.netflix.com/SolLevante/imf/SolLevante_IMF_DolbyVision_PQP3D65_UHD_24fps/CPL_0a207596-a0f5-458a-811e-a97a4286d00c.xml",
     "destination_path": "s3://hybrik-examples/public/output/format_examples/dolby_vision/{{descriptor}}",
-    "segmented_rendering": {
-      "duration_sec": 60
-    },
+    "preproc_output_width": 1280,
+    "preproc_output_height": 720,
+    "preproc_inputEDRAspect": "1",
+    "preproc_inputEDRPad": "0x0x0x0",
+    "preproc_inputEDRCrop": "0x0x0x0",
+    "preproc_inputEDRActive": "-1x-1x-1x-1",
+    "output_width": 1280,
+    "output_height": 720,
     "output_basename": "{source_basename}",
-    "transcode_preset": "veryfast",
-    "compiler_tags": [
-      "dolby_vision_encode"
-    ],
-    "mezzQC_tags": [
-      "dolby_vision_encode"
-    ],
-    "preproc_tags": [
-      "dolby_vision_preproc"
-    ],
-    "transcode_tags": [
-      "dolby_vision_encode"
-    ],
-    "post_transcode_stage_tags": [
-      "dolby_vision_encode"
-    ],
+    "compiler_computing_group_tag": "dolby_vision_encode",
+    "mezzQC_computing_group_tag": "dolby_vision_encode",
+    "preproc_computing_group_tag": "dolby_vision_preproc",
+    "transcode_computing_group_tag": "dolby_vision_encode",
+    "post_transcode_stage_tag": "dolby_vision_encode",
+    "demux_computing_group_tag": "dolby_vision_encode",
     "dovi_sdk_version": "5.4.0_ga",
     "dolby_mezz_qc_version": "5.4.0",
     "dolby_mdpp_ves_qc_version": "0.9.0.9",
     "dolby_mp4muxer_version": "1.2.8",
     "dolby_mp4_qc_version": "1.1.4"
   },
-  "name": "{{descriptor}}: {{source_url}}",
+  "name": "Dolby Vision Profile 8.1",
   "payload": {
     "elements": [
       {
@@ -42,97 +37,116 @@
             "url": "{{source_url}}",
             "options": {
               "resolve_manifest": true
-            },
-            "trim": {
-              "duration_sec": 90
             }
           }
         }
       },
       {
-        "uid": "mezzanine_qc",
+        "uid": "dolby_vision_task",
         "kind": "dolby_vision",
         "task": {
-          "name": "Mezzanine QC",
-          "tags": "{{mezzQC_tags}}"
-        },
-        "payload": {
-          "module": "mezzanine_qc",
-          "params": {
-            "location": {
-              "storage_provider": "s3",
-              "path": "{{destination_path}}"
-            },
-            "file_pattern": "mezz_qc_report.txt",
-            "tool_version": "{{dolby_mezz_qc_version}}"
-          }
-        }
-      },
-      {
-        "uid": "dolby_vision_1280x720",
-        "kind": "dolby_vision",
-        "task": {
-          "retry_method": "fail",
-          "tags": "{{compiler_tags}}",
-          "name": "Encode - 1280x720",
-          "source_element_uids": [
-            "source"
+          "name": "Profile Compiler",
+          "tags": [
+            "{{compiler_computing_group_tag}}"
           ]
         },
         "payload": {
-          "module": "encoder",
-          "profile": 5,
-          "location": {
-            "storage_provider": "s3",
-            "path": "{{destination_path}}"
-          },
-          "preprocessing": {
+          "module": "profile",
+          "profile": 8.1,
+          "mezzanine_qc": {
             "task": {
-              "tags": "{{preproc_tags}}"
+              "tags": [
+                "{{mezzQC_computing_group_tag}}"
+              ]
+            },
+            "enabled": true,
+            "location": {
+              "storage_provider": "s3",
+              "path": "{{destination_path}}/mezzanine_qc"
+            },
+            "file_pattern": "{{output_basename}}_mezz_qc_report.txt",
+            "tool_version": "{{dolby_mezz_qc_version}}"
+          },
+          "preproc_81": {
+            "task": {
+              "tags": [
+                "{{preproc_computing_group_tag}}"
+              ]
+            },
+            "location": {
+              "storage_provider": "s3",
+              "path": "{{destination_path}}/hybrik_temp/preproc_81"
             },
             "num_tasks": "auto",
-            "dovi_sdk_version": "{{dovi_sdk_version}}"
+            "interval_length": 60,
+            "trim": {
+              "inpoint_frame": 10,
+              "outpoint_frame": 610
+            },
+            "cli_options": {
+              "inputEDRSize": "{{preproc_output_width}}x{{preproc_output_height}}",
+              "inputEDRAspect": "{{preproc_inputEDRAspect}}",
+              "inputEDRPad": "{{preproc_inputEDRPad}}",
+              "inputEDRCrop": "{{preproc_inputEDRCrop}}",
+              "inputEDRActive": "{{preproc_inputEDRActive}}"
+            },
+            "dee_options": {
+              "signal_range_coded": "auto",
+              "content_mapping": "none"
+            }
           },
           "transcodes": [
             {
               "uid": "transcode_0",
               "kind": "transcode",
               "task": {
-                "tags": "{{transcode_tags}}"
+                "tags": [
+                  "{{transcode_computing_group_tag}}"
+                ]
               },
               "payload": {
+                "location": {
+                  "storage_provider": "s3",
+                  "path": "{{destination_path}}/hybrik_temp/hevc"
+                },
                 "options": {
                   "pipeline": {
                     "encoder_version": "hybrik_4.0_10bit"
-                  }
+                  },
+                  "source_read_mode": "auto"
                 },
                 "source_pipeline": {
-                  "segmented_rendering": "{{segmented_rendering}}"
+                  "options": {
+
+                  }
                 },
                 "targets": [
                   {
-                    "file_pattern": "{{output_basename}}_1280x720_1200kbs.h265",
+                    "file_pattern": "{{output_basename}}_{{output_width}}x{{output_height}}_{bitrate_kb}kb.h265",
                     "existing_files": "replace",
                     "container": {
                       "kind": "elementary"
                     },
-                    "nr_of_passes": 1,
-                    "slow_first_pass": true,
+                    "nr_of_passes": 2,
+                    "slow_first_pass": false,
                     "ffmpeg_args": "-strict experimental",
                     "video": {
                       "codec": "h265",
-                      "preset": "{{transcode_preset}}",
-                      "tune": "grain",
+                      "preset": "medium",
+                      "tune": "psnr",
                       "profile": "main10",
-                      "width": 1280,
-                      "height": 720,
-                      "bitrate_kb": 1200,
-                      "max_bitrate_kb": 1440,
-                      "vbv_buffer_size_kb": 960,
+                      "width": "{{output_width}}",
+                      "height": "{{output_height}}",
+                      "bitrate_kb": 10000,
+                      "max_bitrate_kb": 12000,
+                      "vbv_buffer_size_kb": 8000,
                       "bitrate_mode": "vbr",
                       "chroma_format": "yuv420p10le",
                       "exact_gop_frames": 48,
-                      "x265_options": "concatenation={auto_concatenation_flag}:vbv-init=0.6:vbv-end=0.6:annexb=1:hrd=1:aud=1:videoformat=5:range=full:colorprim=2:transfer=2:colormatrix=2:rc-lookahead=48:qg-size=32:scenecut=0:no-open-gop=1:frame-threads=0:repeat-headers=1:nr-inter=400:nr-intra=100:psy-rd=0:cbqpoffs=0:crqpoffs=3"
+                      "x265_options": "annexb=1:hrd=1:aud=1:videoformat=5:range=limited:colorprim=9:transfer=16:colormatrix=9:rc-lookahead=48:qg-size=32:scenecut=0:no-open-gop=1:frame-threads=0:repeat-headers=1:nr-inter=400:nr-intra=100:psy-rd=0:cbqpoffs=0:crqpoffs=3",
+                      "hdr10": {
+                        "source": "metadata_file"
+                      }
                     }
                   }
                 ]
@@ -141,7 +155,9 @@
           ],
           "post_transcode": {
             "task": {
-              "tags": "{{post_transcode_stage_tags}}"
+              "tags": [
+                "{{post_transcode_stage_tag}}"
+              ]
             },
             "ves_mux": {
               "enabled": true,
@@ -172,23 +188,16 @@
             },
             "mp4_mux": {
               "enabled": true,
-              "file_pattern": "{source_basename}.mp4",
-              "tool_version": "{{dolby_mp4muxer_version}}",
               "location": {
                 "storage_provider": "s3",
                 "path": "{{destination_path}}"
               },
-              "elementary_streams": [
-                {
-                  "asset_url": {
-                    "storage_provider": "s3",
-                    "url": "{{destination_path}}/hybrik_temp/audio_192kbps_elementary.ac3"
-                  },
-                  "cli_options": {
+              "file_pattern": "{source_basename}.mp4",
+              "tool_version": "{{dolby_mp4muxer_version}}",
+              "copy_source_start_pts": true,
+              "cli_options": {
 
-                  }
-                }
-              ],
+              },
               "qc": {
                 "enabled": true,
                 "tool_version": "{{dolby_mp4_qc_version}}",
@@ -203,40 +212,10 @@
         }
       },
       {
-        "uid": "audio_0",
-        "kind": "transcode",
-        "task": {
-          "tags": "{{transcode_tags}}",
-          "name": "Audio Encode"
-        },
-        "payload": {
-          "location": {
-            "storage_provider": "s3",
-            "path": "{{destination_path}}/hybrik_temp"
-          },
-          "targets": [
-            {
-              "file_pattern": "audio_192kbps_elementary.ac3",
-              "existing_files": "replace",
-              "container": {
-                "kind": "elementary"
-              },
-              "audio": [
-                {
-                  "codec": "ac3",
-                  "bitrate_kb": 192,
-                  "channels": 2
-                }
-              ]
-            }
-          ]
-        }
-      },
-      {
         "uid": "delete_temp_folder",
         "kind": "delete_asset",
         "task": {
-          "tags": "{{transcode_tags}}",
+          "tags": "{{transcode_computing_group_tag}}",
           "name": "delete_temp"
         },
         "payload": {
@@ -259,10 +238,7 @@
         "to": {
           "success": [
             {
-              "element": "mezzanine_qc"
-            },
-            {
-              "element": "audio_0"
+              "element": "dolby_vision_task"
             }
           ]
         }
@@ -270,24 +246,7 @@
       {
         "from": [
           {
-            "element": "mezzanine_qc"
-          },
-          {
-            "element": "audio_0"
-          }
-        ],
-        "to": {
-          "success": [
-            {
-              "element": "dolby_vision_1280x720"
-            }
-          ]
-        }
-      },
-      {
-        "from": [
-          {
-            "element": "dolby_vision_1280x720"
+            "element": "dolby_vision_task"
           }
         ],
         "to": {
@@ -299,6 +258,5 @@
         }
       }
     ]
-  },
-  "priority": "100"
+  }
 }
