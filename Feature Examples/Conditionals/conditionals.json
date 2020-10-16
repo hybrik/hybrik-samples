@@ -1,0 +1,159 @@
+{
+    "definitions": {
+        "descriptor": "conditional_actions",
+        "source_file": "s3://hybrik-examples/public/sources/meridian_1920x1080p59.94_h264_audio-2tk_5.1_LtRt.mov",
+        "destination_path": "s3://hybrik-examples/public/output/feature_examples/conditionals/{{descriptor}}"
+    },
+    "name": "{{descriptor}}: {{source_file}}",
+    "payload": {
+        "elements": [
+            {
+                "uid": "source_file",
+                "kind": "source",
+                "payload": {
+                    "kind": "asset_url",
+                    "payload": {
+                        "storage_provider": "s3",
+                        "url": "{{source_file}}"
+                    }
+                }
+            },
+            {
+                "uid": "transcode_task",
+                "kind": "transcode",
+                "payload": {
+                    "location": {
+                        "storage_provider": "s3",
+                        "path": "{{destination_path}}"
+                    },
+                    "targets": [
+                        {
+                            "file_pattern": "{{descriptor}}_{source_basename}_576.mp4",
+                            "existing_files": "replace",
+                            "container": {
+                                "kind": "mp4"
+                            },
+                            "video": {
+                                "codec": "h264",
+                                "bitrate_mode": "vbr",
+                                "bitrate_kb": 2000,
+                                "max_bitrate_kb": 2400,
+                                "height": 576,
+                                "width": 1024
+                            },
+                            "audio": [
+                                {
+                                    "channels": 2,
+                                    "codec": "aac_lc",
+                                    "bitrate_kb": 96
+                                },
+                                {
+                                    "include_if_source_has": [
+                                        "audio[1]"
+                                    ],
+                                    "source": [
+                                        {
+                                            "track": 1
+                                        }
+                                    ],
+                                    "codec": "aac_lc",
+                                    "bitrate_kb": 128
+                                }
+                            ]
+                        },
+                        {
+                            "file_pattern": "{{descriptor}}_{source_basename}_720.mp4",
+                            "include_conditions": [
+                                "source.video[0].height >= 720"
+                            ],
+                            "existing_files": "replace",
+                            "container": {
+                                "kind": "mp4"
+                            },
+                            "video": {
+                                "codec": "h264",
+                                "bitrate_mode": "vbr",
+                                "bitrate_kb": 3200,
+                                "max_bitrate_kb": 3640,
+                                "height": 720,
+                                "width": 1280
+                            },
+                            "audio": [
+                                {
+                                    "channels": 2,
+                                    "codec": "aac_lc",
+                                    "bitrate_kb": 96
+                                },
+                                {
+                                    "include_if_source_has": [
+                                        "audio[1]"
+                                    ],
+                                    "source": [
+                                        {
+                                            "track": 1
+                                        }
+                                    ],
+                                    "codec": "aac_lc",
+                                    "bitrate_kb": 128
+                                }
+                            ]
+                        },
+                        {
+                            "file_pattern": "{{descriptor}}_{source_basename}_1080.mp4",
+                            "include_conditions": [
+                                "source.video[0].height >= 1080"
+                            ],
+                            "existing_files": "replace",
+                            "container": {
+                                "kind": "mp4"
+                            },
+                            "video": {
+                                "codec": "h264",
+                                "bitrate_mode": "vbr",
+                                "bitrate_kb": 4000,
+                                "max_bitrate_kb": 4800,
+                                "height": 1080,
+                                "width": 1920
+                            },
+                            "audio": [
+                                {
+                                    "channels": 2,
+                                    "codec": "aac_lc",
+                                    "bitrate_kb": 128
+                                },
+                                {
+                                    "include_if_source_has": [
+                                        "audio[1]"
+                                    ],
+                                    "source": [
+                                        {
+                                            "track": 1
+                                        }
+                                    ],
+                                    "codec": "aac_lc",
+                                    "bitrate_kb": 128
+                                }
+                            ]
+                        }
+                    ]
+                }
+            }
+        ],
+        "connections": [
+            {
+                "from": [
+                    {
+                        "element": "source_file"
+                    }
+                ],
+                "to": {
+                    "success": [
+                        {
+                            "element": "transcode_task"
+                        }
+                    ]
+                }
+            }
+        ]
+    }
+}
