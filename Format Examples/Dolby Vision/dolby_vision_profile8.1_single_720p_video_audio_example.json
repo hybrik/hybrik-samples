@@ -79,10 +79,6 @@
             },
             "num_tasks": "auto",
             "interval_length": 60,
-            "trim": {
-              "inpoint_frame": 10,
-              "outpoint_frame": 610
-            },
             "cli_options": {
               "inputEDRSize": "{{preproc_output_width}}x{{preproc_output_height}}",
               "inputEDRAspect": "{{preproc_inputEDRAspect}}",
