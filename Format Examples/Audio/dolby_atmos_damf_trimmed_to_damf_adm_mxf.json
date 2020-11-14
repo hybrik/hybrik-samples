@@ -1,0 +1,145 @@
+{
+  "definitions": {
+    "descriptor": "dolby_atmos_damf_trimmed_to_damf_adm_mxf",
+    "source_path": "s3://hybrik-examples/public/sources/atmos/damf",
+    "atmos_name": "sollevante_lp_v01_DAMF_Nearfield_48k_24b_24.atmos",
+    "atmos_audio_name": "sollevante_lp_v01_DAMF_Nearfield_48k_24b_24.atmos.audio",
+    "atmos_metadata_name": "sollevante_lp_v01_DAMF_Nearfield_48k_24b_24.atmos.metadata",
+    "destination_path": "s3://hybrik-examples/public/output/format_examples/audio/{{descriptor}}"
+  },
+  "name": "{{descriptor}}: {{atmos_name}}",
+  "payload": {
+    "elements": [
+      {
+        "uid": "source_file",
+        "kind": "source",
+        "payload": {
+          "kind": "asset_complex",
+          "payload": {
+            "kind": "sequence",
+            "asset_versions": [
+              {
+                "version_uid": "a1",
+                "location": {
+                  "storage_provider": "s3",
+                  "path": "{{source_path}}"
+                },
+                "asset_components": [
+                  {
+                    "kind": "name",
+                    "name": "{{atmos_name}}"
+                  },
+                  {
+                    "kind": "name",
+                    "name": "{{atmos_audio_name}}"
+                  },
+                  {
+                    "kind": "name",
+                    "name": "{{atmos_metadata_name}}"
+                  }
+                ]
+              }
+            ]
+          }
+        }
+      },
+      {
+        "uid": "dolby_audio_encoder_damf",
+        "kind": "dolby_audio_encoder",
+        "task": {
+          "retry_method": "fail"
+        },
+        "payload": {
+          "location": {
+            "storage_provider": "s3",
+            "path": "{{destination_path}}"
+          },
+          "targets": [
+            {
+              "file_pattern": "{source_basename}_inpoint_sec_30.atmos",
+              "existing_files": "replace",
+              "container": {
+                "kind": "damf"
+              },
+              "trim": {
+                "inpoint_sec": 30
+              }
+            }
+          ]
+        }
+      },
+      {
+        "uid": "dolby_audio_encoder_adm",
+        "kind": "dolby_audio_encoder",
+        "task": {
+          "retry_method": "fail"
+        },
+        "payload": {
+          "location": {
+            "storage_provider": "s3",
+            "path": "{{destination_path}}"
+          },
+          "targets": [
+            {
+              "file_pattern": "{source_basename}_outpoint_sec_10.wav",
+              "existing_files": "replace",
+              "container": {
+                "kind": "adm"
+              },
+              "trim": {
+                "outpoint_sec": 10
+              }
+            }
+          ]
+        }
+      },
+      {
+        "uid": "dolby_audio_encoder_mxf_iab",
+        "kind": "dolby_audio_encoder",
+        "task": {
+          "retry_method": "fail"
+        },
+        "payload": {
+          "location": {
+            "storage_provider": "s3",
+            "path": "{{destination_path}}"
+          },
+          "targets": [
+            {
+              "file_pattern": "{source_basename}_duration_sec_10.mxf",
+              "existing_files": "replace",
+              "container": {
+                "kind": "mxf_iab"
+              },
+              "trim": {
+                "duration_sec": 10
+              }
+            }
+          ]
+        }
+      }
+    ],
+    "connections": [
+      {
+        "from": [
+          {
+            "element": "source_file"
+          }
+        ],
+        "to": {
+          "success": [
+            {
+              "element": "dolby_audio_encoder_damf"
+            },
+            {
+              "element": "dolby_audio_encoder_adm"
+            },
+            {
+              "element": "dolby_audio_encoder_mxf_iab"
+            }
+          ]
+        }
+      }
+    ]
+  }
+}

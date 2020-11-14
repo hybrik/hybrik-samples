@@ -1,0 +1,93 @@
+{
+    "definitions": {
+        "descriptor": "aws_s3_custom_tags",
+        "source_filename": "bars_and_tone_30sec.mp4",
+        "source_path": "s3://hybrik-examples/public/sources",
+        "source": "{{source_path}}/{{source_filename}}",
+        "file_pattern": "{{descriptor}}{default_extension}",
+        "destination_path": "s3://hybrik-examples/public/output/feature_examples/hybrik_json/{{descriptor}}"
+    },
+    "name": "{{descriptor}}",
+    "payload": {
+        "elements": [
+            {
+                "uid": "source",
+                "kind": "source",
+                "payload": {
+                    "kind": "asset_url",
+                    "payload": {
+                        "storage_provider": "s3",
+                        "url": "{{source}}",
+                        "trim": {
+                            "outpoint_sec": 5
+                        }
+                    }
+                }
+            },
+            {
+                "uid": "transcode_task",
+                "kind": "transcode",
+                "task": {
+                    "retry_method": "fail"
+                },
+                "payload": {
+                    "location": {
+                        "storage_provider": "s3",
+                        "path": "{{destination_path}}",
+                        "attributes": [
+                            {
+                                "name": "x-amz-tagging",
+                                "value": "foo=bar"
+                            },
+                            {
+                                "name": "x-amz-meta-my-custom-key",
+                                "value": "my-custom-value"
+                            }
+                        ]
+                    },
+                    "targets": [
+                        {
+                            "file_pattern": "{{file_pattern}}",
+                            "existing_files": "replace",
+                            "container": {
+                                "kind": "mp4"
+                            },
+                            "video": {
+                                "preset": "ultrafast",
+                                "codec": "h264",
+                                "width": 640,
+                                "height": 360,
+                                "bitrate_kb": 1000,
+                                "bitrate_mode": "vbr"
+                            },
+                            "audio": [
+                                {
+                                    "codec": "aac",
+                                    "channels": 2,
+                                    "sample_rate": 44100,
+                                    "bitrate_kb": 128
+                                }
+                            ]
+                        }
+                    ]
+                }
+            }
+        ],
+        "connections": [
+            {
+                "from": [
+                    {
+                        "element": "source"
+                    }
+                ],
+                "to": {
+                    "success": [
+                        {
+                            "element": "transcode_task"
+                        }
+                    ]
+                }
+            }
+        ]
+    }
+}
