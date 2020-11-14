@@ -1,6 +1,6 @@
 {
     "definitions": {
-        "descriptor": "trim_by_source_asset_timecode: {{source_file}}",
+        "descriptor": "trim_by_source_asset_timecode",
         "source_path": "s3://hybrik-examples/public/sources",
         "source_file": "TOS_spoken_1920x1080p24_1tk_ch_positions_5.1_1hour_start.mov",
         "destination_path": "s3://hybrik-examples/public/output/feature_examples/stitch_and_trim/{{descriptor}}"

@@ -2,7 +2,7 @@
     "definitions": {
         "descriptor": "analyze_video_complexity_example",
         "source_path": "s3://hybrik-examples/public/sources",
-        "source_file": "tears_of_steel_720p.mov",
+        "source_file": "tears_of_steel_720p.mov"
     },
     "name": "{{descriptor}}: {{source_file}}",
     "payload": {
