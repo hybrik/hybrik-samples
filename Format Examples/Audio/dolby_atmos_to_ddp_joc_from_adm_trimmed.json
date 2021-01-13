@@ -29,10 +29,7 @@
                     "kind": "asset_url",
                     "payload": {
                         "storage_provider": "s3",
-                        "url": "{{source}}",
-                        "trim": {
-                            "outpoint_sec": 30
-                        }
+                        "url": "{{source}}"
                     }
                 }
             },
@@ -54,6 +51,9 @@
                             "existing_files": "replace",
                             "container": {
                                 "kind": "elementary"
+                            },
+                            "trim": {
+                                "outpoint_sec": 30
                             },
                             "audio": [
                                 {
