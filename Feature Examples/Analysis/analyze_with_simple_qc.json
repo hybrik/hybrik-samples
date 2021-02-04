@@ -1,15 +1,15 @@
 {
-	"definitions": {
-		"descriptor": "analyze_with_simple_qc",
-		"source_file": "bars_and_tone_30sec_2.0.mp4",
-		"source_path": "s3://hybrik-examples/public/sources",
-		"destination_path": "s3://hybrik-examples/public/output/feature_examples/analysis/{{descriptor}}",
-		"output_filename": "{source_basename}{default_extension}"
-	},
-	"name": "{{descriptor}}: {{source_file}}",
-	"payload": {
-		"elements": [
-			{
+    "definitions": {
+        "descriptor": "analyze_with_simple_qc",
+        "source_file": "bars_and_tone_30sec_2.0.mp4",
+        "source_path": "s3://hybrik-examples/public/sources",
+        "destination_path": "s3://hybrik-examples/public/output/feature_examples/analysis/{{descriptor}}",
+        "output_filename": "{source_basename}{default_extension}"
+    },
+    "name": "{{descriptor}}: {{source_file}}",
+    "payload": {
+        "elements": [
+            {
                 "uid": "source_file",
                 "kind": "source",
                 "payload": {
@@ -20,139 +20,144 @@
                     }
                 }
             },
-			{
-				"uid": "analyze_task",
-				"kind": "analyze",
-				"task": {
-					"retry_method": "fail",
-					"name": "general"
-				},
-				"payload": {
-					"general_properties": {
-						"enabled": true
-					}
-				}
-			},
-			{
-				"uid": "qc_task",
-				"kind": "qc",
-				"payload": {
-					"conditions": {
-						"pass": [
-							{
-								"condition": "source.audio.length > 0",
-								"message_pass": "passed qc - this source contains {source.audio.length} audio tracks",
-								"message_fail": "FAILED QC - source file has no audio."
-							}
-						]
-					}
-				}
-			},
-			{
-				"uid": "transcode_task",
-				"kind": "transcode",
-				"payload": {
-					"location": {
-						"storage_provider": "s3",
-						"path": "{{destination_path}}"
-					},
-					"targets": [
-						{
-							"file_pattern": "{{output_filename}}",
-							"existing_files": "rename_new",
-							"container": {
-								"kind": "mov",
-								"enable_data_tracks": true
-							},
-							"video": {
-								"codec": "prores",
-								"profile": "apch",
-								"width": 1920,
-								"height": 1080,
-								"frame_rate": 23.976,
-								"mov_atoms": {
-									"use_clap": false,
-									"pasp": "1:1"
-								}
-							},
-							"audio": [
-								{
-									"codec": "pcm",
-									"channels": 1,
-									"sample_rate": 48000,
-									"sample_size": 24,
-									"language": "eng",
-									"track_name": "Left Total",
-									"channel_designators": [
-										"left_total"
-									]
-								},
-								{
-									"codec": "pcm",
-									"channels": 1,
-									"sample_rate": 48000,
-									"sample_size": 24,
-									"language": "eng",
-									"track_name": "Right Total",
-									"channel_designators": [
-										"right_total"
-									]
-								}
-							],
-							"timecode": [
-								{
-									"source": "media",
-									"force_drop": false
-								}
-							]
-						}
-					]
-				}
-			}
-		],
-		"connections": [
-			{
-				"from": [
-					{
-						"element": "source_file"
-					}
-				],
-				"to": {
-					"success": [
-						{
-							"element": "analyze_task"
-						}
-					]
-				}
-			},
-			{
-				"from": [
-					{
-						"element": "analyze_task"
-					}
-				],
-				"to": {
-					"success": [
-						{
-							"element": "qc_task"
-						}
-					]
-				}
-			},
-			{
-				"from": [
-					{
-						"element": "qc_task"
-					}
-				],
-				"to": {
-					"success": [
-						{
-							"element": "transcode_task"
-						}
-					]
-				}
-			}
-		]
-	}
+            {
+                "uid": "analyze_task",
+                "kind": "analyze",
+                "task": {
+                    "retry_method": "fail",
+                    "name": "general"
+                },
+                "payload": {
+                    "options": {
+                        "response_version": 2
+                    },
+                    "general_properties": {
+                        "enabled": true
+                    }
+                }
+            },
+            {
+                "uid": "qc_task",
+                "kind": "qc",
+                "payload": {
+                    "tests": [
+                        {
+                            "conditions": [
+                                {
+                                    "condition": "general_properties.audio.size() > 0",
+                                    "message_pass": "PASS: Number of audio tracks is at least 1. There are {general_properties.audio.size()} tracks",
+                                    "message_fail": "FAIL: There are no audio tracks."
+                                }
+                            ]
+                        }
+                    ]
+                }
+            },
+            {
+                "uid": "transcode_task",
+                "kind": "transcode",
+                "payload": {
+                    "location": {
+                        "storage_provider": "s3",
+                        "path": "{{destination_path}}"
+                    },
+                    "targets": [
+                        {
+                            "file_pattern": "{{output_filename}}",
+                            "existing_files": "rename_new",
+                            "container": {
+                                "kind": "mov",
+                                "enable_data_tracks": true
+                            },
+                            "video": {
+                                "codec": "prores",
+                                "profile": "apch",
+                                "width": 1920,
+                                "height": 1080,
+                                "frame_rate": 23.976,
+                                "mov_atoms": {
+                                    "use_clap": false,
+                                    "pasp": "1:1"
+                                }
+                            },
+                            "audio": [
+                                {
+                                    "codec": "pcm",
+                                    "channels": 1,
+                                    "sample_rate": 48000,
+                                    "sample_size": 24,
+                                    "language": "eng",
+                                    "track_name": "Left Total",
+                                    "channel_designators": [
+                                        "left_total"
+                                    ]
+                                },
+                                {
+                                    "codec": "pcm",
+                                    "channels": 1,
+                                    "sample_rate": 48000,
+                                    "sample_size": 24,
+                                    "language": "eng",
+                                    "track_name": "Right Total",
+                                    "channel_designators": [
+                                        "right_total"
+                                    ]
+                                }
+                            ],
+                            "timecode": [
+                                {
+                                    "source": "media",
+                                    "force_drop": false
+                                }
+                            ]
+                        }
+                    ]
+                }
+            }
+        ],
+        "connections": [
+            {
+                "from": [
+                    {
+                        "element": "source_file"
+                    }
+                ],
+                "to": {
+                    "success": [
+                        {
+                            "element": "analyze_task"
+                        }
+                    ]
+                }
+            },
+            {
+                "from": [
+                    {
+                        "element": "analyze_task"
+                    }
+                ],
+                "to": {
+                    "success": [
+                        {
+                            "element": "qc_task"
+                        }
+                    ]
+                }
+            },
+            {
+                "from": [
+                    {
+                        "element": "qc_task"
+                    }
+                ],
+                "to": {
+                    "success": [
+                        {
+                            "element": "transcode_task"
+                        }
+                    ]
+                }
+            }
+        ]
+    }
 }

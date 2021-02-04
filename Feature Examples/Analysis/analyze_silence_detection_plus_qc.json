@@ -1,9 +1,10 @@
 {
   "definitions": {
-    "profile_name": "analyze_silence_detection_plus_qc",
-    "source": "s3://hybrik-examples/public/sources/tears_of_steel_720p.mov"
+    "descriptor": "analyze_silence_detection_plus_qc",
+    "source_file": "tears_of_steel_leading_trailing_black.mp4",
+    "source_path": "s3://hybrik-examples/public/sources"  
   },
-  "name": "{{profile_name}}:  {{source}}",
+  "name": "{{descriptor}}: {{source_file}}",
   "payload": {
     "elements": [
       {
@@ -13,7 +14,7 @@
           "kind": "asset_url",
           "payload": {
             "storage_provider": "s3",
-            "url": "{{source}}"
+            "url": "{{source_path}}/{{source_file}}"
           }
         }
       },
@@ -21,6 +22,9 @@
         "uid": "analyze_task",
         "kind": "analyze",
         "payload": {
+          "options": {
+            "response_version": 2 
+          },
           "general_properties": {
             "enabled": true
           },
@@ -46,9 +50,9 @@
           "conditions": {
             "pass": [
               {
-                "condition": "deep_properties.audio[0].silence.size() == 0 || deep_properties.audio[0].silence.max('duration') <= 5",
+                "condition": "deep_properties.audio[0].silence.events.size() == 0 || deep_properties.audio[0].silence.max_sec <= 5",
                 "message_pass": "PASS: Longest audio silence is shorter than 5 seconds.",
-                "message_fail": "FAIL: At least one audio silence is longer than or equal to 5 seconds."
+                "message_fail": "FAIL: At least one audio silence is longer than or equal to 5 seconds: {deep_properties.audio[0].silence.max_sec}"
               }
             ]
           }

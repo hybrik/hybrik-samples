@@ -1,0 +1,275 @@
+{
+    "definitions": {
+        "descriptor": "analyze_with_qc_pdf_report",
+        "source_path": "s3://hybrik-public/sample_sources",
+        "source_file": "tears_of_steel_720p.mov",
+        "destination_path": "s3://hybrik-examples/public/output/feature_examples/analysis/{{descriptor}}"
+    },
+    "name": "{{descriptor}}: {{source_file}}",
+    "payload": {
+        "elements": [
+            {
+                "uid": "source_file",
+                "kind": "source",
+                "payload": {
+                    "kind": "asset_url",
+                    "payload": {
+                        "storage_provider": "s3",
+                        "url": "{{source_path}}/{{source_file}}"
+                    }
+                }
+            },
+            {
+                "uid": "analyze_task",
+                "kind": "analyze",
+                "task": {
+                    "retry_method": "fail"
+                },
+                "payload": {
+                    "options": {
+                        "report_metadata": {
+                            "location": {
+                                "storage_provider": "s3",
+                                "path": "{{destination_path}}/hybrik_temp"
+                            },
+                            "thumbnail_width": 1024
+                        },
+                        "response_version": 2
+                    },
+                    "general_properties": {
+                        "enabled": true,
+                        "mov_atom_descriptor_style": "by_track"
+                    },
+                    "compare_asset": {
+                        "kind": "asset_url",
+                        "payload": {
+                            "storage_provider": "s3",
+                            "url": "{{source_path}}/{{source_file}}"
+                        }
+                    },
+                    "deep_properties": {
+                        "video": {
+                            "black": {
+                                "enabled": true,
+                                "duration_sec": 3,
+                                "black_level": 0.05,
+                                "black_pixel_ratio": 0.9,
+                                "ire_range_mode": "auto"
+                            },
+                            "black_borders": {
+                                "enabled": true
+                            },
+                            "blockiness": {
+                                "enabled": true,
+                                "algorithm": "hybm"
+                            },
+                            "complexity": {
+                                "enabled": true
+                            },
+                            "compressed_stats": {
+                                "enabled": true
+                            },
+                            "content_variance": {
+                                "enabled": true
+                            },
+                            "hdr_stats": {
+                                "enabled": true
+                            },
+                            "levels": {
+                                "enabled": true
+                            },
+                            "scene_change_score": {
+                                "enabled": true,
+                                "thresholds": [
+                                    0.7
+                                ],
+                                "cutlist_threshold": 0.7
+                            },
+                            "ssim": {
+                                "enabled": true
+                            },
+                            "psnr": {
+                                "enabled": true
+                            }
+                        },
+                        "audio": {
+                            "levels": {
+                                "enabled": true,
+                                "is_optional": true
+                            },
+                            "silence": {
+                                "enabled": true,
+                                "is_optional": true,
+                                "noise_db": -60,
+                                "duration_sec": 1
+                            },
+                            "ebur128": {
+                                "enabled": true
+                            },
+                            "psnr": {
+                                "enabled": true
+                            },
+                            "emergency_alert": {
+                                "enabled": true
+                            }
+                        }
+                    },
+                    "report": {
+                        "create_condition": "always",
+                        "file_pattern": "{source_basename}_analyze_report.pdf",
+                        "location": {
+                            "storage_provider": "s3",
+                            "path": "{{destination_path}}"
+                        },
+                        "options": {
+                            "report_version": "v3.0"
+                        }
+                    }
+                }
+            },
+            {
+                "uid": "qc_task",
+                "kind": "qc",
+                "task": {
+                    "retry_method": "fail"
+                },
+                "payload": {
+                    "report": {
+                        "create_condition": "always",
+                        "file_pattern": "{source_basename}_qc_report.pdf",
+                        "location": {
+                            "storage_provider": "s3",
+                            "path": "{{destination_path}}"
+                        },
+                        "temp_location": {
+                            "storage_provider": "s3",
+                            "path": "{{destination_path}}/hybrik_temp"
+                        },
+                        "options": {
+                            "report_version": "v3.0",
+                            "header_mask": "Custom Header for QC Report",
+                            "use_timecode": true
+                        }
+                    },
+                    "tests": [
+                        {
+                            "conditions": [
+                                {
+                                    "condition": "general_properties.container.size_kb > 10000",
+                                    "message_pass": "PASS: Source file size is greater than 10 megabytes, size = {general_properties.container.size_kb} kb.",
+                                    "message_fail": "FAIL: Source file size is less than or equal to 10 megabytes, size = {general_properties.container.size_kb} kb."
+                                },
+                                {
+                                    "condition": "general_properties.video.width >= 1920",
+                                    "message_pass": "PASS: Video frame width is greater than or equal to 1920, width is {general_properties.video.width} pixels.",
+                                    "message_fail": "FAIL: Video frame width is less than 1920, width is {general_properties.video.width} pixels."
+                                },
+                                {
+                                    "condition": "general_properties.video.height >= 1080",
+                                    "message_pass": "PASS: Video frame height is greater than or equal to 1080, height is {general_properties.video.height} pixels.",
+                                    "message_fail": "FAIL: Video frame height is less than 1080, height is {general_properties.video.height} pixels."
+                                },
+                                {
+                                    "condition": "general_properties.audio.size() >= 1",
+                                    "message_pass": "PASS: Number of audio tracks is greater than or equal to 1, there are {general_properties.audio.size()} tracks",
+                                    "message_fail": "FAIL: There are no audio tracks."
+                                },
+                                {
+                                    "condition": "general_properties.audio[0].sample_rate >= 44100",
+                                    "message_pass": "PASS: Audio sample rate is greater than or equal to 44.1 kHz, sample rate is {general_properties.audio[0].sample_rate} Hz.",
+                                    "message_fail": "FAIL: Audio sample rate is less than 44.1 kHz, sample rate is {general_properties.audio[0].sample_rate} Hz."
+                                },
+                                {
+                                    "condition": "deep_properties.video.black.leading_sec <= 5",
+                                    "message_pass": "PASS: There is less than 5 seconds of black at the start of this video. Actual value: {deep_properties.video.black.leading_sec}",
+                                    "message_fail": "FAIL: There is more than 5 seconds of black at the start of this video. Actual value: {deep_properties.video.black.leading_sec}"
+                                },
+                                {
+                                    "condition": "deep_properties.video.black.trailing_sec <= 5",
+                                    "message_pass": "PASS: There is less than 5 seconds of black at the end of this video. Actual value: {deep_properties.video.black.trailing_sec}",
+                                    "message_fail": "FAIL: There is more than 5 seconds of black at the end of this video. Actual value: {deep_properties.video.black.trailing_sec}"
+                                },
+                                {
+                                    "condition": "deep_properties.video.black_borders.top == 0 && deep_properties.video.black_borders.bottom == 0",
+                                    "message_pass": "PASS: Video letterboxing is 0 pixels.",
+                                    "message_fail": "FAIL: Video letterboxing is more than 0 pixels, top = {deep_properties.video.black_borders.top} pixels, bottom = {deep_properties.video.black_borders.bottom} pixels."
+                                },
+                                {
+                                    "condition": "deep_properties.video.black_borders.left == 0 && deep_properties.video.black_borders.right == 0",
+                                    "message_pass": "PASS: Video pillarboxing is 0 pixels.",
+                                    "message_fail": "FAIL: Video pillarboxing is more than 0 pixels, left = {deep_properties.video.black_borders.left} pixels, right = {deep_properties.video.black_borders.right} pixels."
+                                },
+                                {
+                                    "condition": "deep_properties.audio[0].levels.rms_level_db >= -60",
+                                    "message_pass": "PASS: Audio RMS level is higher than or equal to -60 dB, level is {deep_properties.audio[0].levels.rms_level_db} dB.",
+                                    "message_fail": "FAIL: Audio level is lower than -60dB, level is {deep_properties.audio[0].levels.rms_level_db} dB."
+                                },
+                                {
+                                    "condition": "deep_properties.audio[0].silence.events.size() == 0 || deep_properties.audio[0].silence.max_sec <= 5",
+                                    "message_pass": "PASS: Longest audio silence is shorter than 5 seconds.",
+                                    "message_fail": "FAIL: At least one audio silence is longer than or equal to 5 seconds: {deep_properties.audio[0].silence.max_sec}"
+                                }
+                            ]
+                        }
+                    ]
+                }
+            },
+            {
+                "uid": "delete_folder",
+                "kind": "delete_asset",
+                "payload": {
+                    "asset_selector": "config",
+                    "location": {
+                        "storage_provider": "s3",
+                        "path": "{{destination_path}}/hybrik_temp"
+                    },
+                    "delete_folder_acknowledgement": "hybrik_temp"
+                }
+            }
+        ],
+        "connections": [
+            {
+                "from": [
+                    {
+                        "element": "source_file"
+                    }
+                ],
+                "to": {
+                    "success": [
+                        {
+                            "element": "analyze_task"
+                        }
+                    ]
+                }
+            },
+            {
+                "from": [
+                    {
+                        "element": "analyze_task"
+                    }
+                ],
+                "to": {
+                    "success": [
+                        {
+                            "element": "qc_task"
+                        }
+                    ]
+                }
+            },
+            {
+                "from": [
+                    {
+                        "element": "qc_task"
+                    }
+                ],
+                "to": {
+                    "success": [
+                        {
+                            "element": "delete_folder"
+                        }
+                    ]
+                }
+            }
+        ]
+    }
+}
