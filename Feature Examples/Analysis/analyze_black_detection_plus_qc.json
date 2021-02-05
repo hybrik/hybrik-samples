@@ -1,103 +1,102 @@
 {
-  "definitions": {
-    "profile_name": "analyze_black_detection_plus_qc",
-    "source": "s3://hybrik-public/sample_sources/tears_of_steel_720p.mov"
-  },
-  "name": "{{profile_name}}: {{source}}",
-  "payload": {
-    "elements": [
-      {
-        "uid": "source_file",
-        "kind": "source",
-        "payload": {
-          "kind": "asset_url",
-          "payload": {
-            "storage_provider": "s3",
-            "url": "{{source}}"
-          }
-        }
-      },
-      {
-        "uid": "analyze_task",
-        "kind": "analyze",
-        "payload": {
-          "general_properties": {
-            "enabled": true
-          },
-          "deep_properties": {
-            "video": {
-              "black": {
-                "enabled": true,
-                "is_optional": true,
-                "black_level": 0.03,
-                "duration_sec": 1
-              },
-              "black_borders": {
-                "enabled": true,
-                "is_optional": true
-              }
-            }
-          }
-        }
-      },
-      {
-        "uid": "qc_task",
-        "kind": "qc",
-        "task": {
-          "retry_method": "fail"
-        },
-        "payload": {
-          "conditions": {
-            "pass": [
-              {
-                "condition": "deep_properties.video.black.size() == 0 || deep_properties.video.black.max('duration') <= 5",
-                "message_pass": "PASS: Longest black segment is shorter than 5 seconds.",
-                "message_fail": "FAIL: At least one black segment is longer than or equal to 5 seconds."
-              },
-              {
-                "condition": "deep_properties.video.black_borders.top == 0 && deep_properties.video.black_borders.bottom == 0",
-                "message_pass": "PASS: Video letterboxing is 0 pixels.",
-                "message_fail": "FAIL: Video letterboxing is more than 0 pixels, top = {deep_properties.video.black_borders.top} pixels, bottom = {deep_properties.video.black_borders.bottom} pixels."
-              },
-              {
-                "condition": "deep_properties.video.black_borders.left == 0 && deep_properties.video.black_borders.right == 0",
-                "message_pass": "PASS: Video pillarboxing is 0 pixels.",
-                "message_fail": "FAIL: Video pillarboxing is more than 0 pixels, left = {deep_properties.video.black_borders.left} pixels, right = {deep_properties.video.black_borders.right} pixels."
-              }
-            ]
-          }
-        }
-      }
-    ],
-    "connections": [
-      {
-        "from": [
-          {
-            "element": "source_file"
-          }
-        ],
-        "to": {
-          "success": [
+    "definitions": {
+        "profile_name": "analyze_black_detection_plus_qc",
+        "source": "s3://hybrik-public/sample_sources/tears_of_steel_720p.mov"
+    },
+    "name": "{{profile_name}}: {{source}}",
+    "payload": {
+        "elements": [
             {
-              "element": "analyze_task"
-            }
-          ]
-        }
-      },
-      {
-        "from": [
-          {
-            "element": "analyze_task"
-          }
-        ],
-        "to": {
-          "success": [
+                "uid": "source_file",
+                "kind": "source",
+                "payload": {
+                    "kind": "asset_url",
+                    "payload": {
+                        "storage_provider": "s3",
+                        "url": "{{source}}"
+                    }
+                }
+            },
             {
-              "element": "qc_task"
+                "uid": "analyze_task",
+                "kind": "analyze",
+                "payload": {
+                    "options": {
+                        "response_version": 2
+                    },
+                    "deep_properties": {
+                        "video": {
+                            "black": {
+                                "enabled": true,
+                                "is_optional": true,
+                                "black_level": 0.03,
+                                "duration_sec": 1
+                            },
+                            "black_borders": {
+                                "enabled": true,
+                                "is_optional": true
+                            }
+                        }
+                    }
+                }
+            },
+            {
+                "uid": "qc_task",
+                "kind": "qc",
+                "payload": {
+                    "tests": [
+                        {
+                            "conditions": [
+                                {
+                                    "condition": "deep_properties.video.black.events.size() == 0 || deep_properties.video.black.max_sec <= 5",
+                                    "message_pass": "PASS: Longest black segment is shorter than 5 seconds.",
+                                    "message_fail": "FAIL: At least one black segment is longer than or equal to 5 seconds."
+                                },
+                                {
+                                    "condition": "deep_properties.video.black_borders.top == 0 && deep_properties.video.black_borders.bottom == 0",
+                                    "message_pass": "PASS: Video letterboxing is 0 pixels.",
+                                    "message_fail": "FAIL: Video letterboxing is more than 0 pixels, top = {deep_properties.video.black_borders.top} pixels, bottom = {deep_properties.video.black_borders.bottom} pixels."
+                                },
+                                {
+                                    "condition": "deep_properties.video.black_borders.left == 0 && deep_properties.video.black_borders.right == 0",
+                                    "message_pass": "PASS: Video pillarboxing is 0 pixels.",
+                                    "message_fail": "FAIL: Video pillarboxing is more than 0 pixels, left = {deep_properties.video.black_borders.left} pixels, right = {deep_properties.video.black_borders.right} pixels."
+                                }
+                            ]
+                        }
+                    ]
+                }
             }
-          ]
-        }
-      }
-    ]
-  }
+        ],
+        "connections": [
+            {
+                "from": [
+                    {
+                        "element": "source_file"
+                    }
+                ],
+                "to": {
+                    "success": [
+                        {
+                            "element": "analyze_task"
+                        }
+                    ]
+                }
+            },
+            {
+                "from": [
+                    {
+                        "element": "analyze_task"
+                    }
+                ],
+                "to": {
+                    "success": [
+                        {
+                            "element": "qc_task"
+                        }
+                    ]
+                }
+            }
+        ]
+    }
 }
