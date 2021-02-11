@@ -51,6 +51,7 @@
                                         }
                                     }
                                 },
+                                "command": "ffmpeg",
                                 "args": [
                                     "-y",
                                     "-i",

@@ -71,6 +71,7 @@
                                         }
                                     }
                                 },
+                                "command": "ffmpeg",
                                 "args": [
                                     "-i",
                                     "{input_folder}/image_%4d.jpg",
