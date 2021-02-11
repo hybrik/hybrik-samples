@@ -1,8 +1,8 @@
 {
     "definitions": {
-        "descriptor": "dockerhub_image_sequence_example",
+        "descriptor": "dockerhub_image_sequence_example_ARGS",
         "source_path": "s3://hybrik-examples/public/sources/jpg_sequence",
-        "destination": "s3://hybrik-examples/public/output/feature_examples/advanced_outputs/{{descriptor}}",
+        "destination": "s3://hybrik-temporary/1day/dan/{{descriptor}}",
         "dockerhub_user": "TODO",
         "dockerhub_password": "TODO"
     },
@@ -71,7 +71,13 @@
                                         }
                                     }
                                 },
-                                "command_line": "-i \"/{input_folder}/image_%4d.jpg\"  -f image2 \"/{output_folder}/out_%4d.png\""
+                                "args": [
+                                    "-i",
+                                    "{input_folder}/image_%4d.jpg",
+                                    "-f",
+                                    "image2",
+                                    "{output_folder}/out_%4d.png"
+                                ]
                             }
                         ]
                     }

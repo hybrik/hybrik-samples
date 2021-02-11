@@ -51,7 +51,14 @@
                                         }
                                     }
                                 },
-                                "command_line": "-y -i {source_0_0} -f mp4 {output1}",
+                                "args": [
+                                    "-y",
+                                    "-i",
+                                    "{source_0_0}",
+                                    "-f",
+                                    "mp4",
+                                    "{output1}"
+                                ],
                                 "preserve_stdout": true,
                                 "preserve_stderr": true
                             }
