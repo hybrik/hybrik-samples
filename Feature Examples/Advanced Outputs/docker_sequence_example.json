@@ -2,7 +2,7 @@
     "definitions": {
         "descriptor": "dockerhub_image_sequence_example_ARGS",
         "source_path": "s3://hybrik-examples/public/sources/jpg_sequence",
-        "destination": "s3://hybrik-temporary/1day/dan/{{descriptor}}",
+        "destination": "s3://hybrik-examples/public/output/feature_examples/advanced_outputs/{{descriptor}}",
         "dockerhub_user": "TODO",
         "dockerhub_password": "TODO"
     },
