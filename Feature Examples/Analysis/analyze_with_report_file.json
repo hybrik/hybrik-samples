@@ -64,13 +64,6 @@
                 },
                 "payload": {
                     "options": {
-                        "report_metadata": {
-                            "location": {
-                                "storage_provider": "s3",
-                                "path": "{{destination_path}}/hybrik_temp"
-                            },
-                            "thumbnail_width": 1024
-                        },
                         "response_version": 2
                     },
                     "general_properties": {
@@ -157,6 +150,10 @@
                         "location": {
                             "storage_provider": "s3",
                             "path": "{{destination_path}}"
+                        },
+                        "temp_location": {
+                                "storage_provider": "s3",
+                                "path": "{{destination_path}}/hybrik_temp"
                         },
                         "options": {
                             "report_version": "v3.0"
