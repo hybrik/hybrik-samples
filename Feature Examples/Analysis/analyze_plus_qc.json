@@ -1,7 +1,7 @@
 {
     "definitions": {
         "descriptor": "analyze_plus_qc",
-        "source": "s3://hybrik-public/sample_sources/tears_of_steel_720p.mov"
+        "source": "s3://hybrik-examples/public/sources/tears_of_steel_1080p_4_track_audio.mov"
     },
     "name": "{{descriptor}}: {{source}}",
     "payload": {
@@ -62,65 +62,67 @@
                     "retry_method": "fail"
                 },
                 "payload": {
-                    "conditions": {
-                        "pass": [
-                            {
-                                "condition": "general_properties.container.size_kb > 10000",
-                                "message_pass": "PASS: Source file size is greater than 10 megabytes, size = {general_properties.container.size_kb} kb.",
-                                "message_fail": "FAIL: Source file size is less than or equal to 10 megabytes, size = {general_properties.container.size_kb} kb."
-                            },
-                            {
-                                "condition": "general_properties.video.width >= 1920",
-                                "message_pass": "PASS: Video frame width is greater than or equal to 1920, width is {general_properties.video.width} pixels.",
-                                "message_fail": "FAIL: Video frame width is less than 1920, width is {general_properties.video.width} pixels."
-                            },
-                            {
-                                "condition": "general_properties.video.height >= 1080",
-                                "message_pass": "PASS: Video frame height is greater than or equal to 1080, height is {general_properties.video.height} pixels.",
-                                "message_fail": "FAIL: Video frame height is less than 1080, height is {general_properties.video.height} pixels."
-                            },
-                            {
-                                "condition": "general_properties.audio.size() >= 1",
-                                "message_pass": "PASS: Number of audio tracks is greater than or equal to 1, there are {general_properties.audio.size()} tracks",
-                                "message_fail": "FAIL: There are no audio tracks."
-                            },
-                            {
-                                "condition": "general_properties.audio[0].sample_rate >= 44100",
-                                "message_pass": "PASS: Audio sample rate is greater than or equal to 44.1 kHz, sample rate is {general_properties.audio[0].sample_rate} Hz.",
-                                "message_fail": "FAIL: Audio sample rate is less than 44.1 kHz, sample rate is {general_properties.audio[0].sample_rate} Hz."
-                            },
-                            {
-                                "condition": "deep_properties.video.black.leading_sec <= 5",
-                                "message_pass": "PASS: There is less than 5 seconds of black at the start of this video. Actual value: {deep_properties.video.black.leading_sec}",
-                                "message_fail": "FAIL: There is more than 5 seconds of black at the start of this video. Actual value: {deep_properties.video.black.leading_sec}"
-                            },
-                            {
-                                "condition": "deep_properties.video.black.trailing_sec <= 5",
-                                "message_pass": "PASS: There is less than 5 seconds of black at the end of this video. Actual value: {deep_properties.video.black.trailing_sec}",
-                                "message_fail": "FAIL: There is more than 5 seconds of black at the end of this video. Actual value: {deep_properties.video.black.trailing_sec}"
-                            },
-                            {
-                                "condition": "deep_properties.video.black_borders.top == 0 && deep_properties.video.black_borders.bottom == 0",
-                                "message_pass": "PASS: Video letterboxing is 0 pixels.",
-                                "message_fail": "FAIL: Video letterboxing is more than 0 pixels, top = {deep_properties.video.black_borders.top} pixels, bottom = {deep_properties.video.black_borders.bottom} pixels."
-                            },
-                            {
-                                "condition": "deep_properties.video.black_borders.left == 0 && deep_properties.video.black_borders.right == 0",
-                                "message_pass": "PASS: Video pillarboxing is 0 pixels.",
-                                "message_fail": "FAIL: Video pillarboxing is more than 0 pixels, left = {deep_properties.video.black_borders.left} pixels, right = {deep_properties.video.black_borders.right} pixels."
-                            },
-                            {
-                                "condition": "deep_properties.audio[0].levels.rms_level_db >= -60",
-                                "message_pass": "PASS: Audio RMS level is higher than or equal to -60 dB, level is {deep_properties.audio[0].levels.rms_level_db} dB.",
-                                "message_fail": "FAIL: Audio level is lower than -60dB, level is {deep_properties.audio[0].levels.rms_level_db} dB."
-                            },
-                            {
-                                "condition": "deep_properties.audio[0].silence.events.size() == 0 || deep_properties.audio[0].silence.max_sec <= 5",
-                                "message_pass": "PASS: Longest audio silence is shorter than 5 seconds.",
-                                "message_fail": "FAIL: At least one audio silence is longer than or equal to 5 seconds: {deep_properties.audio[0].silence.max_sec}"
-                            }
-                        ]
-                    }
+                    "tests": [
+                        {
+                            "conditions": [
+                                {
+                                    "condition": "general_properties.container.size_kb > 10000",
+                                    "message_pass": "PASS: Source file size is greater than 10 megabytes, size = {general_properties.container.size_kb} kb.",
+                                    "message_fail": "FAIL: Source file size is less than or equal to 10 megabytes, size = {general_properties.container.size_kb} kb."
+                                },
+                                {
+                                    "condition": "general_properties.video.width >= 1920",
+                                    "message_pass": "PASS: Video frame width is greater than or equal to 1920, width is {general_properties.video.width} pixels.",
+                                    "message_fail": "FAIL: Video frame width is less than 1920, width is {general_properties.video.width} pixels."
+                                },
+                                {
+                                    "condition": "general_properties.video.height >= 1080",
+                                    "message_pass": "PASS: Video frame height is greater than or equal to 1080, height is {general_properties.video.height} pixels.",
+                                    "message_fail": "FAIL: Video frame height is less than 1080, height is {general_properties.video.height} pixels."
+                                },
+                                {
+                                    "condition": "general_properties.audio.size() >= 1",
+                                    "message_pass": "PASS: Number of audio tracks is greater than or equal to 1, there are {general_properties.audio.size()} tracks",
+                                    "message_fail": "FAIL: There are no audio tracks."
+                                },
+                                {
+                                    "condition": "general_properties.audio[0].sample_rate >= 44100",
+                                    "message_pass": "PASS: Audio sample rate is greater than or equal to 44.1 kHz, sample rate is {general_properties.audio[0].sample_rate} Hz.",
+                                    "message_fail": "FAIL: Audio sample rate is less than 44.1 kHz, sample rate is {general_properties.audio[0].sample_rate} Hz."
+                                },
+                                {
+                                    "condition": "deep_properties.video.black.leading_sec <= 5",
+                                    "message_pass": "PASS: There is less than 5 seconds of black at the start of this video. Actual value: {deep_properties.video.black.leading_sec}",
+                                    "message_fail": "FAIL: There is more than 5 seconds of black at the start of this video. Actual value: {deep_properties.video.black.leading_sec}"
+                                },
+                                {
+                                    "condition": "deep_properties.video.black.trailing_sec <= 5",
+                                    "message_pass": "PASS: There is less than 5 seconds of black at the end of this video. Actual value: {deep_properties.video.black.trailing_sec}",
+                                    "message_fail": "FAIL: There is more than 5 seconds of black at the end of this video. Actual value: {deep_properties.video.black.trailing_sec}"
+                                },
+                                {
+                                    "condition": "deep_properties.video.black_borders.top == 0 && deep_properties.video.black_borders.bottom == 0",
+                                    "message_pass": "PASS: Video letterboxing is 0 pixels.",
+                                    "message_fail": "FAIL: Video letterboxing is more than 0 pixels, top = {deep_properties.video.black_borders.top} pixels, bottom = {deep_properties.video.black_borders.bottom} pixels."
+                                },
+                                {
+                                    "condition": "deep_properties.video.black_borders.left == 0 && deep_properties.video.black_borders.right == 0",
+                                    "message_pass": "PASS: Video pillarboxing is 0 pixels.",
+                                    "message_fail": "FAIL: Video pillarboxing is more than 0 pixels, left = {deep_properties.video.black_borders.left} pixels, right = {deep_properties.video.black_borders.right} pixels."
+                                },
+                                {
+                                    "condition": "deep_properties.audio[0].levels.rms_level_db >= -60",
+                                    "message_pass": "PASS: Audio RMS level is higher than or equal to -60 dB, level is {deep_properties.audio[0].levels.rms_level_db} dB.",
+                                    "message_fail": "FAIL: Audio level is lower than -60dB, level is {deep_properties.audio[0].levels.rms_level_db} dB."
+                                },
+                                {
+                                    "condition": "deep_properties.audio[0].silence.events.size() == 0 || deep_properties.audio[0].silence.max_sec <= 5",
+                                    "message_pass": "PASS: Longest audio silence is shorter than 5 seconds.",
+                                    "message_fail": "FAIL: At least one audio silence is longer than or equal to 5 seconds: {deep_properties.audio[0].silence.max_sec}"
+                                }
+                            ]
+                        }
+                    ]
                 }
             }
         ],
