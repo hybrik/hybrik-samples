@@ -65,8 +65,7 @@
                                             "analyzer.deep_properties.video.interlacing.interlacing_ratio > 0.2"
                                         ],
                                         "payload": {
-                                            "interlace_mode": "auto",
-                                            "motion_compensation": false
+                                            "interlace_mode": "auto"
                                         }
                                     }
                                 ]
