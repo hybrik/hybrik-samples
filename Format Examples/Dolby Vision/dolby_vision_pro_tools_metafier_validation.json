@@ -1,0 +1,70 @@
+{
+    "definitions": {
+        "descriptor": "dolby_vision_pro_tools_metafier_validation",
+        "source_filename": "VIDEO_e4da5fcd-5ffc-4713-bcdd-95ea579d790b.mxf",
+        "source_path": "s3://download.opencontent.netflix.com/SolLevante/imf/SolLevante_IMF_DolbyVision_PQP3D65_UHD_24fps"
+    },
+    "name": "{{descriptor}}: {{source_filename}}",
+    "payload": {
+        "elements": [
+            {
+                "uid": "source_file",
+                "kind": "source",
+                "payload": {
+                    "kind": "asset_url",
+                    "payload": {
+                        "storage_provider": "s3",
+                        "url": "{{source_path}}/{{source_filename}}"
+                    }
+                }
+            },
+            {
+                "uid": "dovi_metafier_task",
+                "kind": "script",
+                "task": {
+                    "retry_method": "fail"
+                },
+                "payload": {
+                    "kind": "docker",
+                    "payload": {
+                        "commands": [
+                            {
+                                "docker_image": {
+                                    "image_urn": "dv_toolkit_v5.1.0",
+                                    "registry": {
+                                        "kind": "hybrik"
+                                    },
+                                    "license": "dolby_vision_professional"
+                                },
+                                "args": [
+                                    "metafier",
+                                    "--validate",
+                                    "{source_0_0}"
+                                ],
+                                "ignore_exit_code": false,
+                                "preserve_stdout": true,
+                                "preserve_stderr": true
+                            }
+                        ]
+                    }
+                }
+            }
+        ],
+        "connections": [
+            {
+                "from": [
+                    {
+                        "element": "source_file"
+                    }
+                ],
+                "to": {
+                    "success": [
+                        {
+                            "element": "dovi_metafier_task"
+                        }
+                    ]
+                }
+            }
+        ]
+    }
+}

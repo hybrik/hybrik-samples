@@ -1,0 +1,684 @@
+{
+    "definitions": {
+        "descriptor": "dolby_vision_to_ott_profile_5_hdr10_sdr_atmos_ddp_dd_aac_hls_dash",
+        "vision_source_path": "s3://download.opencontent.netflix.com/SolLevante/imf/SolLevante_IMF_DolbyVision_PQP3D65_UHD_24fps",
+        "vision_source_file": "VIDEO_e4da5fcd-5ffc-4713-bcdd-95ea579d790b.mxf",
+        "atmos_source_path": "s3://hybrik-examples/public/sources/hdr/sol",
+        "atmos_source_file": "sollevante_lp_v01_DAMF_Nearfield_48k_24b_24.wav",
+        "stereo_source_path": "s3://download.opencontent.netflix.com/SolLevante/imf/SolLevante_IMF_DolbyVision_PQP3D65_UHD_24fps",
+        "stereo_source_file": "AUDIO_4467fc2f-2536-44ba-b1f9-010e0ae3f6b1.mxf",
+        "destination_path": "s3://hybrik-examples/public/output/format_examples/dolby_vision/{{descriptor}}",
+        "output_basename": "{source_basename}",
+        "segmented_rendering_seconds": 60,
+        "fmp4_fragment_duration_seconds": 6,
+        "idr_interval_secs": 2,
+        "target_base": {
+            "existing_files": "replace",
+            "container": {
+                "kind": "mp4"
+            },
+            "video": {
+                "preset": "slow",
+                "hrd_signaling": "encoder",
+                "bitrate_mode": "vbr",
+                "idr_interval": {
+                    "seconds": "{{idr_interval_secs}}"
+                }
+            }
+        },
+        "sdr_base": {
+            "codec": "h264",
+            "dolby_vision": {
+                "profile": "sdr"
+            },
+            "chroma_format": "yuv420p",
+            "color_matrix": "bt709",
+            "color_primaries": "bt709",
+            "color_trc": "bt709"
+        },
+        "hdr10_base": {
+            "codec": "h265",
+            "vtag": "hvc1",
+            "dolby_vision": {
+                "profile": "hdr10"
+            },
+            "chroma_format": "yuv420p10le"
+        },
+        "dolby_vision_base": {
+            "codec": "h265",
+            "vtag": "dvh1",
+            "dolby_vision": {
+                "profile": "5"
+            },
+            "chroma_format": "yuv420p10le"
+        },
+        "audio_target_base": {
+            "existing_files": "replace",
+            "container": {
+                "kind": "mp4"
+            }
+        },
+        "stereo_audio_base": {
+            "channels": 2,
+            "bitrate_mode": "cbr",
+            "sample_rate": 48000
+        }
+    },
+    "name": "{{descriptor}}: {{vision_source_file}}",
+    "payload": {
+        "elements": [
+            {
+                "uid": "source_file",
+                "kind": "source",
+                "payload": {
+                    "kind": "asset_complex",
+                    "payload": {
+                        "kind": "sequence",
+                        "asset_versions": [
+                            {
+                                "version_uid": "source",
+                                "asset_components": [
+                                    {
+                                        "location": {
+                                            "storage_provider": "s3",
+                                            "path": "{{vision_source_path}}"
+                                        },
+                                        "component_uid": "dolby_vision_video",
+                                        "kind": "name",
+                                        "name": "{{vision_source_file}}",
+                                        "contents": [
+                                            {
+                                                "kind": "video"
+                                            }
+                                        ]
+                                    },
+                                    {
+                                        "location": {
+                                            "storage_provider": "s3",
+                                            "path": "{{stereo_source_path}}"
+                                        },
+                                        "component_uid": "stereo_audio",
+                                        "kind": "name",
+                                        "name": "{{stereo_source_file}}",
+                                        "contents": [
+                                            {
+                                                "kind": "audio"
+                                            }
+                                        ]
+                                    }
+                                ]
+                            }
+                        ]
+                    }
+                }
+            },
+            {
+                "uid": "stereo_audio_analyze_task",
+                "kind": "analyze",
+                "task": {
+                    "name": "stereo audio",
+                    "retry_method": "retry",
+                    "retry": {
+                        "count": 1,
+                        "delay_sec": 30
+                    }
+                },
+                "payload": {
+                    "general_properties": {
+                        "enabled": true
+                    },
+                    "deep_properties": {
+                        "audio": [
+                            {
+                                "dplc": {
+                                    "enabled": true,
+                                    "regulation_type": "atsc_a85_agile"
+                                }
+                            }
+                        ]
+                    }
+                }
+            },
+            {
+                "uid": "segment_script_task",
+                "kind": "script",
+                "task": {
+                    "retry_method": "fail"
+                },
+                "payload": {
+                    "kind": "job_modifier",
+                    "payload": {
+                        "modifiers": [
+                            {
+                                "kind": "transcode_segmented_rendering",
+                                "target_element_uid": "10bit_video_transcode_task",
+                                "duration_sec": "{{segmented_rendering_seconds}}"
+                            },
+                            {
+                                "kind": "transcode_segmented_rendering",
+                                "target_element_uid": "8bit_video_transcode_task",
+                                "duration_sec": "{{segmented_rendering_seconds}}"
+                            }
+                        ]
+                    }
+                }
+            },
+            {
+                "uid": "10bit_video_transcode_task",
+                "kind": "transcode",
+                "task": {
+                    "retry_method": "retry",
+                    "retry": {
+                        "count": 1,
+                        "delay_sec": 30
+                    },
+                    "name": "10bit P5 HDR10 Ladder"
+                },
+                "payload": {
+                    "location": {
+                        "storage_provider": "s3",
+                        "path": "{{destination_path}}"
+                    },
+                    "options": {
+                        "pipeline": {
+                            "encoder_version": "hybrik_4.2_10bit"
+                        }
+                    },
+                    "targets": [
+                        {
+                            "file_pattern": "{{output_basename}}_dv_p5_1080p.mp4",
+                            "$inherits": "{{target_base}}",
+                            "video": {
+                                "$inherits": "{{dolby_vision_base}}",
+                                "width": 1920,
+                                "height": 1080,
+                                "bitrate_kb": 9000
+                            }
+                        },
+                        {
+                            "file_pattern": "{{output_basename}}_dv_p5_720p.mp4",
+                            "$inherits": "{{target_base}}",
+                            "video": {
+                                "$inherits": "{{dolby_vision_base}}",
+                                "width": 1280,
+                                "height": 720,
+                                "bitrate_kb": 5000
+                            }
+                        },
+                        {
+                            "file_pattern": "{{output_basename}}_dv_p5_360p.mp4",
+                            "$inherits": "{{target_base}}",
+                            "video": {
+                                "$inherits": "{{dolby_vision_base}}",
+                                "preset": "veryslow",
+                                "width": 640,
+                                "height": 360,
+                                "bitrate_kb": 1500
+                            }
+                        },
+                        {
+                            "file_pattern": "{{output_basename}}_hdr10_1080p.mp4",
+                            "$inherits": "{{target_base}}",
+                            "video": {
+                                "$inherits": "{{hdr10_base}}",
+                                "width": 1920,
+                                "height": 1080,
+                                "bitrate_kb": 9000
+                            }
+                        },
+                        {
+                            "file_pattern": "{{output_basename}}_hdr10_720p.mp4",
+                            "$inherits": "{{target_base}}",
+                            "video": {
+                                "$inherits": "{{hdr10_base}}",
+                                "width": 1280,
+                                "height": 720,
+                                "bitrate_kb": 4500
+                            }
+                        },
+                        {
+                            "file_pattern": "{{output_basename}}_hdr10_360p.mp4",
+                            "$inherits": "{{target_base}}",
+                            "video": {
+                                "$inherits": "{{hdr10_base}}",
+                                "preset": "veryslow",
+                                "width": 640,
+                                "height": 360,
+                                "bitrate_kb": 1500
+                            }
+                        }
+                    ]
+                }
+            },
+            {
+                "uid": "8bit_video_transcode_task",
+                "kind": "transcode",
+                "task": {
+                    "retry_method": "retry",
+                    "retry": {
+                        "count": 1,
+                        "delay_sec": 30
+                    },
+                    "name": "8bit sdr Ladder"
+                },
+                "payload": {
+                    "location": {
+                        "storage_provider": "s3",
+                        "path": "{{destination_path}}"
+                    },
+                    "options": {
+                        "pipeline": {
+                            "encoder_version": "hybrik_4.2_8bit"
+                        }
+                    },
+                    "targets": [
+                        {
+                            "file_pattern": "{{output_basename}}_sdr_1080p.mp4",
+                            "$inherits": "{{target_base}}",
+                            "video": {
+                                "$inherits": "{{sdr_base}}",
+                                "width": 1920,
+                                "height": 1080,
+                                "bitrate_kb": 7000
+                            }
+                        },
+                        {
+                            "file_pattern": "{{output_basename}}_sdr_720p.mp4",
+                            "$inherits": "{{target_base}}",
+                            "video": {
+                                "$inherits": "{{sdr_base}}",
+                                "width": 1280,
+                                "height": 720,
+                                "bitrate_kb": 4500
+                            }
+                        },
+                        {
+                            "file_pattern": "{{output_basename}}_sdr_360p.mp4",
+                            "$inherits": "{{target_base}}",
+                            "video": {
+                                "$inherits": "{{sdr_base}}",
+                                "preset": "veryslow",
+                                "width": 640,
+                                "height": 360,
+                                "bitrate_kb": 2700
+                            }
+                        }
+                    ]
+                }
+            },
+            {
+                "uid": "stereo_audio_transcode_task",
+                "kind": "transcode",
+                "task": {
+                    "retry_method": "retry",
+                    "retry": {
+                        "count": 1,
+                        "delay_sec": 30
+                    },
+                    "name": "stereo AAC and stereo Dolby Digital"
+                },
+                "payload": {
+                    "location": {
+                        "storage_provider": "s3",
+                        "path": "{{destination_path}}"
+                    },
+                    "options": {
+                        "pipeline": {
+                            "encoder_version": "hybrik_4.2_10bit"
+                        }
+                    },
+                    "targets": [
+                        {
+                            "file_pattern": "{{output_basename}}_stereo_aac.mp4",
+                            "$inherits": "{{audio_target_base}}",
+                            "audio": [
+                                {
+                                    "$inherits": "{{stereo_audio_base}}",
+                                    "codec": "aac_lc",
+                                    "bitrate_kb": 128
+                                }
+                            ]
+                        },
+                        {
+                            "file_pattern": "{{output_basename}}_stereo_dd.mp4",
+                            "$inherits": "{{audio_target_base}}",
+                            "audio": [
+                                {
+                                    "$inherits": "{{stereo_audio_base}}",
+                                    "codec": "dolby_digital",
+                                    "bitrate_kb": 192,
+                                    "sample_size": 16,
+                                    "filters": [
+                                        {
+                                            "kind": "normalize",
+                                            "payload": {
+                                                "kind": "dplc"
+                                            }
+                                        }
+                                    ],
+                                    "dolby_digital_plus": {
+                                        "bitstream_mode": "complete_main",
+                                        "audio_coding_mode": "2/0",
+                                        "dolby_surround_mode": "not_indicated",
+                                        "dynamic_range_control": {
+                                            "line_mode_profile": "film_light",
+                                            "rf_mode_profile": "film_light"
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    ]
+                }
+            },
+            {
+                "uid": "atmos_source",
+                "kind": "source_provider",
+                "task": {
+                    "retry_method": "fail",
+                    "name": "- Dolby Atmos"
+                },
+                "payload": {
+                    "kind": "asset_url",
+                    "payload": {
+                        "storage_provider": "s3",
+                        "url": "{{atmos_source_path}}/{{atmos_source_file}}"
+                    }
+                }
+            },
+            {
+                "uid": "atmos_transcode",
+                "kind": "dolby_audio_encoder",
+                "task": {
+                    "name": "Atmos Encode",
+                    "retry_method": "retry",
+                    "retry": {
+                        "count": 1,
+                        "delay_sec": 30
+                    }
+                },
+                "payload": {
+                    "location": {
+                        "storage_provider": "s3",
+                        "path": "{{destination_path}}"
+                    },
+                    "targets": [
+                        {
+                            "file_pattern": "{{output_basename}}_DDPJOC.mp4",
+                            "existing_files": "replace",
+                            "container": {
+                                "kind": "mp4"
+                            },
+                            "audio": [
+                                {
+                                    "codec": "ddp_joc",
+                                    "bitrate_kb": 768,
+                                    "filters": [
+                                        {
+                                            "audio_filter": {
+                                                "kind": "loudness",
+                                                "payload": {
+                                                    "metering_mode": "1770-4",
+                                                    "dialogue_intelligence": true,
+                                                    "speech_threshold": 20
+                                                }
+                                            }
+                                        },
+                                        {
+                                            "audio_filter": {
+                                                "kind": "drc",
+                                                "payload": {
+                                                    "line_mode_drc_profile": "film_light",
+                                                    "rf_mode_drc_profile": "film_light"
+                                                }
+                                            }
+                                        },
+                                        {
+                                            "audio_filter": {
+                                                "kind": "downmix",
+                                                "payload": {
+                                                    "loro_center_mix_level": -3,
+                                                    "loro_surround_mix_level": -3,
+                                                    "ltrt_center_mix_level": -3,
+                                                    "ltrt_surround_mix_level": -3,
+                                                    "preferred_downmix_mode": "ltrt"
+                                                }
+                                            }
+                                        }
+                                    ]
+                                }
+                            ]
+                        },
+                        {
+                            "file_pattern": "{{output_basename}}_DDP_51.mp4",
+                            "existing_files": "replace",
+                            "container": {
+                                "kind": "mp4"
+                            },
+                            "audio": [
+                                {
+                                    "codec": "ddp_5.1_atmos_downmix",
+                                    "channels": 6,
+                                    "bitrate_kb": 192,
+                                    "filters": [
+                                        {
+                                            "audio_filter": {
+                                                "kind": "loudness",
+                                                "payload": {
+                                                    "metering_mode": "1770-3",
+                                                    "dialogue_intelligence": true,
+                                                    "speech_threshold": 20
+                                                }
+                                            }
+                                        },
+                                        {
+                                            "audio_filter": {
+                                                "kind": "drc",
+                                                "payload": {
+                                                    "line_mode_drc_profile": "film_light",
+                                                    "rf_mode_drc_profile": "film_light"
+                                                }
+                                            }
+                                        },
+                                        {
+                                            "audio_filter": {
+                                                "kind": "downmix",
+                                                "payload": {
+                                                    "loro_center_mix_level": -3,
+                                                    "loro_surround_mix_level": -3,
+                                                    "ltrt_center_mix_level": -3,
+                                                    "ltrt_surround_mix_level": -3,
+                                                    "preferred_downmix_mode": "ltrt"
+                                                }
+                                            }
+                                        }
+                                    ]
+                                }
+                            ]
+                        }
+                    ]
+                }
+            },
+            {
+                "uid": "hls_packaging",
+                "kind": "package",
+                "task": {
+                    "retry_method": "retry",
+                    "retry": {
+                        "count": 2,
+                        "delay_sec": 30
+                    },
+                    "name": "HLS"
+                },
+                "payload": {
+                    "options": {
+                        "auto_audio_layers": "ungrouped"
+                    },
+                    "location": {
+                        "storage_provider": "s3",
+                        "path": "{{destination_path}}/hls",
+                        "attributes": [
+                            {
+                                "name": "ContentType",
+                                "value": "application/vnd.apple.mpegurl"
+                            }
+                        ]
+                    },
+                    "file_pattern": "master_manifest.m3u8",
+                    "kind": "hls",
+                    "uid": "hls_manifest",
+                    "segmentation_mode": "fmp4",
+                    "segment_duration_sec": "{{fmp4_fragment_duration_seconds}}",
+                    "force_original_media": false,
+                    "media_location": {
+                        "storage_provider": "s3",
+                        "path": "{{destination_path}}/hls/media",
+                        "attributes": [
+                            {
+                                "name": "ContentType",
+                                "value": "video/mp4"
+                            }
+                        ]
+                    }
+                }
+            },
+            {
+                "uid": "dash_packaging",
+                "kind": "package",
+                "task": {
+                    "retry_method": "retry",
+                    "retry": {
+                        "count": 2,
+                        "delay_sec": 30
+                    },
+                    "name": "DASH"
+                },
+                "payload": {
+                    "options": {
+                        "auto_audio_layers": "ungrouped"
+                    },
+                    "uid": "dash_manifest",
+                    "kind": "dash",
+                    "file_pattern": "master_manifest.mpd",
+                    "segmentation_mode": "fmp4",
+                    "segment_duration_sec": "{{fmp4_fragment_duration_seconds}}",
+                    "force_original_media": false,
+                    "media_file_pattern": "{source_basename}.mp4",
+                    "location": {
+                        "storage_provider": "s3",
+                        "path": "{{destination_path}}/dash",
+                        "attributes": [
+                            {
+                                "name": "ContentType",
+                                "value": "application/dash+xml"
+                            }
+                        ]
+                    },
+                    "media_location": {
+                        "storage_provider": "s3",
+                        "path": "{{destination_path}}/dash/media",
+                        "attributes": [
+                            {
+                                "name": "ContentType",
+                                "value": "video/mp4"
+                            }
+                        ]
+                    }
+                }
+            }
+        ],
+        "connections": [
+            {
+                "from": [
+                    {
+                        "element": "source_file"
+                    }
+                ],
+                "to": {
+                    "success": [
+                        {
+                            "element": "atmos_source"
+                        },
+                        {
+                            "element": "segment_script_task"
+                        },
+                        {
+                            "element": "stereo_audio_analyze_task"
+                        }
+                    ]
+                }
+            },
+            {
+                "from": [
+                    {
+                        "element": "stereo_audio_analyze_task"
+                    }
+                ],
+                "to": {
+                    "success": [
+                        {
+                            "element": "stereo_audio_transcode_task"
+                        }
+                    ]
+                }
+            },
+            {
+                "from": [
+                    {
+                        "element": "atmos_source"
+                    }
+                ],
+                "to": {
+                    "success": [
+                        {
+                            "element": "atmos_transcode"
+                        }
+                    ]
+                }
+            },
+            {
+                "from": [
+                    {
+                        "element": "segment_script_task"
+                    }
+                ],
+                "to": {
+                    "success": [
+                        {
+                            "element": "10bit_video_transcode_task"
+                        },
+                        {
+                            "element": "8bit_video_transcode_task"
+                        }
+                    ]
+                }
+            },
+            {
+                "from": [
+                    {
+                        "element": "stereo_audio_transcode_task"
+                    },
+                    {
+                        "element": "atmos_transcode"
+                    },
+                    {
+                        "element": "10bit_video_transcode_task"
+                    },
+                    {
+                        "element": "8bit_video_transcode_task"
+                    }
+                ],
+                "to": {
+                    "success": [
+                        {
+                            "element": "hls_packaging"
+                        },
+                        {
+                            "element": "dash_packaging"
+                        }
+                    ]
+                }
+            }
+        ]
+    }
+}

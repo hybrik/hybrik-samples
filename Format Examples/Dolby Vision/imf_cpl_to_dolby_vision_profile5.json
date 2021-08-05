@@ -1,0 +1,126 @@
+{
+    "definitions": {
+        "descriptor": "imf_cpl_to_dolby_vision_profile_5",
+        "source_path": "s3://download.opencontent.netflix.com/SolLevante/imf/SolLevante_IMF_DolbyVision_PQP3D65_UHD_24fps",
+        "source_file": "CPL_0a207596-a0f5-458a-811e-a97a4286d00c.xml",
+        "destination_path": "s3://hybrik-examples/public/output/format_examples/dolby_vision/{{descriptor}}",
+        "output_name": "{source_basename}",
+        "segmented_rendering_secs": 60,
+        "idr_interval_secs": 2,
+        "dolby_vision_base": {
+            "codec": "h265",
+            "preset": "slow",
+            "vtag": "dvh1",
+            "hrd_signaling": "encoder",
+            "bitrate_mode": "vbr",
+            "chroma_format": "yuv420p10le",
+            "idr_interval": {
+                "seconds": "{{idr_interval_secs}}"
+            },
+            "dolby_vision": {
+                "profile": "5"
+            }
+        }
+    },
+    "name": "{{descriptor}}: {{source_file}}",
+    "payload": {
+        "elements": [
+            {
+                "uid": "source_file",
+                "kind": "source",
+                "payload": {
+                    "kind": "asset_url",
+                    "payload": {
+                        "storage_provider": "s3",
+                        "url": "{{source_path}}/{{source_file}}",
+                        "options": {
+                            "resolve_manifest": true
+                        }
+                    }
+                }
+            },
+            {
+                "uid": "segment_script_task",
+                "kind": "script",
+                "task": {
+                  "retry_method": "fail"
+                },
+                "payload": {
+                    "kind": "job_modifier",
+                    "payload": {
+                        "modifiers": [
+                            {
+                                "kind": "transcode_segmented_rendering",
+                                "target_element_uid": "transcode_task",
+                                "duration_sec": "{{segmented_rendering_secs}}"
+                            }
+                        ]
+                    }
+                }
+            },
+            {
+                "uid": "transcode_task",
+                "kind": "transcode",
+                "task": {
+                    "retry_method": "fail"
+                },
+                "payload": {
+                    "location": {
+                        "storage_provider": "s3",
+                        "path": "{{destination_path}}"
+                    },
+                    "options": {
+                        "pipeline": {
+                            "encoder_version": "hybrik_4.2_10bit"
+                        }
+                    },
+                    "targets": [
+                        {
+                            "file_pattern": "{{output_name}}_dv_p5_1080p.mp4",
+                            "existing_files": "replace",
+                            "container": {
+                                "kind": "mp4"
+                            },
+                            "video": {
+                                "$inherits": "{{dolby_vision_base}}",
+                                "width": 1920,
+                                "height": 1080,
+                                "bitrate_kb": 9000
+                            }
+                        }
+                    ]
+                }
+            }
+        ],
+        "connections": [
+            {
+                "from": [
+                    {
+                        "element": "source_file"
+                    }
+                ],
+                "to": {
+                    "success": [
+                        {
+                            "element": "segment_script_task"
+                        }
+                    ]
+                }
+            },
+            {
+                "from": [
+                    {
+                        "element": "segment_script_task"
+                    }
+                ],
+                "to": {
+                    "success": [
+                        {
+                            "element": "transcode_task"
+                        }
+                    ]
+                }
+            }
+        ]
+    }
+}

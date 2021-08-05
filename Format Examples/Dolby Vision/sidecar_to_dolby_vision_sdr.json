@@ -1,0 +1,159 @@
+{
+    "definitions": {
+        "descriptor": "sidecar_to_dolby_vision_sdr",
+        "source_path": "s3://hybrik-examples/public/sources/hdr/sol",
+        "source_video_file": "sollevante_ProRes4444.mov",
+        "source_metadata_file": "SolLevante_IMF_DolbyVision_PQP3D65_UHD_24fps_dolby_vision_metadata.xml",
+        "destination_path": "s3://hybrik-examples/public/output/format_examples/dolby_vision/{{descriptor}}",
+        "output_basename": "{source_basename}",
+        "segmented_rendering_secs": 60,
+        "idr_interval_secs": 2,
+        "sdr_base": {
+            "codec": "h264",
+            "preset": "slow",
+            "hrd_signaling": "encoder",
+            "bitrate_mode": "vbr",
+            "chroma_format": "yuv420p",
+            "color_matrix": "bt709",
+            "color_primaries": "bt709",
+            "color_trc": "bt709",
+            "idr_interval": {
+                "seconds": "{{idr_interval_secs}}"
+            },
+            "dolby_vision": {
+                "profile": "sdr"
+            }
+        }
+    },
+    "name": "{{descriptor}}: {{source_video_file}}",
+    "payload": {
+        "elements": [
+            {
+                "uid": "source_file",
+                "kind": "source",
+                "payload": {
+                    "kind": "asset_complex",
+                    "payload": {
+                        "kind": "sequence",
+                        "asset_versions": [
+                            {
+                                "location": {
+                                    "storage_provider": "s3",
+                                    "path": "{{source_path}}"
+                                },
+                                "version_uid": "source",
+                                "asset_components": [
+                                    {
+                                        "component_uid": "video",
+                                        "kind": "name",
+                                        "name": "{{source_video_file}}",
+                                        "contents": [
+                                            {
+                                                "kind": "video"
+                                            }
+                                        ]
+                                    },
+                                    {
+                                        "component_uid": "metadata",
+                                        "kind": "name",
+                                        "name": "{{source_metadata_file}}",
+                                        "contents": [
+                                            {
+                                                "kind": "metadata",
+                                                "payload": {
+                                                    "standard": "dolbyvision_metadata"
+                                                }
+                                            }
+                                        ]
+                                    }
+                                ]
+                            }
+                        ]
+                    }
+                }
+            },
+            {
+                "uid": "segment_script_task",
+                "kind": "script",
+                "task": {
+                  "retry_method": "fail"
+                },
+                "payload": {
+                    "kind": "job_modifier",
+                    "payload": {
+                        "modifiers": [
+                            {
+                                "kind": "transcode_segmented_rendering",
+                                "target_element_uid": "transcode_task",
+                                "duration_sec": "{{segmented_rendering_secs}}"
+                            }
+                        ]
+                    }
+                }
+            },
+            {
+                "uid": "transcode_task",
+                "kind": "transcode",
+                "task": {
+                    "retry_method": "fail"
+                },
+                "payload": {
+                    "location": {
+                        "storage_provider": "s3",
+                        "path": "{{destination_path}}"
+                    },
+                    "options": {
+                        "pipeline": {
+                            "encoder_version": "hybrik_4.2_8bit"
+                        }
+                    },
+                    "targets": [
+                        {
+                            "file_pattern": "{{output_basename}}_sdr_1080p.mp4",
+                            "existing_files": "replace",
+                            "container": {
+                                "kind": "mp4"
+                            },
+                            "video": {
+                                "$inherits": "{{sdr_base}}",
+                                "width": 1920,
+                                "height": 1080,
+                                "bitrate_kb": 7000
+                            }
+                        }
+                    ]
+                }
+            }
+        ],
+        "connections": [
+            {
+                "from": [
+                    {
+                        "element": "source_file"
+                    }
+                ],
+                "to": {
+                    "success": [
+                        {
+                            "element": "segment_script_task"
+                        }
+                    ]
+                }
+            },
+            {
+                "from": [
+                    {
+                        "element": "segment_script_task"
+                    }
+                ],
+                "to": {
+                    "success": [
+                        {
+                            "element": "transcode_task"
+                        }
+                    ]
+                }
+            }
+        ]
+    }
+}
