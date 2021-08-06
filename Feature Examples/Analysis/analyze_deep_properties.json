@@ -32,7 +32,7 @@
                             "volume": {
                                 "enabled": true
                             },
-                            "ebur128": {
+                            "dplc": {
                                 "enabled": true
                             },
                             "silence": {

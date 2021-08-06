@@ -133,7 +133,7 @@
                                 "noise_db": -60,
                                 "duration_sec": 1
                             },
-                            "ebur128": {
+                            "dplc": {
                                 "enabled": true
                             },
                             "psnr": {
@@ -152,8 +152,8 @@
                             "path": "{{destination_path}}"
                         },
                         "temp_location": {
-                                "storage_provider": "s3",
-                                "path": "{{destination_path}}/hybrik_temp"
+                            "storage_provider": "s3",
+                            "path": "{{destination_path}}/hybrik_temp"
                         },
                         "options": {
                             "report_version": "v3.0"

@@ -32,12 +32,9 @@
                     },
                     "deep_properties": {
                         "audio": {
-                            "ebur128": {
+                            "dplc": {
                                 "enabled": true,
-                                "target_reference": {
-                                    "integrated_lufs": "{{integrated_lufs}}",
-                                    "true_peak_dbfs": "{{true_peak_dbfs}}"
-                                }
+                                "regulation_type": "ebu_r128"
                             },
                             "levels": {
                                 "enabled": true
@@ -82,11 +79,7 @@
                                         {
                                             "kind": "normalize",
                                             "payload": {
-                                                "kind": "ebur128",
-                                                "payload": {
-                                                    "allow_unprecise_mode": false,
-                                                    "integrated_lufs": -12
-                                                }
+                                                "kind": "dplc"
                                             }
                                         }
                                     ]

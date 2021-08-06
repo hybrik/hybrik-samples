@@ -96,7 +96,7 @@
                                 "noise_db": -60,
                                 "duration_sec": 1
                             },
-                            "ebur128": {
+                            "dplc": {
                                 "enabled": true
                             },
                             "psnr": {
