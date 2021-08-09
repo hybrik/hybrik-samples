@@ -1,0 +1,181 @@
+{
+    "definitions": {
+        "descriptor": "ac3_eac3_with_dialnorm_measurement",
+        "source_path": "s3://hybrik-examples/public/sources",
+        "source_file": "TOS_spoken_1920x1080p24_2tk_ch_positions_5.1_2.0.mov",
+        "target_base": "{source_basename}",
+        "destination_path": "s3://hybrik-examples/public/output/format_examples/audio/{{descriptor}}"
+    },
+    "name": "{{descriptor}}: {{source_file}}",
+    "payload": {
+        "elements": [
+            {
+                "uid": "source",
+                "kind": "source",
+                "payload": {
+                    "kind": "asset_url",
+                    "payload": {
+                        "storage_provider": "s3",
+                        "url": "{{source_path}}/{{source_file}}"
+                    }
+                }
+            },
+            {
+                "uid": "analyze_task",
+                "kind": "analyze",
+                "payload": {
+                    "general_properties": {
+                        "enabled": true
+                    },
+                    "deep_properties": {
+                        "audio": [
+                            {
+                                "track_selector": {
+                                    "index": 0
+                                },
+                                "dplc": {
+                                    "enabled": true,
+                                    "regulation_type": "atsc_a85_agile"
+                                }
+                            },
+                            {
+                                "track_selector": {
+                                    "index": 1
+                                },
+                                "dplc": {
+                                    "enabled": true,
+                                    "regulation_type": "atsc_a85_agile"
+                                }
+                            }
+                        ]
+                    }
+                }
+            },
+            {
+                "uid": "transcode_task",
+                "kind": "transcode",
+                "task": {
+                    "retry_method": "fail"
+                },
+                "payload": {
+                    "location": {
+                        "storage_provider": "s3",
+                        "path": "{{destination_path}}"
+                    },
+                    "targets": [
+                        {
+                            "file_pattern": "{{target_base}}_eac3_5.1.mp4",
+                            "existing_files": "replace",
+                            "container": {
+                                "kind": "mp4"
+                            },
+                            "audio": [
+                                {
+                                    "codec": "dolby_digital_plus",
+                                    "channels": 6,
+                                    "bitrate_kb": 448,
+                                    "bitrate_mode": "cbr",
+                                    "sample_rate": 48000,
+                                    "sample_size": 16,
+                                    "filters": [
+                                        {
+                                            "kind": "normalize",
+                                            "payload": {
+                                                "kind": "dplc",
+                                                "payload": {
+                                                    "analyzer_track_index": 0
+                                                }
+                                            }
+                                        }
+                                    ],
+                                    "dolby_digital_plus": {
+                                        "bitstream_mode": "complete_main",
+                                        "dynamic_range_control": {
+                                            "line_mode_profile": "film_light",
+                                            "rf_mode_profile": "film_light"
+                                        }
+                                    },
+                                    "source": [
+                                        {
+                                            "track": 0
+                                        }
+                                    ]
+                                }
+                            ]
+                        },
+                        {
+                            "file_pattern": "{{target_base}}_ac3_stereo.mp4",
+                            "existing_files": "replace",
+                            "container": {
+                                "kind": "mp4"
+                            },
+                            "audio": [
+                                {
+                                    "codec": "dolby_digital",
+                                    "channels": 2,
+                                    "bitrate_kb": 256,
+                                    "bitrate_mode": "cbr",
+                                    "sample_rate": 48000,
+                                    "sample_size": 16,
+                                    "filters": [
+                                        {
+                                            "kind": "normalize",
+                                            "payload": {
+                                                "kind": "dplc",
+                                                "payload": {
+                                                    "analyzer_track_index": 1
+                                                }
+                                            }
+                                        }
+                                    ],
+                                    "dolby_digital_plus": {
+                                        "bitstream_mode": "complete_main",
+                                        "dynamic_range_control": {
+                                            "line_mode_profile": "film_light",
+                                            "rf_mode_profile": "film_light"
+                                        }
+                                    },
+                                    "source": [
+                                        {
+                                            "track": 1
+                                        }
+                                    ]
+                                }
+                            ]
+                        }
+                    ]
+                }
+            }
+        ],
+        "connections": [
+            {
+                "from": [
+                    {
+                        "element": "source"
+                    }
+                ],
+                "to": {
+                    "success": [
+                        {
+                            "element": "analyze_task"
+                        }
+                    ]
+                }
+            },
+            {
+                "from": [
+                    {
+                        "element": "analyze_task"
+                    }
+                ],
+                "to": {
+                    "success": [
+                        {
+                            "element": "transcode_task"
+                        }
+                    ]
+                }
+            }
+        ]
+    }
+}
