@@ -17,10 +17,10 @@
                     "payload": {
                         "asset_versions": [
                             {
-                                "version_uid": "file1",
+                                "version_uid": "bars",
                                 "asset_components": [
                                     {
-                                        "component_uid": "audio_video",
+                                        "component_uid": "file1",
                                         "kind": "name",
                                         "name": "{{source1_filename}}",
                                         "location": {
@@ -35,7 +35,7 @@
                                 ]
                             },
                             {
-                                "version_uid": "asset",
+                                "version_uid": "main_content",
                                 "asset_components": [
                                     {
                                         "component_uid": "file2",

@@ -2,7 +2,7 @@
   "definitions": {
     "descriptor": "analyze_silence_detection_plus_qc",
     "source_file": "tears_of_steel_leading_trailing_black.mp4",
-    "source_path": "s3://hybrik-examples/public/sources"  
+    "source_path": "s3://hybrik-examples/public/sources"
   },
   "name": "{{descriptor}}: {{source_file}}",
   "payload": {
@@ -23,7 +23,7 @@
         "kind": "analyze",
         "payload": {
           "options": {
-            "response_version": 2 
+            "response_version": 2
           },
           "general_properties": {
             "enabled": true
@@ -47,15 +47,17 @@
           "retry_method": "fail"
         },
         "payload": {
-          "conditions": {
-            "pass": [
-              {
-                "condition": "deep_properties.audio[0].silence.events.size() == 0 || deep_properties.audio[0].silence.max_sec <= 5",
-                "message_pass": "PASS: Longest audio silence is shorter than 5 seconds.",
-                "message_fail": "FAIL: At least one audio silence is longer than or equal to 5 seconds: {deep_properties.audio[0].silence.max_sec}"
-              }
-            ]
-          }
+          "tests": [
+            {
+              "conditions": [
+                {
+                  "condition": "deep_properties.audio[0].silence.events.size() == 0 || deep_properties.audio[0].silence.max_sec <= 5",
+                  "message_pass": "PASS: Longest audio silence is shorter than 5 seconds.",
+                  "message_fail": "FAIL: At least one audio silence is longer than or equal to 5 seconds: {deep_properties.audio[0].silence.max_sec}"
+                }
+              ]
+            }
+          ]
         }
       }
     ],
