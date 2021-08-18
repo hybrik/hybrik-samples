@@ -3,7 +3,6 @@
         "descriptor": "hls_packaging_smartsplit_temporal_segmenting",
         "source": "s3://hybrik-examples/public/sources/tears_of_steel_720p.mov",
         "destination_path": "s3://hybrik-examples/public/output/format_examples/hls-dash/{{descriptor}}",
-
         "temporal_segment_duration": 60,
         "segment_duration": 6
     },
@@ -22,19 +21,30 @@
                 }
             },
             {
+                "uid": "job_modifier_task",
+                "kind": "script",
+                "payload": {
+                    "kind": "job_modifier",
+                    "payload": {
+                        "modifiers": [
+                            {
+                                "kind": "transcode_segmented_rendering",
+                                "target_element_uid": "transcode_video",
+                                "duration_sec": "{{temporal_segment_duration}}"
+                            },
+                            {
+                                "kind": "transcode_auto_split",
+                                "target_element_uid": "transcode_video",
+                                "mode": "smart"
+                            }
+                        ]
+                    }
+                }
+            },
+            {
                 "uid": "transcode_video",
                 "kind": "transcode",
-                "task": {
-                    "flags": {
-                        "split_task": "smart"
-                    }
-                },
                 "payload": {
-                    "source_pipeline": {
-                        "segmented_rendering": {
-                            "duration_sec": "{{temporal_segment_duration}}"
-                        }
-                    },
                     "location": {
                         "storage_provider": "s3",
                         "path": "{{destination_path}}/mp4s"
@@ -205,6 +215,20 @@
                 "from": [
                     {
                         "element": "source_file"
+                    }
+                ],
+                "to": {
+                    "success": [
+                        {
+                            "element": "job_modifier_task"
+                        }
+                    ]
+                }
+            },
+            {
+                "from": [
+                    {
+                        "element": "job_modifier_task"
                     }
                 ],
                 "to": {
