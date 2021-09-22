@@ -20,13 +20,27 @@
                 }
             },
             {
+                "uid": "segment_script_task",
+                "kind": "script",
+                "task": {
+                    "retry_method": "fail"
+                },
+                "payload": {
+                    "kind": "job_modifier",
+                    "payload": {
+                        "modifiers": [
+                            {
+                                "kind": "transcode_auto_split",
+                                "target_element_uid": "transcode_all_renditions",
+                                "mode": "smart"
+                            }
+                        ]
+                    }
+                }
+            },
+            {
                 "uid": "transcode_all_renditions",
                 "kind": "transcode",
-                "task": {
-                    "flags": {
-                        "split_task": "smart"
-                    }
-                },
                 "payload": {
                     "location": {
                         "storage_provider": "s3",
@@ -37,8 +51,7 @@
                             "file_pattern": "{source_basename}_800kbps{default_extension}",
                             "existing_files": "replace",
                             "container": {
-                                "kind": "fmp4",
-                                "segment_duration_sec": "{{segment_duration}}"
+                                "kind": "mp4"
                             },
                             "video": {
                                 "codec": "h264",
@@ -59,8 +72,7 @@
                             "file_pattern": "{source_basename}_400kbps{default_extension}",
                             "existing_files": "replace",
                             "container": {
-                                "kind": "fmp4",
-                                "segment_duration_sec": "{{segment_duration}}"
+                                "kind": "mp4"
                             },
                             "video": {
                                 "codec": "h264",
@@ -81,8 +93,7 @@
                             "file_pattern": "{source_basename}_200kbps{default_extension}",
                             "existing_files": "replace",
                             "container": {
-                                "kind": "fmp4",
-                                "segment_duration_sec": "{{segment_duration}}"
+                                "kind": "mp4"
                             },
                             "video": {
                                 "codec": "h264",
@@ -103,8 +114,7 @@
                             "file_pattern": "{source_basename}_audio_64kbps{default_extension}",
                             "existing_files": "replace",
                             "container": {
-                                "kind": "fmp4",
-                                "segment_duration_sec": "{{segment_duration}}"
+                                "kind": "mp4"
                             },
                             "audio": [
                                 {
@@ -120,8 +130,7 @@
                             "file_pattern": "{source_basename}_audio_128kbps{default_extension}",
                             "existing_files": "replace",
                             "container": {
-                                "kind": "fmp4",
-                                "segment_duration_sec": "{{segment_duration}}"
+                                "kind": "mp4"
                             },
                             "audio": [
                                 {
@@ -181,6 +190,20 @@
                 "from": [
                     {
                         "element": "source_file"
+                    }
+                ],
+                "to": {
+                    "success": [
+                        {
+                            "element": "segment_script_task"
+                        }
+                    ]
+                }
+            },
+            {
+                "from": [
+                    {
+                        "element": "segment_script_task"
                     }
                 ],
                 "to": {

@@ -54,8 +54,7 @@
                             "file_pattern": "{source_basename}_800kbps{default_extension}",
                             "existing_files": "replace",
                             "container": {
-                                "kind": "mp4",
-                                "segment_duration_sec": "{{segment_duration}}"
+                                "kind": "mp4"
                             },
                             "video": {
                                 "codec": "h264",
@@ -76,8 +75,7 @@
                             "file_pattern": "{source_basename}_400kbps{default_extension}",
                             "existing_files": "replace",
                             "container": {
-                                "kind": "mp4",
-                                "segment_duration_sec": "{{segment_duration}}"
+                                "kind": "mp4"
                             },
                             "video": {
                                 "codec": "h264",
@@ -98,8 +96,7 @@
                             "file_pattern": "{source_basename}_200kbps{default_extension}",
                             "existing_files": "replace",
                             "container": {
-                                "kind": "mp4",
-                                "segment_duration_sec": "{{segment_duration}}"
+                                "kind": "mp4"
                             },
                             "video": {
                                 "codec": "h264",
@@ -122,11 +119,6 @@
             {
                 "uid": "transcode_audio",
                 "kind": "transcode",
-                "task": {
-                    "flags": {
-                        "split_task": "smart"
-                    }
-                },
                 "payload": {
                     "location": {
                         "storage_provider": "s3",
@@ -137,8 +129,7 @@
                             "file_pattern": "{source_basename}_audio_64kbps{default_extension}",
                             "existing_files": "replace",
                             "container": {
-                                "kind": "mp4",
-                                "segment_duration_sec": "{{segment_duration}}"
+                                "kind": "mp4"
                             },
                             "audio": [
                                 {
@@ -154,8 +145,7 @@
                             "file_pattern": "{source_basename}_audio_128kbps{default_extension}",
                             "existing_files": "replace",
                             "container": {
-                                "kind": "mp4",
-                                "segment_duration_sec": "{{segment_duration}}"
+                                "kind": "mp4"
                             },
                             "audio": [
                                 {

@@ -1,6 +1,6 @@
 {
     "definitions": {
-        "descriptor": "dash_advanced_alternate_audio_subtitles",
+        "descriptor": "hls_advanced_alternate_audio_subtitles",
         "source_path": "s3://hybrik-examples/public/sources",
         "source_filename": "tears_of_steel_720p.mov",
         "audio_it_filename": "tears_of_steel_italian_audio.mp4",
@@ -96,13 +96,27 @@
                 }
             },
             {
+                "uid": "segment_script_task",
+                "kind": "script",
+                "task": {
+                    "retry_method": "fail"
+                },
+                "payload": {
+                    "kind": "job_modifier",
+                    "payload": {
+                        "modifiers": [
+                            {
+                                "kind": "transcode_auto_split",
+                                "target_element_uid": "transcode_all_renditions",
+                                "mode": "smart"
+                            }
+                        ]
+                    }
+                }
+            },
+            {
                 "uid": "transcode_all_renditions",
                 "kind": "transcode",
-                "task": {
-                    "flags": {
-                        "split_task": "smart"
-                    }
-                },
                 "payload": {
                     "location": {
                         "storage_provider": "s3",
@@ -113,8 +127,7 @@
                             "file_pattern": "{source_basename}_800kbps{default_extension}",
                             "existing_files": "replace",
                             "container": {
-                                "kind": "fmp4",
-                                "segment_duration_sec": "{{segment_duration}}"
+                                "kind": "mp4"
                             },
                             "video": {
                                 "codec": "h264",
@@ -135,8 +148,7 @@
                             "file_pattern": "{source_basename}_400kbps{default_extension}",
                             "existing_files": "replace",
                             "container": {
-                                "kind": "fmp4",
-                                "segment_duration_sec": "{{segment_duration}}"
+                                "kind": "mp4"
                             },
                             "video": {
                                 "codec": "h264",
@@ -157,8 +169,7 @@
                             "file_pattern": "{source_basename}_200kbps{default_extension}",
                             "existing_files": "replace",
                             "container": {
-                                "kind": "fmp4",
-                                "segment_duration_sec": "{{segment_duration}}"
+                                "kind": "mp4"
                             },
                             "video": {
                                 "codec": "h264",
@@ -179,8 +190,7 @@
                             "file_pattern": "{source_basename}_audio_en_64kbps{default_extension}",
                             "existing_files": "replace",
                             "container": {
-                                "kind": "fmp4",
-                                "segment_duration_sec": "{{segment_duration}}"
+                                "kind": "mp4"
                             },
                             "audio": [
                                 {
@@ -202,8 +212,7 @@
                             "file_pattern": "{source_basename}_audio_en_128kbps{default_extension}",
                             "existing_files": "replace",
                             "container": {
-                                "kind": "fmp4",
-                                "segment_duration_sec": "{{segment_duration}}"
+                                "kind": "mp4"
                             },
                             "audio": [
                                 {
@@ -225,8 +234,7 @@
                             "file_pattern": "{source_basename}_audio_it_64kbps{default_extension}",
                             "existing_files": "replace",
                             "container": {
-                                "kind": "fmp4",
-                                "segment_duration_sec": "{{segment_duration}}"
+                                "kind": "mp4"
                             },
                             "audio": [
                                 {
@@ -248,8 +256,7 @@
                             "file_pattern": "{source_basename}_audio_it_128kbps{default_extension}",
                             "existing_files": "replace",
                             "container": {
-                                "kind": "fmp4",
-                                "segment_duration_sec": "{{segment_duration}}"
+                                "kind": "mp4"
                             },
                             "audio": [
                                 {
@@ -271,18 +278,51 @@
                 }
             },
             {
-                "uid": "dash_fmp4",
+                "uid": "hls_single_ts",
                 "kind": "package",
                 "payload": {
                     "uid": "main_manifest",
-                    "kind": "dash",
+                    "kind": "hls",
                     "location": {
                         "storage_provider": "s3",
-                        "path": "{{destination_path}}/dash_manifests"
+                        "path": "{{destination_path}}/hls_manifests"
                     },
-                    "file_pattern": "master_manifest.mpd",
-                    "segmentation_mode": "fmp4",
-                    "force_original_media": true
+                    "file_pattern": "master_manifest.m3u8",
+                    "segmentation_mode": "single_ts",
+                    "segment_duration_sec": "{{segment_duration}}",
+                    "force_original_media": false,
+                    "closed_captions": [
+                        {
+                            "cc_index": 1,
+                            "language": "english",
+                            "is_default": true,
+                            "is_autoselect": true
+                        }
+                    ],
+                    "media_location": {
+                        "storage_provider": "s3",
+                        "path": "{{destination_path}}/hls_media",
+                        "attributes": [
+                            {
+                                "name": "ContentType",
+                                "value": "video/MP2T"
+                            }
+                        ]
+                    },
+                    "media_file_pattern": "{source_basename}.ts",
+                    "hls": {
+                        "version": 7,
+                        "media_playlist_location": {
+                            "storage_provider": "s3",
+                            "path": "{{destination_path}}/hls_manifests",
+                            "attributes": [
+                                {
+                                    "name": "ContentType",
+                                    "value": "application/x-mpegURL"
+                                }
+                            ]
+                        }
+                    }
                 }
             }
         ],
@@ -291,6 +331,20 @@
                 "from": [
                     {
                         "element": "source_file"
+                    }
+                ],
+                "to": {
+                    "success": [
+                        {
+                            "element": "segment_script_task"
+                        }
+                    ]
+                }
+            },
+            {
+                "from": [
+                    {
+                        "element": "segment_script_task"
                     }
                 ],
                 "to": {
@@ -310,7 +364,7 @@
                 "to": {
                     "success": [
                         {
-                            "element": "dash_fmp4"
+                            "element": "hls_single_ts"
                         }
                     ]
                 }
