@@ -1,0 +1,93 @@
+{
+    "definitions": {
+        "descriptor": "atmos_analyze_with_qc_ADM",
+        "source": "s3://hybrik-examples/public/sources/atmos/sollevante_lp_v01_ADM_Nearfield_48k_24b_24.wav"
+    },
+    "name": "{{descriptor}}: {{source}}",
+    "payload": {
+        "elements": [
+            {
+                "uid": "source_file",
+                "kind": "source",
+                "payload": {
+                    "kind": "asset_url",
+                    "payload": {
+                        "storage_provider": "s3",
+                        "url": "{{source}}",
+                        "contents": [
+                            {
+                                "kind": "audio",
+                                "format": "atmos_mezzanine"
+                            }
+                        ]
+                    }
+                }
+            },
+            {
+                "uid": "analyze_task",
+                "kind": "analyze",
+                "payload": {
+                    "deep_properties": {
+                        "audio": {
+                            "dolby_atmos": {
+                                "enabled": true
+                            }
+                        }
+                    }
+                }
+            },
+            {
+                "uid": "qc_task",
+                "kind": "qc",
+                "payload": {
+                    "tests": [
+                        {
+                            "conditions": [
+                                {
+                                    "condition": "deep_properties.audio[0].dolby_atmos.first_frame_of_action_sec == 0",
+                                    "message_pass": "PASS: Provided master file contains First Frame of Action equal to 0 seconds.",
+                                    "message_fail": "FAIL: Provided master file contains unexpected First Frame of Action value. Expected: 0, actual: {deep_properties.audio[0].dolby_atmos.first_frame_of_action_sec} seconds."
+                                },
+                                {
+                                    "condition": "deep_properties.audio[0].dolby_atmos.channels.beds.length == 10",
+                                    "message_pass": "PASS: The Atmos Mezzanine has 10 beds.",
+                                    "message_fail": "FAIL: The Atmos Mezzanine does not have 10 beds, it has {deep_properties.audio[0].dolby_atmos.channels.beds.length}."
+                                }
+                            ]
+                        }
+                    ]
+                }
+            }
+        ],
+        "connections": [
+            {
+                "from": [
+                    {
+                        "element": "source_file"
+                    }
+                ],
+                "to": {
+                    "success": [
+                        {
+                            "element": "analyze_task"
+                        }
+                    ]
+                }
+            },
+            {
+                "from": [
+                    {
+                        "element": "analyze_task"
+                    }
+                ],
+                "to": {
+                    "success": [
+                        {
+                            "element": "qc_task"
+                        }
+                    ]
+                }
+            }
+        ]
+    }
+}

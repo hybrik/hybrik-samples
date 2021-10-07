@@ -1,0 +1,57 @@
+{
+    "definitions": {
+        "descriptor": "atmos_analyze_with_qc",
+        "source": "s3://hybrik-examples/public/sources/atmos/sollevante_lp_v01_ADM_Nearfield_48k_24b_24.wav"
+    },
+    "name": "{{descriptor}}: {{source}}",
+    "payload": {
+        "elements": [
+            {
+                "uid": "source_file",
+                "kind": "source",
+                "payload": {
+                    "kind": "asset_url",
+                    "payload": {
+                        "storage_provider": "s3",
+                        "url": "{{source}}",
+                        "contents": [
+                            {
+                                "kind": "audio",
+                                "format": "atmos_mezzanine"
+                            }
+                        ]
+                    }
+                }
+            },
+            {
+                "uid": "analyze_task",
+                "kind": "analyze",
+                "payload": {
+                    "deep_properties": {
+                        "audio": {
+                            "dolby_atmos": {
+                                "enabled": true
+                            }
+                        }
+                    }
+                }
+            }
+        ],
+        "connections": [
+            {
+                "from": [
+                    {
+                        "element": "source_file"
+                    }
+                ],
+                "to": {
+                    "success": [
+                        {
+                            "element": "analyze_task"
+                        }
+                    ]
+                }
+            }
+        ]
+    }
+}
