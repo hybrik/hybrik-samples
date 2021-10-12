@@ -1,0 +1,153 @@
+{
+    "definitions": {
+        "descriptor": "generated_black_silence_head_tail",
+        "source_path": "s3://hybrik-examples/public/sources",
+        "source_file": "bars_and_tone_30sec_2.0.mp4",
+        "destination_path": "s3://hybrik-examples/public/output/feature_examples/stitch_and_trim/{{descriptor}}",
+        "file_pattern": "{{descriptor}}{default_extension}"
+    },
+    "name": "{{descriptor}}: {{source_file}}",
+    "payload": {
+        "elements": [
+            {
+                "uid": "source",
+                "kind": "source",
+                "payload": {
+                    "kind": "asset_complex",
+                    "payload": {
+                        "kind": "sequence",
+                        "asset_versions": [
+                            {
+                                "version_uid": "leading_black",
+                                "asset_components": [
+                                    {
+                                        "kind": "generated",
+                                        "component_uid": "main",
+                                        "component_descriptor": {
+                                            "container": {
+                                                "kind": "raw"
+                                            },
+                                            "video": {
+                                                "width": 1920,
+                                                "height": 1080,
+                                                "frame_rate": 24,
+                                                "chroma_format": "yuv420p",
+                                                "fill_color": "black"
+                                            },
+                                            "audio": [
+                                                {
+                                                    "sample_rate": 48000,
+                                                    "channels": 1,
+                                                    "sample_size": 24
+                                                }
+                                            ]
+                                        },
+                                        "trim": {
+                                            "outpoint_sec": 1
+                                        }
+                                    }
+                                ]
+                            },
+                            {
+                                "version_uid": "main",
+                                "asset_components": [
+                                    {
+                                        "component_uid": "main",
+                                        "kind": "name",
+                                        "location": {
+                                            "path": "{{source_path}}",
+                                            "storage_provider": "s3"
+                                        },
+                                        "name": "{{source_file}}"
+                                    }
+                                ]
+                            },
+                            {
+                                "version_uid": "trailing_black",
+                                "asset_components": [
+                                    {
+                                        "kind": "generated",
+                                        "component_uid": "main",
+                                        "component_descriptor": {
+                                            "container": {
+                                                "kind": "raw"
+                                            },
+                                            "video": {
+                                                "width": 1920,
+                                                "height": 1080,
+                                                "frame_rate": 24,
+                                                "chroma_format": "yuv420p",
+                                                "fill_color": "black"
+                                            },
+                                            "audio": [
+                                                {
+                                                    "sample_rate": 48000,
+                                                    "channels": 1,
+                                                    "sample_size": 24
+                                                }
+                                            ]
+                                        },
+                                        "trim": {
+                                            "outpoint_sec": 1
+                                        }
+                                    }
+                                ]
+                            }
+                        ]
+                    }
+                }
+            },
+            {
+                "uid": "transcode_task",
+                "kind": "transcode",
+                "payload": {
+                    "location": {
+                        "storage_provider": "s3",
+                        "path": "{{destination_path}}"
+                    },
+                    "targets": [
+                        {
+                            "file_pattern": "{{file_pattern}}",
+                            "existing_files": "replace",
+                            "container": {
+                                "kind": "mp4"
+                            },
+                            "video": {
+                                "codec": "h264",
+                                "width": 1920,
+                                "height": 1080,
+                                "bitrate_mode": "vbr",
+                                "frame_rate": 24,
+                                "bitrate_kb": 6000
+                            },
+                            "audio": [
+                                {
+                                    "codec": "aac",
+                                    "channels": 2,
+                                    "sample_rate": 48000,
+                                    "bitrate_kb": 192
+                                }
+                            ]
+                        }
+                    ]
+                }
+            }
+        ],
+        "connections": [
+            {
+                "from": [
+                    {
+                        "element": "source"
+                    }
+                ],
+                "to": {
+                    "success": [
+                        {
+                            "element": "transcode_task"
+                        }
+                    ]
+                }
+            }
+        ]
+    }
+}
