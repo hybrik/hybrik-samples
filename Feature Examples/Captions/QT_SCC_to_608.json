@@ -1,130 +1,123 @@
 {
-  "definitions": {
-  	"descriptor": "quicktime_captions_from_SCC",
-    "source_path": "s3://hybrik-examples/public/sources",
-    "source_name": "tears_of_steel_1080p.mov",
-    "captions_path": "s3://hybrik-examples/public/sources",
-    "captions_name": "TOS-en.scc",
-    "destination_path": "s3://hybrik-examples/public/output/feature_examples/captions/{{descriptor}}",
-    "captions": {
-      "closed_captions": {
-        "enable_cea608": true,
-        "enable_cea708": false,
-        "enable_quicktime_c608": true,
-        "enable_quicktime_c708": false
-      }
-    },
-    "file_pattern": "{source_basename}_{hybrik_version}{default_extension}",
-    "height": 540,
-    "width": 960,
-    "bitrate_kb": 3000,
-    "audio_channels": 2,
+    "definitions": {
+        "descriptor": "quicktime_captions_from_SCC",
+        "source_path": "s3://hybrik-examples/public/sources",
+        "source_name": "tears_of_steel_1080p.mov",
+        "captions_path": "s3://hybrik-examples/public/sources",
+        "captions_name": "TOS-en.scc",
+        "destination_path": "s3://hybrik-examples/public/output/feature_examples/captions/{{descriptor}}",
+        "captions": {
+            "closed_captions": {
+                "enable_cea608": true,
+                "enable_cea708": false,
+                "enable_quicktime_c608": true,
+                "enable_quicktime_c708": false
+            }
+        },
+        "file_pattern": "{{descriptor{{{default_extension}",
+        "height": 540,
+        "width": 960,
+        "bitrate_kb": 3000,
+        "audio_channels": 2,
         "outpoint_sec": 60
-  },
-  "name": "{{source_name}} QT SCC to 608",
-  "payload": {
-    "elements": [
-      {
-        "uid": "sources",
-        "kind": "source",
-        "payload": {
-          "kind": "asset_complex",
-          "payload": {
-            "asset_versions": [
-              {
-                "asset_components": [
-                  {
-                    "kind": "name",
-                    "name": "{{source_name}}",
-                    "location": {
-                      "storage_provider": "s3",
-                      "path": "{{source_path}}"
-                    },
-                    "trim": {
-                      "outpoint_sec": "{{outpoint_sec}}"
-                    },
-                    "contents": [
-                      {
-                        "kind": "video"
-                      },
-                      {
-                        "kind": "audio"
-                      }
-                    ]
-                  },
-                  {
-                    "component_uid": "caption1",
-                    "kind": "name",
-                    "name": "{{captions_name}}",
-                    "location": {
-                      "storage_provider": "s3",
-                      "path": "{{captions_path}}"
-                    },
-                    "contents": [
-                      {
-                        "kind": "closed_caption",
-                        "payload": {
-                          "format": "scc"
-                        }
-                      }
-                    ]
-                  }
-                ]
-              }
-            ]
-          }
-        }
-      },
-      {
-        "uid": "transcode_task",
-        "kind": "transcode",
-        "payload": {
-          "location": {
-            "storage_provider": "s3",
-            "path": "{{destination_path}}"
-          },
-          "targets": [
+    },
+    "name": "{{descriptor}}: {{source_name}}",
+    "payload": {
+        "elements": [
             {
-              "file_pattern": "{{file_pattern}}",
-              "existing_files": "replace",
-              "container": {
-                "kind": "mov"
-              },
-              "video": {
-                "codec": "h264",
-                "width": "{{width}}",
-                "height": "{{height}}",
-                "bitrate_kb": "{{bitrate_kb}}",
-                "$inherits": "{{captions}}"
-              },
-              "audio": [
-                {
-                  "codec": "pcm",
-                  "channels": "{{audio_channels}}",
-                  "sample_rate": 48000,
-                  "sample_size": 16
+                "uid": "sources",
+                "kind": "source",
+                "payload": {
+                    "kind": "asset_complex",
+                    "payload": {
+                        "asset_versions": [
+                            {
+                                "asset_components": [
+                                    {
+                                      "component_uid": "video",
+                                        "kind": "name",
+                                        "name": "{{source_name}}",
+                                        "location": {
+                                            "storage_provider": "s3",
+                                            "path": "{{source_path}}"
+                                        },
+                                        "trim": {
+                                            "outpoint_sec": "{{outpoint_sec}}"
+                                        }
+                                    },
+                                    {
+                                        "component_uid": "caption",
+                                        "kind": "name",
+                                        "name": "{{captions_name}}",
+                                        "location": {
+                                            "storage_provider": "s3",
+                                            "path": "{{captions_path}}"
+                                        },
+                                        "contents": [
+                                            {
+                                                "kind": "closed_caption",
+                                                "payload": {
+                                                    "format": "scc"
+                                                }
+                                            }
+                                        ]
+                                    }
+                                ]
+                            }
+                        ]
+                    }
                 }
-              ]
-            }
-          ]
-        }
-      }
-    ],
-    "connections": [
-      {
-        "from": [
-          {
-            "element": "sources"
-          }
-        ],
-        "to": {
-          "success": [
+            },
             {
-              "element": "transcode_task"
+                "uid": "transcode_task",
+                "kind": "transcode",
+                "payload": {
+                    "location": {
+                        "storage_provider": "s3",
+                        "path": "{{destination_path}}"
+                    },
+                    "targets": [
+                        {
+                            "file_pattern": "{{file_pattern}}",
+                            "existing_files": "replace",
+                            "container": {
+                                "kind": "mov"
+                            },
+                            "video": {
+                                "codec": "h264",
+                                "width": "{{width}}",
+                                "height": "{{height}}",
+                                "bitrate_kb": "{{bitrate_kb}}",
+                                "$inherits": "{{captions}}"
+                            },
+                            "audio": [
+                                {
+                                    "codec": "pcm",
+                                    "channels": "{{audio_channels}}",
+                                    "sample_rate": 48000,
+                                    "sample_size": 16
+                                }
+                            ]
+                        }
+                    ]
+                }
             }
-          ]
-        }
-      }
-    ]
-  }
+        ],
+        "connections": [
+            {
+                "from": [
+                    {
+                        "element": "sources"
+                    }
+                ],
+                "to": {
+                    "success": [
+                        {
+                            "element": "transcode_task"
+                        }
+                    ]
+                }
+            }
+        ]
+    }
 }
