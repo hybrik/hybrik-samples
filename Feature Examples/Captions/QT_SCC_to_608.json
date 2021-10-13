@@ -14,7 +14,7 @@
                 "enable_quicktime_c708": false
             }
         },
-        "file_pattern": "{{descriptor{{{default_extension}",
+        "file_pattern": "{{descriptor}}{default_extension}",
         "height": 540,
         "width": 960,
         "bitrate_kb": 3000,
