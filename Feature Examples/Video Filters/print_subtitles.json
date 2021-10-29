@@ -1,0 +1,343 @@
+{
+    "name": "{{descriptor}}: {{source_name}}",
+    "definitions": {
+        "descriptor": "print_subtitles_combined_example",
+        "source_path": "s3://hybrik-examples/public/sources",
+        "source_name": "tears_of_steel_1080p.mov",
+        "captions_path": "s3://hybrik-examples/public/sources",
+        "captions_name": "TOS-en.scc",
+        "font_path": "s3://hybrik-examples/public/sources/fonts",
+        "font_file": "Oswald.ttf",
+        "destination_path": "s3://hybrik-examples/public/output/feature_examples/video_filters/{{descriptor}}"
+    },
+    "payload": {
+        "elements": [
+            {
+                "uid": "sources",
+                "kind": "source",
+                "payload": {
+                    "kind": "asset_complex",
+                    "payload": {
+                        "asset_versions": [
+                            {
+                                "asset_components": [
+                                    {
+                                        "trim": {
+                                            "inpoint_sec": 29,
+                                            "outpoint_sec": 35
+                                        },
+                                        "component_uid": "av",
+                                        "kind": "name",
+                                        "name": "{{source_name}}",
+                                        "location": {
+                                            "storage_provider": "s3",
+                                            "path": "{{source_path}}"
+                                        },
+                                        "contents": [
+                                            {
+                                                "kind": "video"
+                                            },
+                                            {
+                                                "kind": "audio"
+                                            }
+                                        ]
+                                    },
+                                    {
+                                        "trim": {
+                                            "inpoint_sec": 29,
+                                            "outpoint_sec": 35
+                                        },
+                                        "component_uid": "subtitles",
+                                        "kind": "name",
+                                        "name": "{{captions_name}}",
+                                        "location": {
+                                            "storage_provider": "s3",
+                                            "path": "{{captions_path}}"
+                                        },
+                                        "contents": [
+                                            {
+                                                "kind": "subtitle",
+                                                "payload": {
+                                                    "format": "auto"
+                                                }
+                                            }
+                                        ]
+                                    }
+                                ]
+                            }
+                        ]
+                    }
+                }
+            },
+            {
+                "uid": "transcode_task",
+                "kind": "transcode",
+                "payload": {
+                    "location": {
+                        "storage_provider": "s3",
+                        "path": "{{destination_path}}"
+                    },
+                    "targets": [
+                        {
+                            "file_pattern": "imprint_style_closed_caption_720p.mp4",
+                            "existing_files": "replace",
+                            "container": {
+                                "kind": "mp4"
+                            },
+                            "video": {
+                                "codec": "h264",
+                                "width": 1280,
+                                "height": 720,
+                                "bitrate_kb": 1000,
+                                "filters": [
+                                    {
+                                        "kind": "print_subtitle",
+                                        "payload": {
+                                            "imprint_style": "closed_caption"
+                                        }
+                                    }
+                                ]
+                            },
+                            "audio": [
+                                {
+                                    "codec": "aac",
+                                    "channels": 2,
+                                    "sample_rate": 48000,
+                                    "bitrate_kb": 96
+                                }
+                            ]
+                        },
+                        {
+                            "file_pattern": "imprint_style_subtitle_custom_ass_string_720p.mp4",
+                            "existing_files": "replace",
+                            "container": {
+                                "kind": "mp4"
+                            },
+                            "video": {
+                                "codec": "h264",
+                                "width": 1280,
+                                "height": 720,
+                                "bitrate_kb": 2000,
+                                "filters": [
+                                    {
+                                        "kind": "print_subtitle",
+                                        "payload": {
+                                            "imprint_style": "subtitle",
+                                            "option_string": "force_style='Alignment=2,FontSize=15,PrimaryColour=&H000099E6,OutlineColour=&H00000000,Outline=0.5'"
+                                        }
+                                    }
+                                ]
+                            },
+                            "audio": [
+                                {
+                                    "codec": "aac",
+                                    "channels": 2,
+                                    "sample_rate": 48000,
+                                    "bitrate_kb": 96
+                                }
+                            ]
+                        },
+                        {
+                            "file_pattern": "imprint_style_subtitle_720p.mp4",
+                            "existing_files": "replace",
+                            "container": {
+                                "kind": "mp4"
+                            },
+                            "video": {
+                                "codec": "h264",
+                                "width": 1280,
+                                "height": 720,
+                                "bitrate_kb": 2000,
+                                "filters": [
+                                    {
+                                        "kind": "print_subtitle",
+                                        "payload": {
+                                            "imprint_style": "subtitle"
+                                        }
+                                    }
+                                ]
+                            },
+                            "audio": [
+                                {
+                                    "codec": "aac",
+                                    "channels": 2,
+                                    "sample_rate": 48000,
+                                    "bitrate_kb": 96
+                                }
+                            ]
+                        },
+                        {
+                            "file_pattern": "imprint_style_subtitle_custom_font_720p.mp4",
+                            "existing_files": "replace",
+                            "container": {
+                                "kind": "mp4"
+                            },
+                            "video": {
+                                "codec": "h264",
+                                "width": 1280,
+                                "height": 720,
+                                "bitrate_kb": 2000,
+                                "filters": [
+                                    {
+                                        "kind": "print_subtitle",
+                                        "payload": {
+                                            "imprint_style": "subtitle",
+                                            "font_files": [
+                                                {
+                                                    "storage_provider": "s3",
+                                                    "url": "{{font_path}}/{{font_file}}"
+                                                }
+                                            ]
+                                        }
+                                    }
+                                ]
+                            },
+                            "audio": [
+                                {
+                                    "codec": "aac",
+                                    "channels": 2,
+                                    "sample_rate": 48000,
+                                    "bitrate_kb": 96
+                                }
+                            ]
+                        },
+                        {
+                            "file_pattern": "imprint_style_ttml_webkit_720p.mp4",
+                            "existing_files": "replace",
+                            "container": {
+                                "kind": "mp4"
+                            },
+                            "video": {
+                                "codec": "h264",
+                                "width": 1280,
+                                "height": 720,
+                                "bitrate_kb": 2000,
+                                "filters": [
+                                    {
+                                        "kind": "print_subtitle",
+                                        "payload": {
+                                            "ttml_render_engine": "webkit",
+                                            "imprint_style": "ttml",
+                                            "attributes": [
+                                                {
+                                                    "name": "tts:origin",
+                                                    "value": "2.5% 0%"
+                                                },
+                                                {
+                                                    "name": "tts:extent",
+                                                    "value": "100% 95%"
+                                                },
+                                                {
+                                                    "name": "tts:position",
+                                                    "value": "center"
+                                                },
+                                                {
+                                                    "name": "tts:textOutline",
+                                                    "value": "black 4px 0px"
+                                                },
+                                                {
+                                                    "name": "tts:fontSize",
+                                                    "value": "95%"
+                                                }
+                                            ]
+                                        }
+                                    }
+                                ]
+                            },
+                            "audio": [
+                                {
+                                    "codec": "aac",
+                                    "channels": 2,
+                                    "sample_rate": 48000,
+                                    "bitrate_kb": 96
+                                }
+                            ]
+                        },
+                        {
+                            "file_pattern": "imprint_style_ttml_webkit_custom_font_720p.mp4",
+                            "existing_files": "replace",
+                            "container": {
+                                "kind": "mp4"
+                            },
+                            "video": {
+                                "codec": "h264",
+                                "width": 1280,
+                                "height": 720,
+                                "bitrate_kb": 2000,
+                                "filters": [
+                                    {
+                                        "kind": "print_subtitle",
+                                        "payload": {
+                                            "ttml_render_engine": "webkit",
+                                            "imprint_style": "ttml",
+                                            "font_files": [
+                                                {
+                                                    "storage_provider": "s3",
+                                                    "url": "{{font_path}}/{{font_file}}"
+                                                }
+                                            ],
+                                            "attributes": [
+                                                {
+                                                    "name": "tts:origin",
+                                                    "value": "2.5% 0%"
+                                                },
+                                                {
+                                                    "name": "tts:extent",
+                                                    "value": "100% 95%"
+                                                },
+                                                {
+                                                    "name": "tts:position",
+                                                    "value": "center"
+                                                },
+                                                {
+                                                    "name": "tts:textOutline",
+                                                    "value": "black 4px 0px"
+                                                },
+                                                {
+                                                    "name": "tts:color",
+                                                    "value": "#E69900"
+                                                },
+                                                {
+                                                    "name": "tts:fontSize",
+                                                    "value": "95%"
+                                                },
+                                                {
+                                                    "name": "tts:fontFamily",
+                                                    "value": "Oswald"
+                                                }
+                                            ]
+                                        }
+                                    }
+                                ]
+                            },
+                            "audio": [
+                                {
+                                    "codec": "aac",
+                                    "channels": 2,
+                                    "sample_rate": 48000,
+                                    "bitrate_kb": 96
+                                }
+                            ]
+                        }
+                    ]
+                }
+            }
+        ],
+        "connections": [
+            {
+                "from": [
+                    {
+                        "element": "sources"
+                    }
+                ],
+                "to": {
+                    "success": [
+                        {
+                            "element": "transcode_task"
+                        }
+                    ]
+                }
+            }
+        ]
+    }
+}
