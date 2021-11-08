@@ -1,0 +1,438 @@
+{
+    "definitions": {
+        "descriptor": "multi_track_audio_processing_discrete_to_interleaved",
+        "source_file_0": "TOS_spoken_ch_positions_8tk-1ch.mov",
+        "source_path_0": "s3://hybrik-examples/public/sources",
+        "source_file_1": "tears_of_steel_720p.mov",
+        "source_path_1": "s3://hybrik-examples/public/sources",
+        "destination_path": "s3://hybrik-examples/public/output/feature_examples/audio_filters/{{descriptor}}",
+        "name": "{{descriptor}}"
+    },
+    "name": "{{name}}",
+    "payload": {
+        "elements": [
+            {
+                "uid": "source_file",
+                "kind": "source",
+                "payload": {
+                    "kind": "asset_complex",
+                    "payload": {
+                        "kind": "sequence",
+                        "asset_versions": [
+                            {
+                                "version_uid": "0",
+                                "asset_components": [
+                                    {
+                                        "location": {
+                                            "storage_provider": "s3",
+                                            "path": "{{source_path_1}}"
+                                        },
+                                        "kind": "name",
+                                        "name": "{{source_file_1}}",
+                                        "component_uid": "video",
+                                        "contents": [
+                                            {
+                                                "kind": "video"
+                                            }
+                                        ]
+                                    },
+                                    {
+                                        "location": {
+                                            "storage_provider": "s3",
+                                            "path": "{{source_path_0}}"
+                                        },
+                                        "kind": "name",
+                                        "name": "{{source_file_0}}",
+                                        "component_uid": "audio_eng",
+                                        "contents": [
+                                            {
+                                                "kind": "audio",
+                                                "payload": {
+                                                    "language": "eng"
+                                                },
+                                                "map": [
+                                                    {
+                                                        "input": {
+                                                            "track": 0,
+                                                            "channel": 0
+                                                        },
+                                                        "output": {
+                                                            "track": 0,
+                                                            "channel": 0
+                                                        }
+                                                    },
+                                                    {
+                                                        "input": {
+                                                            "track": 1,
+                                                            "channel": 0
+                                                        },
+                                                        "output": {
+                                                            "track": 0,
+                                                            "channel": 1
+                                                        }
+                                                    },
+                                                    {
+                                                        "input": {
+                                                            "track": 2,
+                                                            "channel": 0
+                                                        },
+                                                        "output": {
+                                                            "track": 0,
+                                                            "channel": 2
+                                                        }
+                                                    },
+                                                    {
+                                                        "input": {
+                                                            "track": 3,
+                                                            "channel": 0
+                                                        },
+                                                        "output": {
+                                                            "track": 0,
+                                                            "channel": 3
+                                                        }
+                                                    },
+                                                    {
+                                                        "input": {
+                                                            "track": 4,
+                                                            "channel": 0
+                                                        },
+                                                        "output": {
+                                                            "track": 0,
+                                                            "channel": 4
+                                                        }
+                                                    },
+                                                    {
+                                                        "input": {
+                                                            "track": 5,
+                                                            "channel": 0
+                                                        },
+                                                        "output": {
+                                                            "track": 0,
+                                                            "channel": 5
+                                                        }
+                                                    },
+                                                    {
+                                                        "input": {
+                                                            "track": 6,
+                                                            "channel": 0
+                                                        },
+                                                        "output": {
+                                                            "track": 0,
+                                                            "channel": 6
+                                                        }
+                                                    },
+                                                    {
+                                                        "input": {
+                                                            "track": 7,
+                                                            "channel": 0
+                                                        },
+                                                        "output": {
+                                                            "track": 0,
+                                                            "channel": 7
+                                                        }
+                                                    }
+                                                ]
+                                            }
+                                        ]
+                                    }
+                                ]
+                            }
+                        ]
+                    }
+                }
+            },
+            {
+                "uid": "analyze_task",
+                "kind": "analyze",
+                "payload": {
+                    "source_pipeline": {
+                        "contents": [
+                            {
+                                "kind": "audio",
+                                "map": [
+                                    {
+                                        "input": {
+                                            "track": 0,
+                                            "channel": 0
+                                        },
+                                        "output": {
+                                            "track": 0,
+                                            "channel": 0
+                                        }
+                                    },
+                                    {
+                                        "input": {
+                                            "track": 0,
+                                            "channel": 1
+                                        },
+                                        "output": {
+                                            "track": 0,
+                                            "channel": 1
+                                        }
+                                    },
+                                    {
+                                        "input": {
+                                            "track": 0,
+                                            "channel": 2
+                                        },
+                                        "output": {
+                                            "track": 0,
+                                            "channel": 2
+                                        }
+                                    },
+                                    {
+                                        "input": {
+                                            "track": 0,
+                                            "channel": 3
+                                        },
+                                        "output": {
+                                            "track": 0,
+                                            "channel": 3
+                                        }
+                                    },
+                                    {
+                                        "input": {
+                                            "track": 0,
+                                            "channel": 4
+                                        },
+                                        "output": {
+                                            "track": 0,
+                                            "channel": 4
+                                        }
+                                    },
+                                    {
+                                        "input": {
+                                            "track": 0,
+                                            "channel": 5
+                                        },
+                                        "output": {
+                                            "track": 0,
+                                            "channel": 5
+                                        }
+                                    },
+                                    {
+                                        "input": {
+                                            "track": 0,
+                                            "channel": 6
+                                        },
+                                        "output": {
+                                            "track": 1,
+                                            "channel": 0
+                                        }
+                                    },
+                                    {
+                                        "input": {
+                                            "track": 0,
+                                            "channel": 7
+                                        },
+                                        "output": {
+                                            "track": 1,
+                                            "channel": 1
+                                        }
+                                    }
+                                ]
+                            }
+                        ]
+                    },
+                    "general_properties": {
+                        "enabled": true
+                    },
+                    "deep_properties": {
+                        "audio": [
+                            {
+                                "track_selector": {
+                                    "index": 0
+                                },
+                                "dplc": {
+                                    "enabled": true,
+                                    "loudness_target": -23,
+                                    "regulation_type": "manual",
+                                    "limit_mode": "true_peak",
+                                    "correction_mode": "pcm_normalization",
+                                    "metering_mode": "1770-3",
+                                    "peak_limit_db": -1
+                                }
+                            },
+                            {
+                                "track_selector": {
+                                    "index": 1
+                                },
+                                "dplc": {
+                                    "enabled": true,
+                                    "loudness_target": -23,
+                                    "regulation_type": "manual",
+                                    "limit_mode": "true_peak",
+                                    "correction_mode": "pcm_normalization",
+                                    "metering_mode": "1770-3",
+                                    "peak_limit_db": -1
+                                }
+                            }
+                        ]
+                    }
+                }
+            },
+            {
+                "uid": "transcode_task",
+                "kind": "transcode",
+                "task": {
+                    "retry_method": "fail"
+                },
+                "payload": {
+                    "location": {
+                        "storage_provider": "s3",
+                        "path": "{{destination_path}}",
+                        "access": {}
+                    },
+                    "source_pipeline": {
+                        "multi_track_audio_processing": [
+                            {
+                                "source": [
+                                    {
+                                        "track": 0,
+                                        "channel": 0
+                                    },
+                                    {
+                                        "track": 0,
+                                        "channel": 1
+                                    },
+                                    {
+                                        "track": 0,
+                                        "channel": 2
+                                    },
+                                    {
+                                        "track": 0,
+                                        "channel": 3
+                                    },
+                                    {
+                                        "track": 0,
+                                        "channel": 4
+                                    },
+                                    {
+                                        "track": 0,
+                                        "channel": 5
+                                    }
+                                ],
+                                "filters": [
+                                    {
+                                        "kind": "normalize",
+                                        "payload": {
+                                            "kind": "dplc",
+                                            "payload": {
+                                                "analyzer_track_index": 0
+                                            }
+                                        }
+                                    }
+                                ]
+                            },
+                            {
+                                "source": [
+                                    {
+                                        "track": 0,
+                                        "channel": 6
+                                    },
+                                    {
+                                        "track": 0,
+                                        "channel": 7
+                                    }
+                                ],
+                                "filters": [
+                                    {
+                                        "kind": "normalize",
+                                        "payload": {
+                                            "kind": "dplc",
+                                            "payload": {
+                                                "analyzer_track_index": 1
+                                            }
+                                        }
+                                    }
+                                ]
+                            }
+                        ]
+                    },
+                    "options": {
+                        "pipeline": {
+                            "encoder_version": "hybrik_4.2_8bit"
+                        }
+                    },
+                    "targets": [
+                        {
+                            "file_pattern": "{{descriptor}}.ts",
+                            "existing_files": "replace",
+                            "container": {
+                                "kind": "mpegts",
+                                "pmt_pid": 480,
+                                "use_sdt": false
+                            },
+                            "video": {
+                                "codec": "mpeg2",
+                                "pid": 481,
+                                "width": 1920,
+                                "height": 1080,
+                                "dar": "16:9",
+                                "frame_rate": 23.976,
+                                "profile": "422P",
+                                "level": "HL",
+                                "chroma_format": "yuv422p",
+                                "bitrate_kb": 8000,
+                                "max_bitrate_kb": 8000,
+                                "bitrate_mode": "cbr",
+                                "exact_gop_frames": 12,
+                                "use_scene_detection": false,
+                                "use_closed_gop": true,
+                                "interlace_mode": "progressive",
+                                "max_bframes": 2
+                            },
+                            "audio": [
+                                {
+                                    "pid": 482,
+                                    "codec": "s302m",
+                                    "channels": 8,
+                                    "sample_rate": 48000,
+                                    "language": "eng",
+                                    "track_name": "Stereo",
+                                    "sample_size": 16
+                                }
+                            ],
+                            "timecode": [
+                                {
+                                    "source": "media",
+                                    "force_drop": false
+                                }
+                            ]
+                        }
+                    ]
+                }
+            }
+        ],
+        "connections": [
+            {
+                "from": [
+                    {
+                        "element": "source_file"
+                    }
+                ],
+                "to": {
+                    "success": [
+                        {
+                            "element": "analyze_task"
+                        }
+                    ]
+                }
+            },
+            {
+                "from": [
+                    {
+                        "element": "analyze_task"
+                    }
+                ],
+                "to": {
+                    "success": [
+                        {
+                            "element": "transcode_task"
+                        }
+                    ]
+                }
+            }
+        ]
+    }
+}

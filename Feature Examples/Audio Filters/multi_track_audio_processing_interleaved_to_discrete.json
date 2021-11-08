@@ -1,0 +1,269 @@
+{
+    "definitions": {
+        "descriptor": "multi_track_audio_processing_interleaved_to_discrete",
+        "source_file": "s3://hybrik-examples/public/sources/meridian_1920x1080p59.94_h264_audio-2tk_5.1_LtRt.mov",
+        "target_base": "{{descriptor}}",
+        "destination_path": "s3://hybrik-examples/public/output/feature_examples/audio_filters/{{descriptor}}"
+    },
+    "name": "{{descriptor}}",
+    "payload": {
+        "elements": [
+            {
+                "uid": "source",
+                "kind": "source",
+                "payload": {
+                    "kind": "asset_url",
+                    "payload": {
+                        "storage_provider": "s3",
+                        "url": "{{source_file}}"
+                    }
+                }
+            },
+            {
+                "uid": "analyze_task",
+                "kind": "analyze",
+                "payload": {
+                    "general_properties": {
+                        "enabled": true
+                    },
+                    "deep_properties": {
+                        "audio": [
+                            {
+                                "track_selector": {
+                                    "index": 0
+                                },
+                                "dplc": {
+                                    "enabled": true,
+                                    "regulation_type": "ebu_r128"
+                                }
+                            },
+                            {
+                                "track_selector": {
+                                    "index": 1
+                                },
+                                "dplc": {
+                                    "enabled": true,
+                                    "regulation_type": "ebu_r128"
+                                }
+                            }
+                        ]
+                    }
+                }
+            },
+            {
+                "uid": "transcode_task",
+                "kind": "transcode",
+                "task": {
+                    "retry_method": "fail"
+                },
+                "payload": {
+                    "source_pipeline": {
+                        "multi_track_audio_processing": [
+                            {
+                                "source": [
+                                    {
+                                        "track": 0
+                                    }
+                                ],
+                                "filters": [
+                                    {
+                                        "kind": "normalize",
+                                        "payload": {
+                                            "kind": "dplc",
+                                            "payload": {
+                                                "analyzer_track_index": 0
+                                            }
+                                        }
+                                    }
+                                ]
+                            },
+                            {
+                                "source": [
+                                    {
+                                        "track": 1
+                                    }
+                                ],
+                                "filters": [
+                                    {
+                                        "kind": "normalize",
+                                        "payload": {
+                                            "kind": "dplc",
+                                            "payload": {
+                                                "analyzer_track_index": 1
+                                            }
+                                        }
+                                    }
+                                ]
+                            }
+                        ]
+                    },
+                    "location": {
+                        "storage_provider": "s3",
+                        "path": "{{destination_path}}"
+                    },
+                    "targets": [
+                        {
+                            "file_pattern": "{{target_base}}_8tk.mxf",
+                            "existing_files": "replace",
+                            "compliance": "xdcam_hd_422",
+                            "container": {
+                                "kind": "mxf",
+                                "timecode_start_value": "01:00:00:00"
+                            },
+                            "video": {
+                                "codec": "mpeg2",
+                                "width": 1920,
+                                "height": 1080,
+                                "par": "1:1",
+                                "frame_rate": 23.976,
+                                "profile": "422P",
+                                "level": "HL",
+                                "chroma_format": "yuv422p",
+                                "bitrate_kb": 50000,
+                                "bitrate_mode": "cbr",
+                                "use_scene_detection": false,
+                                "max_bframes": 3
+                            },
+                            "audio": [
+                                {
+                                    "codec": "pcm",
+                                    "channels": 1,
+                                    "sample_rate": 48000,
+                                    "language": "eng",
+                                    "sample_size": 24,
+                                    "source": [
+                                        {
+                                            "track": 0,
+                                            "channel": 0
+                                        }
+                                    ]
+                                },
+                                {
+                                    "codec": "pcm",
+                                    "channels": 1,
+                                    "sample_rate": 48000,
+                                    "language": "eng",
+                                    "sample_size": 24,
+                                    "source": [
+                                        {
+                                            "track": 0,
+                                            "channel": 1
+                                        }
+                                    ]
+                                },
+                                {
+                                    "codec": "pcm",
+                                    "channels": 1,
+                                    "sample_rate": 48000,
+                                    "language": "eng",
+                                    "sample_size": 24,
+                                    "source": [
+                                        {
+                                            "track": 0,
+                                            "channel": 2
+                                        }
+                                    ]
+                                },
+                                {
+                                    "codec": "pcm",
+                                    "channels": 1,
+                                    "sample_rate": 48000,
+                                    "language": "eng",
+                                    "sample_size": 24,
+                                    "source": [
+                                        {
+                                            "track": 0,
+                                            "channel": 3
+                                        }
+                                    ]
+                                },
+                                {
+                                    "codec": "pcm",
+                                    "channels": 1,
+                                    "sample_rate": 48000,
+                                    "language": "eng",
+                                    "sample_size": 24,
+                                    "source": [
+                                        {
+                                            "track": 0,
+                                            "channel": 4
+                                        }
+                                    ]
+                                },
+                                {
+                                    "codec": "pcm",
+                                    "channels": 1,
+                                    "sample_rate": 48000,
+                                    "language": "eng",
+                                    "sample_size": 24,
+                                    "source": [
+                                        {
+                                            "track": 0,
+                                            "channel": 5
+                                        }
+                                    ]
+                                },
+                                {
+                                    "codec": "pcm",
+                                    "channels": 1,
+                                    "sample_rate": 48000,
+                                    "language": "eng",
+                                    "sample_size": 24,
+                                    "source": [
+                                        {
+                                            "track": 1,
+                                            "channel": 0
+                                        }
+                                    ]
+                                },
+                                {
+                                    "codec": "pcm",
+                                    "channels": 1,
+                                    "sample_rate": 48000,
+                                    "language": "eng",
+                                    "sample_size": 24,
+                                    "source": [
+                                        {
+                                            "track": 1,
+                                            "channel": 1
+                                        }
+                                    ]
+                                }
+                            ]
+                        }
+                    ]
+                }
+            }
+        ],
+        "connections": [
+            {
+                "from": [
+                    {
+                        "element": "source"
+                    }
+                ],
+                "to": {
+                    "success": [
+                        {
+                            "element": "analyze_task"
+                        }
+                    ]
+                }
+            },
+            {
+                "from": [
+                    {
+                        "element": "analyze_task"
+                    }
+                ],
+                "to": {
+                    "success": [
+                        {
+                            "element": "transcode_task"
+                        }
+                    ]
+                }
+            }
+        ]
+    }
+}
