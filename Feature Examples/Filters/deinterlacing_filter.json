@@ -2,7 +2,7 @@
     "definitions": {
         "descriptor": "deinterlacing_filter",
         "source": "s3://hybrik-examples/public/sources/bicycle_interlaced.avi",
-        "destination_path": "s3://hybrik-examples/public/output/feature_examples/filters/{{descriptor}}",
+        "destination_path": "s3://hybrik-examples/public/output/feature_examples/filters/{{descriptor}}"
     },
     "name": "{{descriptor}}: {{source}}",
     "payload": {
