@@ -1,0 +1,197 @@
+{
+  "name": "contents_array",
+  "definitions": {
+    "source_video_path": "s3://hybrik-examples/public/sources",
+    "source_video_file": "tears_of_steel_1080p.mov",
+    "source_audio_path": "s3://hybrik-examples/public/sources",
+    "source_audio_file": "tears_of_steel_1080p_4_track_audio.mov",
+    "source_subtitle_path": "s3://hybrik-examples/public/sources",
+    "source_subtitle_file": "TOS-en.srt",
+    "destination_path": "s3://hybrik-examples/public/output/feature_examples/source_options/contents_array",
+    "output_filename": "contents_array"
+  },
+  "payload": {
+    "elements": [
+      {
+        "uid": "source",
+        "kind": "source",
+        "payload": {
+          "kind": "asset_complex",
+          "payload": {
+            "kind": "sequence",
+            "asset_versions": [
+              {
+                "version_uid": "0",
+                "asset_components": [
+                  {
+                    "location": {
+                      "storage_provider": "s3",
+                      "path": "{{source_video_path}}"
+                    },
+                    "kind": "name",
+                    "name": "{{source_video_file}}",
+                    "component_uid": "video",
+                    "contents": [
+                      {
+                        "kind": "video"
+                      }
+                    ]
+                  },
+                  {
+                    "location": {
+                      "storage_provider": "s3",
+                      "path": "{{source_audio_path}}"
+                    },
+                    "kind": "name",
+                    "name": "{{source_audio_file}}",
+                    "component_uid": "audio",
+                    "contents": [
+                      {
+                        "kind": "audio",
+                        "payload": {
+                          "language": "eng"
+                        },
+                        "map": [
+                          {
+                            "input": {
+                              "track": 0,
+                              "channel": 0
+                            },
+                            "output": {
+                              "track": 0,
+                              "channel": 0
+                            }
+                          },
+                          {
+                            "input": {
+                              "track": 1,
+                              "channel": 0
+                            },
+                            "output": {
+                              "track": 0,
+                              "channel": 1
+                            }
+                          }
+                        ]
+                      }
+                    ]
+                  },
+                  {
+                    "location": {
+                      "storage_provider": "s3",
+                      "path": "{{source_subtitle_path}}"
+                    },
+                    "kind": "name",
+                    "name": "{{source_subtitle_file}}",
+                    "component_uid": "audio",
+                    "contents": [
+                      {
+                        "kind": "subtitle",
+                        "payload": {
+                          "format": "auto",
+                          "language": "en"
+                        }
+                      }
+                    ]
+                  }
+                ]
+              }
+            ]
+          }
+        }
+      },
+      {
+        "uid": "transcode_task",
+        "kind": "transcode",
+        "task": {
+          "retry_method": "fail"
+        },
+        "payload": {
+          "location": {
+            "storage_provider": "s3",
+            "path": "{{destination_path}}"
+          },
+          "source_pipeline": {
+            "trim": {
+              "duration_sec": 30
+            }
+          },
+          "options": {
+            "pipeline": {
+              "encoder_version": "hybrik_4.2_10bit"
+            }
+          },
+          "targets": [
+            {
+              "file_pattern": "{{output_filename}}{default_extension}",
+              "existing_files": "replace",
+              "container": {
+                "kind": "mov",
+                "enable_data_tracks": true
+              },
+              "video": {
+                "codec": "prores",
+                "profile": "apch",
+                "width": 1920,
+                "height": 1080,
+                "frame_rate": 23.976,
+                "mov_atoms": {
+                  "use_clap": false,
+                  "pasp": "1:1"
+                }
+              },
+              "audio": [
+                {
+                  "codec": "pcm",
+                  "channels": 2,
+                  "sample_rate": 48000,
+                  "sample_size": 24,
+                  "language": "eng",
+                  "track_name": "stereo",
+                  "channel_designators": [
+                    "left_total",
+                    "right_total"
+                  ]
+                }
+              ],
+              "timecode": [
+                {
+                  "source": "media",
+                  "force_drop": false
+                }
+              ]
+            },
+            {
+              "file_pattern": "{{output_filename}}.ttml",
+              "existing_files": "replace",
+              "container": {
+                "kind": "ttml"
+              },
+              "subtitle": [
+                {
+                  "format": "ttml"
+                }
+              ]
+            }
+          ]
+        }
+      }
+    ],
+    "connections": [
+      {
+        "from": [
+          {
+            "element": "source"
+          }
+        ],
+        "to": {
+          "success": [
+            {
+              "element": "transcode_task"
+            }
+          ]
+        }
+      }
+    ]
+  }
+}

@@ -1,0 +1,205 @@
+{
+  "name": "contents_array_stitched_sequence",
+  "definitions": {
+    "source_0_path": "s3://hybrik-examples/public/sources",
+    "source_0_file": "tears_of_steel_1080p.mov",
+    "source_1_video_path": "s3://hybrik-examples/public/sources",
+    "source_1_video_file": "tears_of_steel_1080p.mov",
+    "source_1_audio_path": "s3://hybrik-examples/public/sources",
+    "source_1_audio_file": "tears_of_steel_1080p_4_track_audio.mov",
+    "destination_path": "s3://hybrik-examples/public/output/feature_examples/source_options/contents_array",
+    "output_filename": "contents_array_stitched_sequence"
+  },
+  "payload": {
+    "elements": [
+      {
+        "uid": "source",
+        "kind": "source",
+        "payload": {
+          "kind": "asset_complex",
+          "payload": {
+            "kind": "sequence",
+            "asset_versions": [
+              {
+                "version_uid": "0",
+                "asset_components": [
+                  {
+                    "location": {
+                      "storage_provider": "s3",
+                      "path": "{{source_0_path}}"
+                    },
+                    "kind": "name",
+                    "name": "{{source_0_file}}",
+                    "component_uid": "video",
+                    "contents": [
+                      {
+                        "kind": "video"
+                      },
+                      {
+                        "kind": "audio",
+                        "payload": {
+                          "language": "eng"
+                        },
+                        "map": [
+                          {
+                            "input": {
+                              "track": 0,
+                              "channel": 0
+                            },
+                            "output": {
+                              "track": 0,
+                              "channel": 0
+                            }
+                          },
+                          {
+                            "input": {
+                              "track": 1,
+                              "channel": 0
+                            },
+                            "output": {
+                              "track": 0,
+                              "channel": 1
+                            }
+                          }
+                        ]
+                      }
+                    ]
+                  }
+                ]
+              },
+              {
+                "version_uid": "1",
+                "asset_components": [
+                  {
+                    "location": {
+                      "storage_provider": "s3",
+                      "path": "{{source_1_video_path}}"
+                    },
+                    "kind": "name",
+                    "name": "{{source_1_video_file}}",
+                    "component_uid": "video",
+                    "contents": [
+                      {
+                        "kind": "video"
+                      }
+                    ]
+                  },
+                  {
+                    "location": {
+                      "storage_provider": "s3",
+                      "path": "{{source_1_audio_path}}"
+                    },
+                    "kind": "name",
+                    "name": "{{source_1_audio_file}}",
+                    "component_uid": "audio",
+                    "contents": [
+                      {
+                        "kind": "audio",
+                        "payload": {
+                          "language": "eng"
+                        },
+                        "map": [
+                          {
+                            "input": {
+                              "track": 2,
+                              "channel": 0
+                            },
+                            "output": {
+                              "track": 0,
+                              "channel": 0
+                            }
+                          },
+                          {
+                            "input": {
+                              "track": 3,
+                              "channel": 0
+                            },
+                            "output": {
+                              "track": 0,
+                              "channel": 1
+                            }
+                          }
+                        ]
+                      }
+                    ]
+                  }
+                ]
+              }
+            ]
+          }
+        }
+      },
+      {
+        "uid": "transcode_task",
+        "kind": "transcode",
+        "task": {
+          "retry_method": "fail"
+        },
+        "payload": {
+          "location": {
+            "storage_provider": "s3",
+            "path": "{{destination_path}}"
+          },
+          "source_pipeline": {
+
+          },
+          "options": {
+            "pipeline": {
+              "encoder_version": "hybrik_4.2_8bit"
+            }
+          },
+          "targets": [
+            {
+              "file_pattern": "{{output_filename}}{default_extension}",
+              "existing_files": "replace",
+              "container": {
+                "kind": "mov",
+                "enable_data_tracks": true
+              },
+              "video": {
+                "codec": "h264",
+                "bitrate_kb": 1500,
+                "width": 960,
+                "height": 540,
+                "mov_atoms": {
+                  "use_clap": false,
+                  "pasp": "1:1"
+                }
+              },
+              "audio": [
+                {
+                  "codec": "aac",
+                  "channels": 2,
+                  "sample_rate": 48000,
+                  "sample_size": 16,
+                  "language": "eng",
+                  "track_name": "stereo",
+                  "channel_designators": [
+                    "left_total",
+                    "right_total"
+                  ]
+                }
+              ]
+            }
+          ]
+        }
+      }
+    ],
+    "connections": [
+      {
+        "from": [
+          {
+            "element": "source"
+          }
+        ],
+        "to": {
+          "success": [
+            {
+              "element": "transcode_task"
+            }
+          ]
+        }
+      }
+    ]
+  }
+}

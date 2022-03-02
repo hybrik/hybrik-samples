@@ -1,0 +1,115 @@
+{
+  "name": "contents_array_audio_mapping",
+  "definitions": {
+    "source_audio_path": "s3://hybrik-examples/public/sources",
+    "source_audio_file": "tears_of_steel_1080p_4_track_audio.mov",
+    "destination_path": "s3://hybrik-examples/public/output/feature_examples/source_options/contents_array",
+    "output_filename": "contents_array_audio_mapping"
+  },
+  "payload": {
+    "elements": [
+      {
+        "uid": "source",
+        "kind": "source",
+        "payload": {
+          "kind": "asset_url",
+          "payload": {
+            "storage_provider": "s3",
+            "url": "{{source_audio_path}}/{{source_audio_file}}",
+            "contents": [
+              {
+                "kind": "audio",
+                "payload": {
+                  "language": "eng"
+                },
+                "map": [
+                  {
+                    "input": {
+                      "track": 2,
+                      "channel": 0
+                    },
+                    "output": {
+                      "track": 0,
+                      "channel": 0
+                    }
+                  },
+                  {
+                    "input": {
+                      "track": 3,
+                      "channel": 0
+                    },
+                    "output": {
+                      "track": 0,
+                      "channel": 1
+                    }
+                  }
+                ]
+              }
+            ]
+          }
+        }
+      },
+      {
+        "uid": "transcode_task",
+        "kind": "transcode",
+        "task": {
+          "retry_method": "fail"
+        },
+        "payload": {
+          "location": {
+            "storage_provider": "s3",
+            "path": "{{destination_path}}"
+          },
+          "source_pipeline": {
+
+          },
+          "options": {
+            "pipeline": {
+              "encoder_version": "hybrik_4.2_8bit"
+            }
+          },
+          "targets": [
+            {
+              "file_pattern": "{{output_filename}}{default_extension}",
+              "existing_files": "replace",
+              "container": {
+                "kind": "mov",
+                "enable_data_tracks": true
+              },
+              "audio": [
+                {
+                  "codec": "pcm",
+                  "channels": 2,
+                  "sample_rate": 48000,
+                  "sample_size": 24,
+                  "language": "eng",
+                  "track_name": "stereo",
+                  "channel_designators": [
+                    "left_total",
+                    "right_total"
+                  ]
+                }
+              ]
+            }
+          ]
+        }
+      }
+    ],
+    "connections": [
+      {
+        "from": [
+          {
+            "element": "source"
+          }
+        ],
+        "to": {
+          "success": [
+            {
+              "element": "transcode_task"
+            }
+          ]
+        }
+      }
+    ]
+  }
+}
