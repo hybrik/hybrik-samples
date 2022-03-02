@@ -1,0 +1,94 @@
+{
+  "definitions": {
+    "descriptor": "analyze_deep_properties_audio",
+    "source_url": "s3://hybrik-examples/public/sources/tears_of_steel_italian_audio.mp4",
+    "destination_path": "s3://hybrik-examples/public/output/feature_examples/analysis/{{descriptor}}"
+  },
+  "name": "{{descriptor}}",
+  "payload": {
+    "elements": [
+      {
+        "uid": "source_file",
+        "kind": "source",
+        "payload": {
+          "kind": "asset_url",
+          "payload": {
+            "storage_provider": "s3",
+            "url": "{{source_url}}"
+          }
+        }
+      },
+      {
+        "uid": "analyze_task",
+        "kind": "analyze",
+        "payload": {
+          "options": {
+            "response_version": 2,
+            "pipeline": {
+              "analyzer_version": "hybrik_4.2"
+            }
+          },
+          "general_properties": {
+            "enabled": true
+          },
+          "deep_properties": {
+            "audio": [
+              {
+                "track_selector": {
+                  "index": 0
+                },
+                "dplc": {
+                  "enabled": true,
+                  "loudness_target": -24,
+                  "regulation_type": "manual",
+                  "limit_mode": "true_peak",
+                  "correction_mode": "pcm_normalization",
+                  "metering_mode": "1770-3",
+                  "peak_limit_db": -2.5
+                },
+                "ebur128": {
+                  "enabled": true,
+                  "scale_meter": 18,
+                  "target_reference": {
+                    "integrated_lufs": -16.45,
+                    "true_peak_dbfs": -3.5
+                  }
+                },
+                "levels": {
+                  "enabled": true
+                },
+                "volume": {
+                  "enabled": true
+                },
+                "silence": {
+                  "enabled": true,
+                  "noise_db": -60,
+                  "duration_sec": 1
+                },
+                "emergency_alert": {
+                  "enabled": true
+                }
+              }
+            ]
+          }
+        }
+      }
+    ],
+    "connections": [
+      {
+        "from": [
+          {
+            "element": "source_file"
+          }
+        ],
+        "to": {
+          "success": [
+            {
+              "element": "analyze_task"
+            }
+          ]
+        }
+      }
+    ]
+  }
+}
