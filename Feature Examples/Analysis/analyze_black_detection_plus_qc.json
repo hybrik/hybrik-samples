@@ -1,7 +1,7 @@
 {
     "definitions": {
         "profile_name": "analyze_black_detection_plus_qc",
-        "source": "s3://hybrik-public/sample_sources/tears_of_steel_720p.mov"
+        "source": "s3://hybrik-examples/public/sources/tears_of_steel_720p.mov"
     },
     "name": "{{profile_name}}: {{source}}",
     "payload": {

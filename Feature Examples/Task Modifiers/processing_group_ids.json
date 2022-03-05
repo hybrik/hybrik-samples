@@ -1,7 +1,7 @@
 {
     "definitions": {
         "descriptor": "processing_group_ids",
-        "source_path": "s3://hybrik-public/sample_sources",
+        "source_path": "s3://hybrik-examples/public/sources",
         "source_file_name": "tears_of_steel_720p.mov",
         "destination_path": "s3://hybrik-examples/public/output/feature_examples/task_modifiers/{{descriptor}}",
         "destination_hls_media": "{{destination_path}}/hls_media",
@@ -122,7 +122,7 @@
                                 "segment_duration_sec": "{{segment_duration}}"
                             },
                             "video": {
-                                
+
                                 "height": 540,
                                 "codec": "h265",
                                 "bitrate_mode": "cbr",

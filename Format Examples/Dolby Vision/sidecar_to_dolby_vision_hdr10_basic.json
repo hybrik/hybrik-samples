@@ -1,7 +1,7 @@
 {
     "definitions": {
         "descriptor": "sidecar_to_dolby_vision_hdr10",
-        "source_path": "s3://hybrik-test-assets/dolby-vision_hdr10/SolLevante",
+        "source_path": "s3://hybrik-examples/public/sources/hdr/sol",
         "source_video_file": "sollevante_ProRes4444.mov",
         "source_metadata_file": "SolLevante_IMF_DolbyVision_PQP3D65_UHD_24fps_dolby_vision_metadata.xml",
         "destination_path": "s3://hybrik-examples/public/output/format_examples/dolby_vision/{{descriptor}}",
