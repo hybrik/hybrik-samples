@@ -1,0 +1,108 @@
+{
+  "definitions": {
+    "descriptor": "telecine_sample",
+    "source_path": "s3://hybrik-examples/public/sources",
+    "source_name": "tears_of_steel_720p.mov",
+    "destination_path": "s3://hybrik-examples/public/output/feature_examples/video_filters/{{descriptor}}"
+  },
+  "name": "{{descriptor}}: {{source_name}}",
+  "payload": {
+    "elements": [
+      {
+        "uid": "source",
+        "kind": "source",
+        "payload": {
+          "kind": "asset_url",
+          "payload": {
+            "trim": {
+              "duration_sec": 60
+            },
+            "storage_provider": "s3",
+            "url": "{{source_path}}/{{source_name}}"
+          }
+        }
+      },
+      {
+        "uid": "transcode_task",
+        "kind": "transcode",
+        "name": "transcode_0",
+        "payload": {
+          "options": {
+            "source_read_mode": "auto",
+            "pipeline": {
+              "ffmpeg_version": "hybrik_4.0_8bit"
+            }
+          },
+          "targets": [
+            {
+              "location": {
+                "storage_provider": "s3",
+                "path": "{{destination_path}}"
+              },
+              "uid": "target1",
+              "file_pattern": "telecine_output_SD_16x9.mpg",
+              "existing_files": "replace",
+              "container": {
+                "use_sdt": false,
+                "kind": "mpegts",
+                "muxrate_kb": 3750
+              },
+              "video": {
+                "codec": "mpeg2",
+                "width": 720,
+                "height": 480,
+                "bitrate_kb": 3180,
+                "frame_rate": 29.97,
+                "interlace_mode": "tff",
+                "filters": [
+                  {
+                    "kind": "telecine",
+                    "payload": {
+                      "interlace_mode": "tff",
+                      "pattern": "23"
+                    }
+                  }
+                ]
+              },
+              "audio": [
+                {
+                  "pid": 482,
+                  "codec": "dolby_digital",
+                  "bitrate_kb": 192,
+                  "sample_rate": 48000,
+                  "channels": 2,
+                  "sample_size": 16,
+                  "language": "en",
+                  "dialnorm": -12
+                }
+              ],
+              "timecode": [
+                {
+                  "force_drop": false,
+                  "source": "start_value",
+                  "start_value": "00:00:00:00"
+                }
+              ]
+            }
+          ]
+        }
+      }
+    ],
+    "connections": [
+      {
+        "from": [
+          {
+            "element": "source"
+          }
+        ],
+        "to": {
+          "success": [
+            {
+              "element": "transcode_task"
+            }
+          ]
+        }
+      }
+    ]
+  }
+}
