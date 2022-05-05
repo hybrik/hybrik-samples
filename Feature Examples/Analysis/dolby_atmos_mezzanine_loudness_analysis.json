@@ -1,0 +1,69 @@
+{
+    "definitions": {
+      "descriptor": "atmos_mezzanine_loudness_measurements",
+      "source": "s3://hybrik-examples/public/sources/atmos/sollevante_lp_v01_ADM_Nearfield_48k_24b_24.wav"
+    },
+    "task_tags": [
+        ""
+    ],
+    "name": "{{descriptor}} : {{source}}",
+    "payload": {
+        "elements": [
+            {
+                "uid": "source_file",
+                "kind": "source",
+                "payload": {
+                    "kind": "asset_url",
+                    "payload": {
+                        "storage_provider": "s3",
+                        "url": "{{source}}",
+                        "contents": [
+                            {
+                                "kind": "audio",
+                                "format": "atmos_mezzanine"
+                            }
+                        ]
+                    }
+                }
+            },
+            {
+                "uid": "analyze_task",
+                "kind": "analyze",
+                "task": {
+                    "retry_method": "fail"
+                },
+                "payload": {
+                    "general_properties": {
+                        "enabled": true
+                    },
+                    "deep_properties": {
+                        "audio": [
+                            {
+                                "dplc": {
+                                    "enabled": true,
+                                    "regulation_type": "atsc_a85_agile"
+                                }
+                            }
+                        ]
+                    }
+                }
+            }
+        ],
+        "connections": [
+            {
+                "from": [
+                    {
+                        "element": "source_file"
+                    }
+                ],
+                "to": {
+                    "success": [
+                        {
+                            "element": "analyze_task"
+                        }
+                    ]
+                }
+            }
+        ]
+    }
+}
