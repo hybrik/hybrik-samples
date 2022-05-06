@@ -1,0 +1,161 @@
+{
+    "definitions": {
+        "descriptor": "drm_dash_package_from_source",
+        "source_path": "s3://hybrik-examples/public/sources/media",
+        "destination_base_path": "s3://hybrik-examples/public/output/feature_examples/DRM/{{descriptor}}",
+        "segment_duration": 6,
+        "key_id": "02dd303e-3de8-417d-baea-1e5bbec7749d",
+        "key": "2066345bbc9a2b4f01e6341424b51747e",
+        "playready_url": "https://yourDRM.com/license-proxy-headerauth/RightsManager.asmx"
+    },
+    "name": "{{descriptor}}: {{source_path}}",
+    "payload": {
+        "elements": [
+            {
+                "uid": "source_file",
+                "kind": "source",
+                "payload": {
+                    "kind": "asset_complex",
+                    "payload": {
+                        "kind": "multi",
+                        "location": {
+                            "storage_provider": "s3",
+                            "path": "{{source_path}}"
+                        },
+                        "asset_versions": [
+                            {
+                                "version_uid": "v",
+                                "asset_components": [
+                                    {
+                                        "kind": "name",
+                                        "name": "tears_of_steel_720p_video_180k.mp4",
+                                        "contents": [
+                                            {
+                                                "kind": "video",
+                                                "layer_affinities": [
+                                                    "audio_low"
+                                                ]
+                                            }
+                                        ]
+                                    },
+                                    {
+                                        "kind": "name",
+                                        "name": "tears_of_steel_720p_video_640k.mp4",
+                                        "contents": [
+                                            {
+                                                "kind": "video",
+                                                "layer_affinities": [
+                                                    "audio_low"
+                                                ]
+                                            }
+                                        ]
+                                    },
+                                    {
+                                        "kind": "name",
+                                        "name": "tears_of_steel_720p_video_750k.mp4",
+                                        "contents": [
+                                            {
+                                                "kind": "video",
+                                                "layer_affinities": [
+                                                    "audio_high"
+                                                ]
+                                            }
+                                        ]
+                                    },
+                                    {
+                                        "kind": "name",
+                                        "name": "tears_of_steel_720p_audio_low.mp4",
+                                        "contents": [
+                                            {
+                                                "kind": "audio",
+                                                "language": "eng",
+                                                "layer_id": "audio_low"
+                                            }
+                                        ]
+                                    },
+                                    {
+                                        "kind": "name",
+                                        "name": "tears_of_steel_720p_audio_high.mp4",
+                                        "contents": [
+                                            {
+                                                "kind": "video",
+                                                "language": "eng",
+                                                "layer_id": "audio_high"
+                                            }
+                                        ]
+                                    }
+                                ]
+                            }
+                        ]
+                    }
+                }
+            },
+            {
+                "uid": "package_dash_encrypted",
+                "kind": "package",
+                "task": {
+                    "name": "package_dash_encrypted",
+                    "retry_method": "retry",
+                    "retry": {
+                        "count": 2,
+                        "delay_sec": 30
+                    }
+                },
+                "payload": {
+                    "kind": "dash",
+                    "segmentation_mode": "fmp4",
+                    "file_pattern": "master_manifest.mpd",
+                    "segment_duration_sec": "{{segment_duration}}",
+                    "force_original_media": false,
+                    "encryption": {
+                        "enabled": true,
+                        "schema": "mpeg-cenc",
+                        "drm": [
+                            "widevine",
+                            "playready"
+                        ],
+                        "key_id": "{{key_id}}",
+                        "key": "{{key}}",
+                        "playready_url": "{{playready_url}}"
+                    },
+                    "location": {
+                        "storage_provider": "s3",
+                        "path": "{{destination_base_path}}/manifests",
+                        "attributes": [
+                            {
+                                "name": "ContentType",
+                                "value": "application/dash+xml"
+                            }
+                        ]
+                    },
+                    "media_location": {
+                        "storage_provider": "s3",
+                        "path": "{{destination_base_path}}/dash_media",
+                        "attributes": [
+                            {
+                                "name": "ContentType",
+                                "value": "video/mp4"
+                            }
+                        ]
+                    }
+                }
+            }
+        ],
+        "connections": [
+            {
+                "from": [
+                    {
+                        "element": "source_file"
+                    }
+                ],
+                "to": {
+                    "success": [
+                        {
+                            "element": "package_dash_encrypted"
+                        }
+                    ]
+                }
+            }
+        ]
+    }
+}

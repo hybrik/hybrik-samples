@@ -1,0 +1,224 @@
+{
+    "definitions": {
+        "descriptor": "drm_per-layer_hls_fairplay",
+        "source_file_name": "tears_of_steel_720p.mov",
+        "source_path": "s3://hybrik-examples/public/sources",
+        "destination_base_path": "s3://hybrik-examples/public/output/feature_examples/DRM/{{descriptor}}",
+        "segment_duration": 6,
+        "idr_interval": 2,
+        "output_basename": "{source_basename}",
+        "iv_1": "222249d20d4d4ef59154f08e90c203a6",
+        "key_1": "2222ddfc977fbe0422d80efe3fe1412c",
+        "key_id_1": "222249d20d4d4ef59154f08e90c203a6",
+        "iv_2": "888849d20d4d4ef59154f08e90c203a6",
+        "key_2": "8888ddfc977fbe0422d80efe3fe1412c",
+        "key_id_2": "888849d20d4d4ef59154f08e90c203a6",
+        "fairplay_skd_uri_1": "skd://fps.ezdrm.com/;222249d2-0d4d-4ef5-9154-f08e90c203a6",
+        "fairplay_skd_uri_2": "skd://fps.ezdrm.com/;888849d2-0d4d-4ef5-9154-f08e90c203a6"
+    },
+    "name": "{{descriptor}}: {{source_file_name}}",
+    "task_tags": [],
+    "payload": {
+        "elements": [
+            {
+                "uid": "source_file",
+                "kind": "source",
+                "payload": {
+                    "kind": "asset_url",
+                    "payload": {
+                        "storage_provider": "s3",
+                        "url": "{{source_path}}/{{source_file_name}}"
+                    }
+                }
+            },
+            {
+                "uid": "transcode_all_layers",
+                "kind": "transcode",
+                "task": {
+                    "name": "transcode_all_layers"
+                },
+                "payload": {
+                    "location": {
+                        "storage_provider": "s3",
+                        "path": "{{destination_base_path}}/transcoded_media"
+                    },
+                    "targets": [
+                        {
+                            "file_pattern": "{source_basename}_video_180k.mp4",
+                            "existing_files": "replace",
+                            "container": {
+                                "kind": "mp4"
+                            },
+                            "video": {
+                                "codec": "h264",
+                                "height": 144,
+                                "idr_interval": {
+                                    "seconds": "{{idr_interval}}"
+                                },
+                                "bitrate_kb": 180
+                            },
+                            "encryption_id": "id_fairplay_key1"
+                        },
+                        {
+                            "file_pattern": "{source_basename}_video_640k.mp4",
+                            "existing_files": "replace",
+                            "container": {
+                                "kind": "mp4"
+                            },
+                            "video": {
+                                "codec": "h264",
+                                "height": 288,
+                                "idr_interval": {
+                                    "seconds": "{{idr_interval}}"
+                                },
+                                "bitrate_kb": 640
+                            },
+                            "encryption_id": "id_fairplay_key2"
+                        },
+                        {
+                            "file_pattern": "{source_basename}_video_750k.mp4",
+                            "existing_files": "replace",
+                            "container": {
+                                "kind": "mp4"
+                            },
+                            "video": {
+                                "codec": "h264",
+                                "height": 384,
+                                "idr_interval": {
+                                    "seconds": "{{idr_interval}}"
+                                },
+                                "bitrate_kb": 750
+                            },
+                            "encryption_id": "id_fairplay_key2"
+                        },
+                        {
+                            "file_pattern": "{source_basename}_audio_low.mp4",
+                            "existing_files": "replace",
+                            "container": {
+                                "kind": "mp4"
+                            },
+                            "audio": [
+                                {
+                                    "channels": 2,
+                                    "codec": "aac_lc",
+                                    "sample_rate": 48000,
+                                    "bitrate_kb": 64
+                                }
+                            ],
+                            "encryption_id": "id_fairplay_key1"
+                        },
+                        {
+                            "file_pattern": "{source_basename}_audio_high.mp4",
+                            "existing_files": "replace",
+                            "container": {
+                                "kind": "mp4"
+                            },
+                            "audio": [
+                                {
+                                    "channels": 2,
+                                    "codec": "aac_lc",
+                                    "sample_rate": 48000,
+                                    "bitrate_kb": 128
+                                }
+                            ],
+                            "encryption_id": "id_fairplay_key2"
+                        }
+                    ]
+                }
+            },
+            {
+                "uid": "hls-fairplay-sample-aes",
+                "kind": "package",
+                "task": {
+                    "name": "hls-fairplay-sample-aes",
+                    "retry_method": "retry",
+                    "retry": {
+                        "count": 2,
+                        "delay_sec": 30
+                    }
+                },
+                "payload": {
+                    "options": {
+                        "auto_audio_layers": "ungrouped"
+                    },
+                    "location": {
+                        "storage_provider": "s3",
+                        "path": "{{destination_base_path}}/manifests"
+                    },
+                    "media_location": {
+                        "storage_provider": "s3",
+                        "path": "{{destination_base_path}}/hls_media",
+                        "attributes": [
+                            {
+                                "name": "ContentType",
+                                "value": "video/MP2T"
+                            }
+                        ]
+                    },
+                    "segmentation_mode": "fmp4",
+                    "segment_duration_sec": "{{segment_duration}}",
+                    "force_original_media": false,
+                    "file_pattern": "master_manifest.m3u8",
+                    "kind": "hls",
+                    "uid": "main_manifest",
+                    "encryptions": [
+                        {
+                            "id": "id_fairplay_key1",
+                            "enabled": true,
+                            "schema": "mpeg-cbcs",
+                            "drm": [
+                                "fairplay"
+                            ],
+                            "iv": "{{iv_1}}",
+                            "key": "{{key_1}}",
+                            "key_id": "{{key_id_1}}",
+                            "fairplay_uri": "{{fairplay_skd_uri_1}}"
+                        },
+                        {
+                            "id": "id_fairplay_key2",
+                            "enabled": true,
+                            "schema": "mpeg-cbcs",
+                            "drm": [
+                                "fairplay"
+                            ],
+                            "iv": "{{iv_2}}",
+                            "key": "{{key_2}}",
+                            "key_id": "{{key_id_2}}",
+                            "fairplay_uri": "{{fairplay_skd_uri_2}}"
+                        }
+                    ]
+                }
+            }
+        ],
+        "connections": [
+            {
+                "from": [
+                    {
+                        "element": "source_file"
+                    }
+                ],
+                "to": {
+                    "success": [
+                        {
+                            "element": "transcode_all_layers"
+                        }
+                    ]
+                }
+            },
+            {
+                "from": [
+                    {
+                        "element": "transcode_all_layers"
+                    }
+                ],
+                "to": {
+                    "success": [
+                        {
+                            "element": "hls-fairplay-sample-aes"
+                        }
+                    ]
+                }
+            }
+        ]
+    }
+}
