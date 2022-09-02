@@ -1,11 +1,11 @@
 {
     "definitions": {
         "descriptor": "drm_dash_package_from_source",
-        "source_path": "s3://hybrik-examples/public/sources/media",
+        "source_path": "s3://hybrik-examples/public/sources/short_adaptive_bitrate_sources",
         "destination_base_path": "s3://hybrik-examples/public/output/feature_examples/DRM/{{descriptor}}",
         "segment_duration": 6,
         "key_id": "02dd303e-3de8-417d-baea-1e5bbec7749d",
-        "key": "2066345bbc9a2b4f01e6341424b51747e",
+        "key": "2066345bbc9a2b4f01e6341424b5174e",
         "playready_url": "https://yourDRM.com/license-proxy-headerauth/RightsManager.asmx"
     },
     "name": "{{descriptor}}: {{source_path}}",
@@ -28,7 +28,7 @@
                                 "asset_components": [
                                     {
                                         "kind": "name",
-                                        "name": "tears_of_steel_720p_video_180k.mp4",
+                                        "name": "tears_of_steel_1200kbps_360p.mp4",
                                         "contents": [
                                             {
                                                 "kind": "video",
@@ -40,7 +40,7 @@
                                     },
                                     {
                                         "kind": "name",
-                                        "name": "tears_of_steel_720p_video_640k.mp4",
+                                        "name": "tears_of_steel_4200kbps_720p.mp4",
                                         "contents": [
                                             {
                                                 "kind": "video",
@@ -52,7 +52,7 @@
                                     },
                                     {
                                         "kind": "name",
-                                        "name": "tears_of_steel_720p_video_750k.mp4",
+                                        "name": "tears_of_steel_12000kbps_1080p.mp4",
                                         "contents": [
                                             {
                                                 "kind": "video",
@@ -64,7 +64,7 @@
                                     },
                                     {
                                         "kind": "name",
-                                        "name": "tears_of_steel_720p_audio_low.mp4",
+                                        "name": "tears_of_steel_audio_low_64kbps.mp4",
                                         "contents": [
                                             {
                                                 "kind": "audio",
@@ -75,10 +75,10 @@
                                     },
                                     {
                                         "kind": "name",
-                                        "name": "tears_of_steel_720p_audio_high.mp4",
+                                        "name": "tears_of_steel_audio_high_128kbps.mp4",
                                         "contents": [
                                             {
-                                                "kind": "video",
+                                                "kind": "audio",
                                                 "language": "eng",
                                                 "layer_id": "audio_high"
                                             }
