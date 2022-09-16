@@ -1,7 +1,7 @@
 {
     "definitions": {
         "descriptor": "deinterlacing_filter",
-        "source": "s3://hybrik-examples/public/sources/bicycle_interlaced.avi",
+        "source": "s3://hybrik-examples/public/sources/meridian_sequence_2997i.mov",
         "destination_path": "s3://hybrik-examples/public/output/feature_examples/filters/{{descriptor}}"
     },
     "name": "{{descriptor}}: {{source}}",
@@ -53,15 +53,7 @@
                                 "bitrate_mode": "vbr",
                                 "bitrate_kb": 1200,
                                 "max_bitrate_kb": 1340
-                            },
-                            "audio": [
-                                {
-                                    "codec": "aac_lc",
-                                    "channels": 2,
-                                    "sample_rate": 48000,
-                                    "bitrate_kb": 96
-                                }
-                            ]
+                            }
                         }
                     ]
                 }
