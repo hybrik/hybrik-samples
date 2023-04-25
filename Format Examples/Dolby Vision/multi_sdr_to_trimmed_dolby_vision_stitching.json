@@ -1,0 +1,205 @@
+{
+    "definitions": {
+        "descriptor": "multi_sdr_to_trimmed_dolby_vision_stitching",
+        "sdr_source_path": "s3://hybrik-examples/public/sources/bumpers",
+        "sdr_source_filename": "dolby_bumper_sdrmeta.mp4",
+        "dolby_vision_source_path": "s3://download.opencontent.netflix.com/SolLevante/imf/SolLevante_IMF_DolbyVision_PQP3D65_UHD_24fps",
+        "dolby_vision_source_filename": "VIDEO_e4da5fcd-5ffc-4713-bcdd-95ea579d790b.mxf",
+        "destination_path": "s3://hybrik-examples/public/output/format_examples/dolby_vision/{{descriptor}}",
+        "file_pattern": "SolLevante_stitched{default_extension}",
+        "segmented_rendering_sec": 60,
+        "idr_interval_secs": 2,
+        "dolby_vision_base": {
+            "codec": "h265",
+            "preset": "fast",
+            "hrd_signaling": "encoder",
+            "vtag": "dvh1",
+            "bitrate_mode": "vbr",
+            "chroma_format": "yuv420p10le",
+            "idr_interval": {
+                "seconds": "{{idr_interval_secs}}"
+            },
+            "dolby_vision": {
+                "profile": "5",
+                "convert_to_dolby_vision": "simple_conversion"
+            }
+        }
+    },
+    "name": "NEW TEST {{descriptor}}: {{dolby_vision_source_filename}}",
+    "payload": {
+        "elements": [
+            {
+                "uid": "sources",
+                "kind": "source",
+                "payload": {
+                    "kind": "asset_complex",
+                    "payload": {
+                        "kind": "sequence",
+                        "asset_versions": [
+                            {
+                                "location": {
+                                    "storage_provider": "s3",
+                                    "path": "{{sdr_source_path}}"
+                                },
+                                "version_uid": "logo1",
+                                "asset_components": [
+                                    {
+                                        "component_uid": "video",
+                                        "kind": "name",
+                                        "name": "{{sdr_source_filename}}"
+                                    }
+                                ]
+                            },
+                            {
+                                "location": {
+                                    "storage_provider": "s3",
+                                    "path": "{{dolby_vision_source_path}}"
+                                },
+                                "version_uid": "content1",
+                                "asset_components": [
+                                    {
+                                        "component_uid": "video",
+                                        "kind": "name",
+                                        "name": "{{dolby_vision_source_filename}}",
+                                        "trim": {
+                                            "inpoint_frame": 1440,
+                                            "outpoint_frame": 1560
+                                        }
+                                    }
+                                ]
+                            },
+                            {
+                                "location": {
+                                    "storage_provider": "s3",
+                                    "path": "{{sdr_source_path}}"
+                                },
+                                "version_uid": "logo2",
+                                "asset_components": [
+                                    {
+                                        "component_uid": "video",
+                                        "kind": "name",
+                                        "name": "{{sdr_source_filename}}"
+                                    }
+                                ]
+                            },
+                            {
+                                "location": {
+                                    "storage_provider": "s3",
+                                    "path": "{{dolby_vision_source_path}}"
+                                },
+                                "version_uid": "content2",
+                                "asset_components": [
+                                    {
+                                        "component_uid": "video",
+                                        "kind": "name",
+                                        "name": "{{dolby_vision_source_filename}}",
+                                        "trim": {
+                                            "inpoint_frame": 1680,
+                                            "outpoint_frame": 1800
+                                        }
+                                    }
+                                ]
+                            },
+                            {
+                                "location": {
+                                    "storage_provider": "s3",
+                                    "path": "{{sdr_source_path}}"
+                                },
+                                "version_uid": "logo3",
+                                "asset_components": [
+                                    {
+                                        "component_uid": "video",
+                                        "kind": "name",
+                                        "name": "{{sdr_source_filename}}"
+                                    }
+                                ]
+                            }
+                        ]
+                    }
+                }
+            },
+            {
+                "uid": "segment_script_task",
+                "kind": "script",
+                "payload": {
+                    "kind": "job_modifier",
+                    "payload": {
+                        "modifiers": [
+                            {
+                                "kind": "transcode_segmented_rendering",
+                                "target_element_uid": "transcode_task",
+                                "duration_sec": "{{segmented_rendering_sec}}"
+                            }
+                        ]
+                    }
+                }
+            },
+            {
+                "uid": "transcode_task",
+                "kind": "transcode",
+                "task": {
+                    "retry_method": "fail",
+                    "name": "Dolby Vision"
+                },
+                "payload": {
+                    "location": {
+                        "storage_provider": "s3",
+                        "path": "{{destination_path}}"
+                    },
+                    "options": {
+                        "pipeline": {
+                            "encoder_version": "hybrik_4.2_10bit"
+                        }
+                    },
+                    "targets": [
+                        {
+                            "container": {
+                                "kind": "mp4",
+                                "brand": "isom",
+                                "faststart": true
+                            },
+                            "existing_files": "replace",
+                            "file_pattern": "{{file_pattern}}",
+                            "video": {
+                                "$inherits": "{{dolby_vision_base}}",
+                                "width": 1920,
+                                "height": 1080,
+                                "bitrate_kb": 6000
+                            }
+                        }
+                    ]
+                }
+            }
+        ],
+        "connections": [
+            {
+                "from": [
+                    {
+                        "element": "sources"
+                    }
+                ],
+                "to": {
+                    "success": [
+                        {
+                            "element": "segment_script_task"
+                        }
+                    ]
+                }
+            },
+            {
+                "from": [
+                    {
+                        "element": "segment_script_task"
+                    }
+                ],
+                "to": {
+                    "success": [
+                        {
+                            "element": "transcode_task"
+                        }
+                    ]
+                }
+            }
+        ]
+    }
+}
