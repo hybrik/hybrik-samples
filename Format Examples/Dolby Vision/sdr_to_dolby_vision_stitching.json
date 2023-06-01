@@ -21,7 +21,9 @@
             },
             "dolby_vision": {
                 "profile": "5",
-                "convert_to_dolby_vision": "simple_conversion"
+                "convert_to_dolby_vision": {
+                    "mode": "simple_conversion"
+                }
             }
         }
     },
