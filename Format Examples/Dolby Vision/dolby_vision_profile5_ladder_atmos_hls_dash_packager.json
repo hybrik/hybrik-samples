@@ -10,6 +10,7 @@
         "segmented_rendering_secs": 60,
         "fmp4_fragment_duration_seconds": 6,
         "idr_interval_secs": 2,
+        "metering_mode": "1770-4",
         "target_base": {
             "existing_files": "replace",
             "container": {
@@ -168,7 +169,7 @@
                                             "audio_filter": {
                                                 "kind": "loudness",
                                                 "payload": {
-                                                    "metering_mode": "1770-3",
+                                                    "metering_mode": "{{metering_mode}}",
                                                     "dialogue_intelligence": true,
                                                     "speech_threshold": 20
                                                 }
@@ -212,7 +213,7 @@
                                             "audio_filter": {
                                                 "kind": "loudness",
                                                 "payload": {
-                                                    "metering_mode": "1770-3",
+                                                    "metering_mode": "{{metering_mode}}",
                                                     "dialogue_intelligence": true,
                                                     "speech_threshold": 20
                                                 }
