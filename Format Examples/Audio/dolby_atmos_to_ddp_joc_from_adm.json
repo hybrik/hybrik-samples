@@ -59,7 +59,7 @@
                                     "filters": [
                                         {
                                             "audio_filter": {
-                                                "kind": "loudness",
+                                                "kind": "loudness_measurement",
                                                 "payload": {
                                                     "metering_mode": "{{metering_mode}}",
                                                     "dialogue_intelligence": "{{dialogue_intelligence}}",
