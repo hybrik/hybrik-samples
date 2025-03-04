@@ -28,10 +28,7 @@
         "name": "transcode_0",
         "payload": {
           "options": {
-            "source_read_mode": "auto",
-            "pipeline": {
-              "ffmpeg_version": "hybrik_4.0_8bit"
-            }
+            "source_read_mode": "auto"
           },
           "targets": [
             {
