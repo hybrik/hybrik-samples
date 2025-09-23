@@ -1,0 +1,227 @@
+{
+    "definitions": {
+        "descriptor": "dolby_atmos_cbi_514_mono_tracks_to_atmos_ddpjoc",
+        "source_path": "s3://hybrik-examples/public/sources/atmos",
+        "source_name": "DLB_Atmos_ShortFuryRebrand-50fps_ATMOS-PCM-5.1.4.mov",
+        "destination_path": "s3://hybrik-examples/public/output/format_examples/audio/{{descriptor}}"
+    },
+    "name": "{{descriptor}}: {{source_name}}",
+    "payload": {
+        "elements": [
+            {
+                "uid": "source",
+                "kind": "source",
+                "payload": {
+                    "kind": "asset_complex",
+                    "payload": {
+                        "kind": "sequence",
+                        "asset_versions": [
+                            {
+                                "version_uid": "0",
+                                "asset_components": [
+                                    {
+                                        "location": {
+                                            "storage_provider": "s3",
+                                            "path": "{{source_path}}"
+                                        },
+                                        "kind": "name",
+                                        "name": "{{source_name}}",
+                                        "component_uid": "source_0",
+                                        "contents": [
+                                            {
+                                                "kind": "audio",
+                                                "payload": {
+                                                    "language": "eng"
+                                                },
+                                                "map": [
+                                                    {
+                                                        "input": {
+                                                            "track": 0,
+                                                            "channel": 0
+                                                        },
+                                                        "output": {
+                                                            "track": 0,
+                                                            "channel": 0
+                                                        }
+                                                    },
+                                                    {
+                                                        "input": {
+                                                            "track": 1,
+                                                            "channel": 0
+                                                        },
+                                                        "output": {
+                                                            "track": 0,
+                                                            "channel": 1
+                                                        }
+                                                    },
+                                                    {
+                                                        "input": {
+                                                            "track": 2,
+                                                            "channel": 0
+                                                        },
+                                                        "output": {
+                                                            "track": 0,
+                                                            "channel": 2
+                                                        }
+                                                    },
+                                                    {
+                                                        "input": {
+                                                            "track": 3,
+                                                            "channel": 0
+                                                        },
+                                                        "output": {
+                                                            "track": 0,
+                                                            "channel": 3
+                                                        }
+                                                    },
+                                                    {
+                                                        "input": {
+                                                            "track": 4,
+                                                            "channel": 0
+                                                        },
+                                                        "output": {
+                                                            "track": 0,
+                                                            "channel": 4
+                                                        }
+                                                    },
+                                                    {
+                                                        "input": {
+                                                            "track": 5,
+                                                            "channel": 0
+                                                        },
+                                                        "output": {
+                                                            "track": 0,
+                                                            "channel": 5
+                                                        }
+                                                    },
+                                                    {
+                                                        "input": {
+                                                            "track": 6,
+                                                            "channel": 0
+                                                        },
+                                                        "output": {
+                                                            "track": 0,
+                                                            "channel": 6
+                                                        }
+                                                    },
+                                                    {
+                                                        "input": {
+                                                            "track": 7,
+                                                            "channel": 0
+                                                        },
+                                                        "output": {
+                                                            "track": 0,
+                                                            "channel": 7
+                                                        }
+                                                    },
+                                                    {
+                                                        "input": {
+                                                            "track": 8,
+                                                            "channel": 0
+                                                        },
+                                                        "output": {
+                                                            "track": 0,
+                                                            "channel": 8
+                                                        }
+                                                    },
+                                                    {
+                                                        "input": {
+                                                            "track": 9,
+                                                            "channel": 0
+                                                        },
+                                                        "output": {
+                                                            "track": 0,
+                                                            "channel": 9
+                                                        }
+                                                    }
+                                                ]
+                                            }
+                                        ]
+                                    }
+                                ]
+                            }
+                        ]
+                    }
+                }
+            },
+            {
+                "uid": "dolby_audio_encoder",
+                "kind": "dolby_audio_encoder",
+                "task": {
+                    "retry_method": "fail",
+                    "name": "Atmos Encode"
+                },
+                "payload": {
+                    "location": {
+                        "storage_provider": "s3",
+                        "path": "{{destination_path}}"
+                    },
+                    "targets": [
+                        {
+                            "file_pattern": "{source_basename}_{{descriptor}}.mp4",
+                            "existing_files": "replace",
+                            "container": {
+                                "kind": "mp4"
+                            },
+                            "audio": [
+                                {
+                                    "codec": "ddp_joc_cbi",
+                                    "bitrate_kb": 448,
+                                    "filters": [
+                                        {
+                                            "audio_filter": {
+                                                "kind": "loudness_measurement",
+                                                "payload": {
+                                                    "metering_mode": "1770-4",
+                                                    "dialogue_intelligence": false,
+                                                    "speech_threshold": 100
+                                                }
+                                            }
+                                        },
+                                        {
+                                            "audio_filter": {
+                                                "kind": "drc",
+                                                "payload": {
+                                                    "line_mode_drc_profile": "film_light",
+                                                    "rf_mode_drc_profile": "film_light"
+                                                }
+                                            }
+                                        },
+                                        {
+                                            "audio_filter": {
+                                                "kind": "downmix",
+                                                "payload": {
+                                                    "loro_center_mix_level": -3,
+                                                    "loro_surround_mix_level": -3,
+                                                    "ltrt_center_mix_level": -3,
+                                                    "ltrt_surround_mix_level": -3,
+                                                    "preferred_downmix_mode": "loro"
+                                                }
+                                            }
+                                        }
+                                    ]
+                                }
+                            ]
+                        }
+                    ]
+                }
+            }
+        ],
+        "connections": [
+            {
+                "from": [
+                    {
+                        "element": "source"
+                    }
+                ],
+                "to": {
+                    "success": [
+                        {
+                            "element": "dolby_audio_encoder"
+                        }
+                    ]
+                }
+            }
+        ]
+    }
+}
