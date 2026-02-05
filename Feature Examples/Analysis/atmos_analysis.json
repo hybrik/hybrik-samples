@@ -16,8 +16,7 @@
                         "url": "{{source}}",
                         "contents": [
                             {
-                                "kind": "audio",
-                                "format": "atmos_mezzanine"
+                                "kind": "audio"
                             }
                         ]
                     }
