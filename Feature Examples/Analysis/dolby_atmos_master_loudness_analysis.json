@@ -1,6 +1,6 @@
 {
     "definitions": {
-      "descriptor": "atmos_mezzanine_loudness_measurements",
+      "descriptor": "atmos_master_loudness_measurements",
       "source": "s3://hybrik-examples/public/sources/atmos/sollevante_lp_v01_ADM_Nearfield_48k_24b_24.wav"
     },
     "task_tags": [
@@ -19,8 +19,7 @@
                         "url": "{{source}}",
                         "contents": [
                             {
-                                "kind": "audio",
-                                "format": "atmos_mezzanine"
+                                "kind": "audio"
                             }
                         ]
                     }
