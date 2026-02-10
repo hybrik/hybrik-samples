@@ -13,12 +13,7 @@
                     "kind": "asset_url",
                     "payload": {
                         "storage_provider": "s3",
-                        "url": "{{source}}",
-                        "contents": [
-                            {
-                                "kind": "audio"
-                            }
-                        ]
+                        "url": "{{source}}"
                     }
                 }
             },
