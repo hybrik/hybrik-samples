@@ -44,8 +44,8 @@
                                 },
                                 {
                                     "condition": "deep_properties.audio[0].dolby_atmos.channels.beds.length == 10",
-                                    "message_pass": "PASS: The Atmos Mezzanine has 10 beds.",
-                                    "message_fail": "FAIL: The Atmos Mezzanine does not have 10 beds, it has {deep_properties.audio[0].dolby_atmos.channels.beds.length}."
+                                    "message_pass": "PASS: The Atmos Master has 10 beds.",
+                                    "message_fail": "FAIL: The Atmos Master does not have 10 beds, it has {deep_properties.audio[0].dolby_atmos.channels.beds.length}."
                                 }
                             ]
                         }
