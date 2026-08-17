@@ -1,7 +1,7 @@
 {
     "definitions": {
         "descriptor": "copy_task_http_to_bucket",
-        "source": "https://download.blender.org/demo/movies/ToS/subtitles/TOS-en.srt",
+        "source": "http://download.opencontent.netflix.com.s3.amazonaws.com/Meridian/subtitles/STL/Meridian_en_CC.stl",
         "destination_path": "s3://hybrik-examples/public/output/feature_examples/data_movement/{{descriptor}}"
     },
     "name": "{{descriptor}}: {{source}}",
